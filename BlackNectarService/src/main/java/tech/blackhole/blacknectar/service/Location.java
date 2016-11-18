@@ -31,9 +31,15 @@ import tech.sirwellington.alchemy.annotations.objects.Pojo;
 public class Location
 {
 
-    private double latitude;
-    private double longitude;
+    double latitude;
+    double longitude;
 
+    public Location(double latitude, double longitude)
+    {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+    
     @Override
     public int hashCode()
     {

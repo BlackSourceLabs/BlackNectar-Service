@@ -28,7 +28,7 @@ import tech.sirwellington.alchemy.annotations.objects.Pojo;
 @Pojo
 @Mutable
 @ThreadUnsafe
-public class Location
+public final class Location
 {
 
     double latitude;

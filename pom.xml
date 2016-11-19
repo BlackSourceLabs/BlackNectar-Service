@@ -135,6 +135,12 @@
             <artifactId>alchemy-collections</artifactId>
             <version>1.1</version>
         </dependency>
+        
+        <dependency>
+            <groupId>tech.sirwellington.alchemy</groupId>
+            <artifactId>alchemy-generator</artifactId>
+            <version>1.5</version>
+        </dependency>
 
         <!--=======================-->
         <!--AROMA-->

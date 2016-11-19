@@ -16,7 +16,11 @@
 
 package tech.blackhole.blacknectar.service;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
@@ -25,6 +29,7 @@ import spark.Spark;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
 import tech.blackhole.blacknectar.service.stores.Store;
+import tech.blackhole.blacknectar.service.stores.StoreRepository;
 
 /**
  *
@@ -34,9 +39,12 @@ public final class Server
 {
     
     private final static Logger LOG = LoggerFactory.getLogger(Server.class);
-    final static Aroma AROMA = Aroma.create("ec07e6fe-7203-4f18-abf4-f33b48ec904d");
+    public final static Aroma AROMA = Aroma.create("ec07e6fe-7203-4f18-abf4-f33b48ec904d");
     
     final static String APPLICATION_JSON = "application/json";
+    
+    private final StoreRepository repository = StoreRepository.FILE;
+    private final List<Store> stores = repository.getAllStores();
     
     public static void main(String[] args)
     {
@@ -60,8 +68,9 @@ public final class Server
     
     void setupRoutes()
     {
-        Spark.get("/", this::getStore);
-        Spark.get("/hello", this::sayHello);
+        Spark.get("/stores", this::getStores);
+        Spark.get("/sample-store", this::getStores);
+        Spark.get("/", this::sayHello);
     }
     
     String sayHello(Request request, Response response)
@@ -77,10 +86,10 @@ public final class Server
         //U+1F573
         return "BlackWhole 🕳";
     }
-
-    JsonObject getStore(Request request, Response response)
+    
+    JsonObject getSampleStore(Request request, Response response)
     {
-        LOG.info("Received GET request from IP [{}]", request.ip());
+        LOG.info("Received GET request to GET a Sample Store from IP [{}]", request.ip());
 
         AROMA.begin().titled("Request Received")
             .text("From IP [{}]", request.ip())
@@ -104,5 +113,26 @@ public final class Server
                 .send();
             return new JsonObject();
         }
+    }
+
+    JsonArray getStores(Request request, Response response)
+    {
+        LOG.info("Received GET request to GET all stores from IP [{}]", request.ip());
+
+        AROMA.begin().titled("Request Received")
+            .text("From IP [{}]", request.ip())
+            .withUrgency(Urgency.LOW)
+            .send();
+
+        response.status(200);
+        response.type(APPLICATION_JSON);
+        
+        Supplier<JsonArray> supplier = () -> new JsonArray();
+        BiConsumer<JsonArray, JsonObject> accumulator = (array, object) -> array.add(object);
+        BiConsumer<JsonArray, JsonArray> combiner = (first, second) -> first.addAll(second);
+        
+        return stores.stream()
+            .map(Store::asJSON)
+            .collect(supplier, accumulator, combiner);
     }
 }

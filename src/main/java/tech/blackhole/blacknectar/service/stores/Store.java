@@ -18,6 +18,8 @@ package tech.blackhole.blacknectar.service.stores;
 
 import com.google.gson.JsonObject;
 import java.util.Objects;
+import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
+import tech.sirwellington.alchemy.annotations.arguments.Required;
 import tech.sirwellington.alchemy.annotations.concurrency.Immutable;
 import tech.sirwellington.alchemy.annotations.concurrency.ThreadSafe;
 import tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern;
@@ -25,6 +27,7 @@ import tech.sirwellington.alchemy.annotations.objects.Pojo;
 
 import static tech.blackhole.blacknectar.service.stores.Address.validAddress;
 import static tech.blackhole.blacknectar.service.stores.Location.validLocation;
+import static tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern.Role.BUILDER;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern.Role.PRODUCT;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
@@ -165,5 +168,72 @@ public class Store implements JSONRepresentable
                                       2079);
         
         return new Store(name, location, address);
+    }
+    
+    /**
+     * Facilitates construction of {@link Store} objects.
+     */
+    @BuilderPattern(role = BUILDER)
+    static class Builder
+    {
+
+        static Builder newInstance()
+        {
+            return new Builder();
+        }
+
+        private String name;
+        private Location location;
+        private Address address;
+
+        Builder()
+        {
+
+        }
+
+        Builder withName(@NonEmpty String name)
+        {
+            checkThat(name)
+                .usingMessage("name cannot be empty")
+                .is(nonEmptyString());
+
+            this.name = name;
+            return this;
+        }
+
+        Builder withAddress(@Required Address address)
+        {
+            checkThat(address)
+                .is(validAddress());
+
+            this.address = address;
+            return this;
+        }
+
+        Builder withLocation(@Required Location location)
+        {
+            checkThat(location)
+                .is(validLocation());
+
+            this.location = location;
+            return this;
+        }
+
+        Store build() throws IllegalStateException
+        {
+            checkThat(location)
+                .usingMessage("Location is missing or invalid")
+                .is(validLocation());
+
+            checkThat(name)
+                .usingMessage("Missing name")
+                .is(nonEmptyString());
+
+            checkThat(address)
+                .usingMessage("Address is missing or invalid")
+                .is(validAddress());
+
+            return new Store(this.name, this.location, this.address);
+        }
     }
 }

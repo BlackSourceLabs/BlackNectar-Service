@@ -21,7 +21,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
-import tech.sirwellington.alchemy.arguments.FailedAssertionException;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateDouble;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
@@ -60,10 +59,6 @@ public class LocationTest
     private void setupData() throws Exception
     {
         location = new Location(latitude, longitude);
-        
-        double badLatitude = one(doubles(91, Double.MAX_VALUE));
-        double badLongitude = one(doubles(-Double.MAX_VALUE, -91.0));
-        badLocation = new Location(badLatitude, badLongitude);
     }
 
     @Test
@@ -76,10 +71,12 @@ public class LocationTest
     }
     
     @Test
-    public void testValidLocationWithInvalid()
+    public void testInvalidLocation()
     {
-        AlchemyAssertion<Location> assertion = Location.validLocation();
-        assertThrows(() -> assertion.check(badLocation)).isInstanceOf(FailedAssertionException.class);
+        double badLatitude = one(doubles(91, Double.MAX_VALUE));
+        double badLongitude = one(doubles(-Double.MAX_VALUE, -91.0));
+        
+        assertThrows(() -> new Location(badLatitude, badLongitude));
     }
 
     @Test

@@ -17,6 +17,7 @@
 
 package tech.blackhole.blacknectar.service;
 
+import tech.blackhole.blacknectar.service.stores.Location;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
@@ -61,11 +62,11 @@ interface DistanceFormula
         {
             checkThat(first, second).are(notNull());
             
-            final double latitudeDelta = Math.toRadians(first.latitude - second.latitude);
-            final double longitudeDelta = Math.toRadians(first.longitude - second.longitude);
+            final double latitudeDelta = Math.toRadians(first.getLatitude() - second.getLatitude());
+            final double longitudeDelta = Math.toRadians(first.getLongitude() - second.getLongitude());
             
-            final double firstLatitude = Math.toRadians(first.latitude);
-            final double secondLatitude = Math.toRadians(second.latitude);
+            final double firstLatitude = Math.toRadians(first.getLatitude());
+            final double secondLatitude = Math.toRadians(second.getLatitude());
             
             final double harvesineOfLatitude = Math.pow(Math.sin(latitudeDelta / 2), 2);
             final double harvesineOfLongitude = Math.pow(Math.sin(longitudeDelta / 2), 2);

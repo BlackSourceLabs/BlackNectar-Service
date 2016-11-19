@@ -66,7 +66,7 @@ public final class Location
         {
             checkThat(lon)
                 .usingMessage("Longitude must be between -180 and 180")
-                .is(greaterThanOrEqualTo(180.0))
+                .is(greaterThanOrEqualTo(-180.0))
                 .is(lessThanOrEqualTo(180.0));
             };
     }

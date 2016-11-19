@@ -28,7 +28,6 @@ import static tech.blackhole.blacknectar.service.stores.Location.validLocation;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern.Role.PRODUCT;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 
 /**
  *
@@ -76,7 +75,7 @@ public class Store implements JSONRepresentable
     @Override
     public JsonObject asJSON()
     {
-        return json;
+        return createJSON();
     }
 
     @Override

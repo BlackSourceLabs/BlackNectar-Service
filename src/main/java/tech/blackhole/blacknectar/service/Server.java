@@ -16,6 +16,7 @@
 
 package tech.blackhole.blacknectar.service;
 
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
@@ -23,6 +24,10 @@ import spark.Response;
 import spark.Spark;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
+import tech.blackhole.blacknectar.service.stores.Store;
+
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
 
 /**
  *
@@ -58,7 +63,8 @@ public final class Server
     
     void setupRoutes()
     {
-        Spark.get("/", this::sayHello);
+        Spark.get("/", this::getStore);
+        Spark.get("/hello", this::sayHello);
     }
     
     String sayHello(Request request, Response response)
@@ -73,5 +79,21 @@ public final class Server
         response.status(200);
         //U+1F573
         return "BlackWhole 🕳";
+    }
+
+    JsonObject getStore(Request request, Response response)
+    {
+        LOG.info("Received GET request from IP [{}]", request.ip());
+
+        AROMA.begin().titled("Request Received")
+            .text("From IP [{}]", request.ip())
+            .withUrgency(Urgency.LOW)
+            .send();
+
+        response.status(200);
+
+        Store store = one(pojos(Store.class));
+        
+        return store.asJSON();
     }
 }

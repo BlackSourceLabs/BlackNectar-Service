@@ -305,7 +305,7 @@
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
                             <useUniqueVersions>false</useUniqueVersions>
-                            <mainClass>tech.blackwhole.blacknectar.service.Server</mainClass>
+                            <mainClass>tech.blackhole.blacknectar.service.Server</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

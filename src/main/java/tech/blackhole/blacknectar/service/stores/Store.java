@@ -16,6 +16,7 @@
 
 package tech.blackhole.blacknectar.service.stores;
 
+import com.google.gson.JsonObject;
 import java.util.Objects;
 import tech.sirwellington.alchemy.annotations.concurrency.Immutable;
 import tech.sirwellington.alchemy.annotations.concurrency.ThreadSafe;
@@ -27,6 +28,7 @@ import static tech.blackhole.blacknectar.service.stores.Location.validLocation;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern.Role.PRODUCT;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 
 /**
  *
@@ -36,12 +38,13 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
 @Immutable
 @ThreadSafe
 @BuilderPattern(role = PRODUCT)
-public class Store
+public class Store implements JSONRepresentable
 {
 
     private final String name;
     private final Location location;
     private final Address address;
+    private final JsonObject json;
 
     public Store(String name, Location location, Address address)
     {
@@ -52,6 +55,7 @@ public class Store
         this.name = name;
         this.location = location;
         this.address = address;
+        this.json = createJSON();
     }
 
     public String getName()
@@ -67,6 +71,12 @@ public class Store
     public Address getAddress()
     {
         return address;
+    }
+
+    @Override
+    public JsonObject asJSON()
+    {
+        return json;
     }
 
     @Override
@@ -116,4 +126,24 @@ public class Store
         return "Store{" + "name=" + name + ", location=" + location + ", address=" + address + '}';
     }
 
+    private JsonObject createJSON()
+    {
+        JsonObject jsonObject = new JsonObject();
+        
+        jsonObject.addProperty(Keys.NAME, this.name);
+        jsonObject.add(Keys.LOCATION, location.asJSON());
+        jsonObject.add(Keys.ADDRESS, jsonObject);
+        
+        return jsonObject;
+    }
+
+    /**
+     * The Keys used when writing the object as JSON.
+     */
+    static class Keys
+    {
+        static final String NAME = "store_name";
+        static final String LOCATION = "location";
+        static final String ADDRESS = "address";
+    }
 }

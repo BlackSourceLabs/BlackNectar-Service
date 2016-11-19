@@ -60,7 +60,9 @@ interface DistanceFormula
         @Override
         public double distanceBetween(Location first, Location second)
         {
-            checkThat(first, second).are(notNull());
+            checkThat(first, second)
+                .usingMessage("Location objects cannot be null")
+                .are(notNull());
             
             final double latitudeDelta = Math.toRadians(first.getLatitude() - second.getLatitude());
             final double longitudeDelta = Math.toRadians(first.getLongitude() - second.getLongitude());

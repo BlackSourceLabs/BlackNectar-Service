@@ -155,7 +155,7 @@ public class Store implements JSONRepresentable
     private static Store createSampleStore()
     {
         String name = "COOPERS FOODS";
-        Location location = new Location(-93.600769, 44.790585);
+        Location location = new Location(44.790585, -93.600769);
         Address address = new Address("710 N Walnut St",
                                       null,
                                       "Chaska",

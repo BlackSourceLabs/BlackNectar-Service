@@ -14,15 +14,39 @@
  * limitations under the License.
  */
 
-
 package tech.blackhole.blacknectar.service.stores;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import sir.wellington.alchemy.collections.lists.Lists;
+import tech.aroma.client.Urgency;
+import tech.blackhole.blacknectar.service.OperationFailedException;
+
+import static java.util.stream.Collectors.toList;
+import static tech.blackhole.blacknectar.service.Server.AROMA;
 
 /**
  *
  * @author SirWellington
  */
-public interface StoreRepository 
+public interface StoreRepository
 {
+
+    /**
+     * Returns all of the {@linkplain Store Stores} saved in the Repository;
+     *
+     * @return
+     */
+    List<Store> getAllStores();
     
+    static StoreRepository FILE = new FileRepository();
+
+
 }

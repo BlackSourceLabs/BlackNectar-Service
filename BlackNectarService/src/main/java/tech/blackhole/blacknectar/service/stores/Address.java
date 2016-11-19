@@ -14,24 +14,35 @@
  * limitations under the License.
  */
 
- 
 package tech.blackhole.blacknectar.service.stores;
 
-
 import java.util.Objects;
+import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
+import tech.sirwellington.alchemy.annotations.arguments.Optional;
 import tech.sirwellington.alchemy.annotations.concurrency.Immutable;
 import tech.sirwellington.alchemy.annotations.concurrency.ThreadSafe;
+import tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern;
 import tech.sirwellington.alchemy.annotations.objects.Pojo;
 
+import static tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern.Role.BUILDER;
+import static tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern.Role.PRODUCT;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThan;
+import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.lessThan;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
+
 /**
- *
+ *s
  * @author SirWellington
  */
 @Pojo
 @Immutable
 @ThreadSafe
-final class Address 
+@BuilderPattern(role = PRODUCT)
+final class Address
 {
+
     private final String addressLineOne;
     private final String addressLineTwo;
     private final String city;
@@ -152,6 +163,103 @@ final class Address
     {
         return "Address{" + "addressLineOne=" + addressLineOne + ", addressLineTwo=" + addressLineTwo + ", city=" + city + ", state=" + state + ", country=" + country + ", zip5=" + zip5 + ", zip4=" + zip4 + '}';
     }
-    
-    
+
+    @BuilderPattern(role = BUILDER)
+    static class Builder
+    {
+
+        private String addressLineOne;
+        @Optional
+        private String addressLineTwo;
+        private String city;
+        private String state;
+        private String county;
+        private int zipCode5;
+        @Optional
+        private int zipCode4;
+
+        public static Builder newBuilder()
+        {
+            return new Builder();
+        }
+
+        Builder()
+        {
+        }
+
+        Builder withAddressLineOne(@NonEmpty String addressLine) throws IllegalArgumentException
+        {
+            checkThat(addressLine)
+                .usingMessage("Address Line 1 cannot be empty")
+                .is(nonEmptyString());
+
+            this.addressLineOne = addressLine;
+
+            return this;
+        }
+
+        Builder withAddressLineTwo(@NonEmpty String addressLine) throws IllegalArgumentException
+        {
+            checkThat(addressLine)
+                .usingMessage("Address Line 2 should not be empty")
+                .is(nonEmptyString());
+
+            this.addressLineTwo = addressLine;
+            return this;
+        }
+
+        Builder withCity(@NonEmpty String city) throws IllegalArgumentException
+        {
+            checkThat(city)
+                .usingMessage("City cannot be empty")
+                .are(nonEmptyString());
+
+            this.city = city;
+            return this;
+        }
+
+        Builder withState(@NonEmpty String state) throws IllegalArgumentException
+        {
+            checkThat(state)
+                .usingMessage("State cannot be empty")
+                .are(nonEmptyString());
+
+            this.state = state;
+            return this;
+        }
+
+        Builder withCounty(@NonEmpty String county) throws IllegalArgumentException
+        {
+            checkThat(county)
+                .usingMessage("County cannot be empty")
+                .are(nonEmptyString());
+
+            this.county = county;
+            return this;
+        }
+
+        Address build() throws IllegalStateException
+        {
+            checkThat(addressLineOne, city, state, county)
+                .usingMessage("Required information missing")
+                .are(notNull())
+                .are(nonEmptyString());
+
+            checkThat(zipCode5)
+                .usingMessage("Zip Code must be > 0")
+                .are(greaterThan(0))
+                .usingMessage("Zip5 must be less than 100,000")
+                .is(lessThan(100_000));
+
+            return new Address(this.addressLineOne,
+                               this.addressLineTwo,
+                               this.city,
+                               this.state,
+                               this.county,
+                               this.zipCode5,
+                               this.zipCode4);
+
+        }
+    }
+
 }

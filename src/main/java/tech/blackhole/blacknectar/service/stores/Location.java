@@ -22,6 +22,7 @@ import tech.sirwellington.alchemy.annotations.objects.Pojo;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThanOrEqualTo;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.lessThanOrEqualTo;
 
@@ -46,6 +47,19 @@ public final class Location
         
         this.latitude = latitude;
         this.longitude = longitude;
+    }
+    
+    static AlchemyAssertion<Location> validLocation()
+    {
+        return location ->
+        {
+            checkThat(location)
+                .usingMessage("Location cannot be null")
+                .is(notNull());
+            
+            checkThat(location.latitude).is(validLatitude());
+            checkThat(location.longitude).is(validLongitude());
+        };
     }
     
     static AlchemyAssertion<Double> validLatitude()

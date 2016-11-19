@@ -48,7 +48,7 @@ public final class Address
     private final String addressLineTwo;
     private final String city;
     private final String state;
-    private final String country;
+    private final String county;
     private final int zip5;
     private final int zip4;
     
@@ -72,7 +72,7 @@ public final class Address
                 .usingMessage("State is missing")
                 .is(nonEmptyString());
             
-            checkThat(a.country)
+            checkThat(a.county)
                 .usingMessage("Country is missing")
                 .is(nonEmptyString());
             
@@ -90,7 +90,7 @@ public final class Address
         this.addressLineTwo = addressLineTwo;
         this.city = city;
         this.state = state;
-        this.country = country;
+        this.county = country;
         this.zip5 = zip5;
         this.zip4 = zip4;
     }
@@ -115,9 +115,9 @@ public final class Address
         return state;
     }
 
-    public String getCountry()
+    public String getCounty()
     {
-        return country;
+        return county;
     }
 
     public int getZip5()
@@ -138,7 +138,7 @@ public final class Address
         hash = 41 * hash + Objects.hashCode(this.addressLineTwo);
         hash = 41 * hash + Objects.hashCode(this.city);
         hash = 41 * hash + Objects.hashCode(this.state);
-        hash = 41 * hash + Objects.hashCode(this.country);
+        hash = 41 * hash + Objects.hashCode(this.county);
         hash = 41 * hash + this.zip5;
         hash = 41 * hash + this.zip4;
         return hash;
@@ -184,7 +184,7 @@ public final class Address
         {
             return false;
         }
-        if (!Objects.equals(this.country, other.country))
+        if (!Objects.equals(this.county, other.county))
         {
             return false;
         }
@@ -194,7 +194,7 @@ public final class Address
     @Override
     public String toString()
     {
-        return "Address{" + "addressLineOne=" + addressLineOne + ", addressLineTwo=" + addressLineTwo + ", city=" + city + ", state=" + state + ", country=" + country + ", zip5=" + zip5 + ", zip4=" + zip4 + '}';
+        return "Address{" + "addressLineOne=" + addressLineOne + ", addressLineTwo=" + addressLineTwo + ", city=" + city + ", state=" + state + ", county=" + county + ", zip5=" + zip5 + ", zip4=" + zip4 + '}';
     }
 
     @BuilderPattern(role = BUILDER)

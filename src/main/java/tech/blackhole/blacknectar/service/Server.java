@@ -64,12 +64,14 @@ public final class Server
     String sayHello(Request request, Response response)
     {
         LOG.info("Received GET request from IP [{}]", request.ip());
+        
         AROMA.begin().titled("Request Received")
             .text("From IP [{}]", request.ip())
             .withUrgency(Urgency.LOW)
             .send();
         
         response.status(200);
-        return "Hello World!";
+        //U+1F573
+        return "BlackWhole 🕳";
     }
 }

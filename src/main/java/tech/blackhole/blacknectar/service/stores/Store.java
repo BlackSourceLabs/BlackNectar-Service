@@ -40,11 +40,15 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
 public class Store implements JSONRepresentable
 {
 
-    private final String name;
-    private final Location location;
-    private final Address address;
-    private final JsonObject json;
+    private String name;
+    private Location location;
+    private Address address;
+    private JsonObject json;
 
+    Store()
+    {
+    }
+    
     public Store(String name, Location location, Address address)
     {
         checkThat(address).is(validAddress());

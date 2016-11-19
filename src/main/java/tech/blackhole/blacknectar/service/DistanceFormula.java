@@ -44,6 +44,12 @@ interface DistanceFormula
     
     
     /**
+     * This Singleton {@link DistanceFormula} computes the distance between two points
+     * using the Harvesine formula.
+     */
+    static DistanceFormula HARVESINE = new HarvesineDistance();
+    
+    /**
      * Uses the <a href="https://rosettacode.org/wiki/Haversine_formula">Harvesine Formula</a> to calculate
      * the distance between two points.
      * <p>

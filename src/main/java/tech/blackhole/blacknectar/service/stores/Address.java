@@ -50,14 +50,14 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
 public final class Address implements JSONRepresentable
 {
 
-    private final String addressLineOne;
-    private final String addressLineTwo;
-    private final String city;
-    private final String state;
-    private final String county;
-    private final int zip5;
-    private final int zip4;
-    private final JsonObject json;
+    private String addressLineOne;
+    private String addressLineTwo;
+    private String city;
+    private String state;
+    private String county;
+    private int zip5;
+    private int zip4;
+    private JsonObject json;
     
     static AlchemyAssertion<Address> validAddress()
     {
@@ -91,13 +91,23 @@ public final class Address implements JSONRepresentable
         };
     }
 
-    Address(String addressLineOne, String addressLineTwo, String city, String state, String country, int zip5, int zip4)
+    Address()
+    {
+    }
+    
+    Address(String addressLineOne, 
+            String addressLineTwo,
+            String city,
+            String state,
+            String county,
+            int zip5,
+            int zip4)
     {
         this.addressLineOne = addressLineOne;
         this.addressLineTwo = addressLineTwo;
         this.city = city;
         this.state = state;
-        this.county = country;
+        this.county = county;
         this.zip5 = zip5;
         this.zip4 = zip4;
         
@@ -142,7 +152,7 @@ public final class Address implements JSONRepresentable
     @Override
     public JsonObject asJSON()
     {
-        return json;
+        return createJSON();
     }
 
     @Override
@@ -276,6 +286,7 @@ public final class Address implements JSONRepresentable
             return this;
         }
 
+        @Optional
         Builder withAddressLineTwo(@NonEmpty String addressLine) throws IllegalArgumentException
         {
             checkThat(addressLine)
@@ -306,6 +317,7 @@ public final class Address implements JSONRepresentable
             return this;
         }
 
+        @Optional
         Builder withCounty(@NonEmpty String county) throws IllegalArgumentException
         {
             checkThat(county)
@@ -324,6 +336,7 @@ public final class Address implements JSONRepresentable
             return this;
         }
         
+        @Optional
         Builder withLocalZipCode(int localZipCode) throws IllegalArgumentException
         {
             checkThat(localZipCode)

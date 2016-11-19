@@ -41,7 +41,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
 @Immutable
 @ThreadSafe
 @BuilderPattern(role = PRODUCT)
-final class Address
+public final class Address
 {
 
     private final String addressLineOne;

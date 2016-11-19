@@ -42,6 +42,11 @@ public final class Location implements JSONRepresentable
     private final double latitude;
     private final double longitude;
     private final JsonObject json;
+
+    Location()
+    {
+        this(0, 0);
+    }
     
     public Location(double latitude, double longitude)
     {

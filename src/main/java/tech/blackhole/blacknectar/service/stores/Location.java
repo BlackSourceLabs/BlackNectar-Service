@@ -16,6 +16,8 @@
 
 package tech.blackhole.blacknectar.service.stores;
 
+import com.google.gson.JsonObject;
+import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.concurrency.Immutable;
 import tech.sirwellington.alchemy.annotations.concurrency.ThreadSafe;
 import tech.sirwellington.alchemy.annotations.objects.Pojo;
@@ -34,11 +36,12 @@ import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.l
 @Pojo
 @Immutable
 @ThreadSafe
-public final class Location
+public final class Location implements JSONRepresentable
 {
     
     private final double latitude;
     private final double longitude;
+    private final JsonObject json;
     
     public Location(double latitude, double longitude)
     {
@@ -47,6 +50,7 @@ public final class Location
         
         this.latitude = latitude;
         this.longitude = longitude;
+        this.json = createJSON();
     }
     
     static AlchemyAssertion<Location> validLocation()
@@ -82,7 +86,13 @@ public final class Location
                 .usingMessage("Longitude must be between -180 and 180")
                 .is(greaterThanOrEqualTo(-180.0))
                 .is(lessThanOrEqualTo(180.0));
-            };
+        };
+    }
+
+    @Override
+    public JsonObject asJSON()
+    {
+        return json;
     }
 
     public double getLatitude()
@@ -135,5 +145,21 @@ public final class Location
     public String toString()
     {
         return "Location{" + "latitude=" + latitude + ", longitude=" + longitude + '}';
+    }
+
+    @Internal
+    private JsonObject createJSON()
+    {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty(Keys.LATITUDE, latitude);
+        jsonObject.addProperty(Keys.LONGITUDE, longitude);
+        
+        return jsonObject;
+    }
+    
+    static class Keys
+    {
+        static final String LATITUDE = "latitude";
+        static final String LONGITUDE = "longitude";
     }
 }

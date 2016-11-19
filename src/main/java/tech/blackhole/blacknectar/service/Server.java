@@ -92,8 +92,19 @@ public final class Server
 
         response.status(200);
 
-        Store store = one(pojos(Store.class));
-        
-        return store.asJSON();
+        try
+        {
+            Store store = one(pojos(Store.class));
+
+            return store.asJSON();
+        }
+        catch (Exception ex)
+        {
+            AROMA.begin().titled("Request Failed")
+                .text("Could not load Store, {}", ex)
+                .withUrgency(Urgency.HIGH)
+                .send();
+            return new JsonObject();
+        }
     }
 }

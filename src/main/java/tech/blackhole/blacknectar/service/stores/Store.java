@@ -149,4 +149,21 @@ public class Store implements JSONRepresentable
         static final String LOCATION = "location";
         static final String ADDRESS = "address";
     }
+    
+    public static final Store SAMPLE_STORE = createSampleStore();
+    
+    private static Store createSampleStore()
+    {
+        String name = "COOPERS FOODS";
+        Location location = new Location(-93.600769, 44.790585);
+        Address address = new Address("710 N Walnut St",
+                                      null,
+                                      "Chaska",
+                                      "MN",
+                                      "CARVER",
+                                      55318,
+                                      2079);
+        
+        return new Store(name, location, address);
+    }
 }

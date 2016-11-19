@@ -26,9 +26,6 @@ import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
 import tech.blackhole.blacknectar.service.stores.Store;
 
-import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
-import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
-
 /**
  *
  * @author SirWellington
@@ -94,7 +91,7 @@ public final class Server
 
         try
         {
-            Store store = one(pojos(Store.class));
+            Store store = Store.SAMPLE_STORE;
 
             return store.asJSON();
         }

@@ -23,6 +23,7 @@ import tech.sirwellington.alchemy.annotations.concurrency.Immutable;
 import tech.sirwellington.alchemy.annotations.concurrency.ThreadSafe;
 import tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern;
 import tech.sirwellington.alchemy.annotations.objects.Pojo;
+import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 
 import static tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern.Role.BUILDER;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern.Role.PRODUCT;
@@ -33,7 +34,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.l
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
- *s
+ * 
  * @author SirWellington
  */
 @Pojo
@@ -50,8 +51,40 @@ final class Address
     private final String country;
     private final int zip5;
     private final int zip4;
+    
+    static AlchemyAssertion<Address> validAddress()
+    {
+        return a ->
+        {
+            checkThat(a)
+                .usingMessage("Address was null")
+                .is(notNull());
+            
+            checkThat(a.addressLineOne)
+                .usingMessage("Address Line 1 cannot be empty")
+                .is(nonEmptyString());
+            
+            checkThat(a.city)
+                .usingMessage("City is missing")
+                .is(nonEmptyString());
+            
+            checkThat(a.state)
+                .usingMessage("State is missing")
+                .is(nonEmptyString());
+            
+            checkThat(a.country)
+                .usingMessage("Country is missing")
+                .is(nonEmptyString());
+            
+            checkThat(a.zip5)
+                .usingMessage("Zip Code 5 is missing")
+                .is(greaterThan(0))
+                .usingMessage("Zip Code 5 must be < 100,000")
+                .is(lessThan(100_000));
+        };
+    }
 
-    public Address(String addressLineOne, String addressLineTwo, String city, String state, String country, int zip5, int zip4)
+    Address(String addressLineOne, String addressLineTwo, String city, String state, String country, int zip5, int zip4)
     {
         this.addressLineOne = addressLineOne;
         this.addressLineTwo = addressLineTwo;
@@ -194,7 +227,6 @@ final class Address
                 .is(nonEmptyString());
 
             this.addressLineOne = addressLine;
-
             return this;
         }
 
@@ -241,17 +273,19 @@ final class Address
         Address build() throws IllegalStateException
         {
             checkThat(addressLineOne, city, state, county)
+                .throwing(IllegalStateException.class)
                 .usingMessage("Required information missing")
                 .are(notNull())
                 .are(nonEmptyString());
 
             checkThat(zipCode5)
+                .throwing(IllegalStateException.class)
                 .usingMessage("Zip Code must be > 0")
                 .are(greaterThan(0))
                 .usingMessage("Zip5 must be less than 100,000")
                 .is(lessThan(100_000));
 
-            return new Address(this.addressLineOne,
+            Address address = new Address(this.addressLineOne,
                                this.addressLineTwo,
                                this.city,
                                this.state,
@@ -259,6 +293,9 @@ final class Address
                                this.zipCode5,
                                this.zipCode4);
 
+            checkThat(address).is(validAddress());
+            
+            return address;
         }
     }
 

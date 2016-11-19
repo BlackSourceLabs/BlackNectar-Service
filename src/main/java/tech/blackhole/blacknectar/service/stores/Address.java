@@ -16,7 +16,9 @@
 
 package tech.blackhole.blacknectar.service.stores;
 
+import com.google.gson.JsonObject;
 import java.util.Objects;
+import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 import tech.sirwellington.alchemy.annotations.arguments.Optional;
 import tech.sirwellington.alchemy.annotations.concurrency.Immutable;
@@ -25,12 +27,16 @@ import tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern;
 import tech.sirwellington.alchemy.annotations.objects.Pojo;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern.Role.BUILDER;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern.Role.PRODUCT;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.AddressAssertions.validZipCode;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThan;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.lessThan;
+import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.lessThanOrEqualTo;
+import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.positiveInteger;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
@@ -41,7 +47,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
 @Immutable
 @ThreadSafe
 @BuilderPattern(role = PRODUCT)
-public final class Address
+public final class Address implements JSONRepresentable
 {
 
     private final String addressLineOne;
@@ -51,6 +57,7 @@ public final class Address
     private final String county;
     private final int zip5;
     private final int zip4;
+    private final JsonObject json;
     
     static AlchemyAssertion<Address> validAddress()
     {
@@ -93,6 +100,8 @@ public final class Address
         this.county = country;
         this.zip5 = zip5;
         this.zip4 = zip4;
+        
+        this.json = createJSON();
     }
 
     public String getAddressLineOne()
@@ -128,6 +137,12 @@ public final class Address
     public int getZip4()
     {
         return zip4;
+    }
+
+    @Override
+    public JsonObject asJSON()
+    {
+        return json;
     }
 
     @Override
@@ -197,6 +212,37 @@ public final class Address
         return "Address{" + "addressLineOne=" + addressLineOne + ", addressLineTwo=" + addressLineTwo + ", city=" + city + ", state=" + state + ", county=" + county + ", zip5=" + zip5 + ", zip4=" + zip4 + '}';
     }
 
+    @Internal
+    private JsonObject createJSON()
+    {
+        JsonObject jsonObject = new JsonObject();
+        
+        jsonObject.addProperty(Keys.ADDRESS_LINE_ONE, addressLineOne);
+        
+        if (!isNullOrEmpty(addressLineTwo))
+        {
+            jsonObject.addProperty(Keys.ADDRESS_LINE_TWO, addressLineTwo);
+        }
+        
+        jsonObject.addProperty(Keys.CITY, city);
+        jsonObject.addProperty(Keys.STATE, state);
+        jsonObject.addProperty(Keys.COUNTY, county);
+        jsonObject.addProperty(Keys.ZIP, zipToString(zip5));
+        jsonObject.addProperty(Keys.LOCAL_ZIP, localZipToString(zip4));
+        
+        return jsonObject;
+    }
+    
+    private String zipToString(int zip)
+    {
+        return String.format("%05d", zip);
+    }
+    
+    private String localZipToString(int localZip)
+    {
+        return String.format("%04d", localZip);
+    }
+
     @BuilderPattern(role = BUILDER)
     static class Builder
     {
@@ -207,9 +253,9 @@ public final class Address
         private String city;
         private String state;
         private String county;
-        private int zipCode5;
+        private int zipCode;
         @Optional
-        private int zipCode4;
+        private int localZip;
 
         public static Builder newBuilder()
         {
@@ -269,6 +315,26 @@ public final class Address
             this.county = county;
             return this;
         }
+        
+        Builder withZipCode(int zipCode) throws IllegalArgumentException
+        {
+            checkThat(zipCode).is(validZipCode());
+            
+            this.zipCode = zipCode;
+            return this;
+        }
+        
+        Builder withLocalZipCode(int localZipCode) throws IllegalArgumentException
+        {
+            checkThat(localZipCode)
+                .usingMessage("Local Zip Code cannot be negative")
+                .is(positiveInteger())
+                .usingMessage("Local Zip Code cannot exceed 4 digits")
+                .is(lessThanOrEqualTo(9_999));
+            
+            this.localZip = localZipCode;
+            return this;
+        }
 
         Address build() throws IllegalStateException
         {
@@ -278,25 +344,37 @@ public final class Address
                 .are(notNull())
                 .are(nonEmptyString());
 
-            checkThat(zipCode5)
+            checkThat(zipCode)
                 .throwing(IllegalStateException.class)
-                .usingMessage("Zip Code must be > 0")
-                .are(greaterThan(0))
-                .usingMessage("Zip5 must be less than 100,000")
-                .is(lessThan(100_000));
+                .is(validZipCode());
 
             Address address = new Address(this.addressLineOne,
                                this.addressLineTwo,
                                this.city,
                                this.state,
                                this.county,
-                               this.zipCode5,
-                               this.zipCode4);
+                               this.zipCode,
+                               this.localZip);
 
             checkThat(address).is(validAddress());
-            
+
             return address;
         }
+
     }
 
+    /**
+     * Keys used when serializing an {@link Address} to JSON.
+     */
+    static class Keys
+    {
+
+        final static String ADDRESS_LINE_ONE = "address_line_1";
+        final static String ADDRESS_LINE_TWO = "address_line_2";
+        final static String CITY = "city";
+        final static String STATE = "state";
+        final static String COUNTY = "county";
+        final static String ZIP = "zip_code";
+        final static String LOCAL_ZIP = "local_zip_code";
+    }
 }

@@ -88,6 +88,7 @@ public final class Server
             .send();
 
         response.status(200);
+        response.type(APPLICATION_JSON);
 
         try
         {

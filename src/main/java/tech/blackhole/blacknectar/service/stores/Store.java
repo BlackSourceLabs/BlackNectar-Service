@@ -135,7 +135,7 @@ public class Store implements JSONRepresentable
         
         jsonObject.addProperty(Keys.NAME, this.name);
         jsonObject.add(Keys.LOCATION, location.asJSON());
-        jsonObject.add(Keys.ADDRESS, jsonObject);
+        jsonObject.add(Keys.ADDRESS, this.address.asJSON());
         
         return jsonObject;
     }

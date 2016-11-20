@@ -16,6 +16,7 @@
 
 package tech.blackhole.blacknectar.service;
 
+import com.google.common.base.Strings;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.util.List;
@@ -29,16 +30,28 @@ import spark.Response;
 import spark.Spark;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
+import tech.blackhole.blacknectar.service.api.BlackNectarSearchRequest;
 import tech.blackhole.blacknectar.service.api.BlackNectarService;
+import tech.blackhole.blacknectar.service.exceptions.BadArgumentException;
 import tech.blackhole.blacknectar.service.stores.Location;
 import tech.blackhole.blacknectar.service.stores.Store;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static com.google.common.base.Strings.nullToEmpty;
+import static tech.blackhole.blacknectar.service.stores.Location.validLatitude;
+import static tech.blackhole.blacknectar.service.stores.Location.validLongitude;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThanOrEqualTo;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.decimalString;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.integerString;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.stringWithLengthGreaterThanOrEqualTo;
 
 /**
  *
  * @author SirWellington
+ */
+/*
+ * Ideally, this Server class is only responsible for setting up a routes,
+ * with each API call getting its own Dedicated RequestHandler class, for focus.
  */
 public final class Server
 {
@@ -147,97 +160,120 @@ public final class Server
 
     private List<Store> findStores(Request request)
     {
-        QueryParamsMap queryParams = request.queryMap();
+    
+        BlackNectarSearchRequest searchRequest = createSearchRequestFrom(request);
         
-        Location center = null;
+        return service.searchForStores(searchRequest);
+    }
+
+    private BlackNectarSearchRequest createSearchRequestFrom(Request request)
+    {
+        BlackNectarSearchRequest searchRequest = new BlackNectarSearchRequest();
         
-        if (hasLocationParameters(queryParams))
+        QueryParamsMap queryParameters = request.queryMap();
+        
+        insertLocationIfPresentInto(searchRequest, queryParameters);
+        insertRadiusIfPresentInto(searchRequest, queryParameters);
+        insertLimitIfPresentInto(searchRequest, queryParameters);
+        insertSearchTermIfPresentInto(searchRequest, queryParameters);
+        
+        return searchRequest;
+    }
+
+    private void insertLocationIfPresentInto(BlackNectarSearchRequest request, QueryParamsMap queryParameters)
+    {
+        if (!hasLocationParameters(queryParameters))
         {
-            double latitude = queryParams.get(QueryKeys.LATITUDE).doubleValue();
-            double longitude = queryParams.get(QueryKeys.LONGITUDE).doubleValue();
-            center = new Location(latitude, longitude);
+            return;
         }
         
-        int limit = 0;
-        if (hasLimitParameter(queryParams))
+        String latitudeString = queryParameters.get(QueryKeys.LATITUDE).value();
+        String longitudeString = queryParameters.get(QueryKeys.LONGITUDE).value();
+
+        checkThat(latitudeString, longitudeString)
+            .usingMessage("latitude and longitude must be numerical")
+            .throwing(BadArgumentException.class)
+            .are(decimalString());
+
+        double latitude = Double.valueOf(latitudeString);
+        double longitude = Double.valueOf(longitudeString);
+
+        checkThat(latitude)
+            .throwing(BadArgumentException.class)
+            .is(validLatitude());
+
+        checkThat(longitude)
+            .throwing(BadArgumentException.class)
+            .is(validLongitude());
+
+        request.withCenter(new Location(latitude, longitude));
+    }
+
+    private void insertRadiusIfPresentInto(BlackNectarSearchRequest request, QueryParamsMap queryParameters)
+    {
+        if (!hasRadiusParameter(queryParameters))
         {
-            limit = queryParams.get(QueryKeys.LIMIT).integerValue();
-            if (limit <0 )
-            {
-                LOG.warn("Unexpected limit received: {}", limit);
-                
-                AROMA.begin()
-                    .titled("Bad Argument")
-                    .text("Unexpected limit received: {}", limit)
-                    .send();
-                
-                limit = 0;
-            }
+            return;
+
+        }
+        String radiusString = queryParameters.value(QueryKeys.RADIUS);
+
+        checkThat(radiusString)
+            .throwing(BadArgumentException.class)
+            .usingMessage("radius parameter must be a decimal value")
+            .is(decimalString());
+
+        double radius = Double.valueOf(radiusString);
+
+        checkThat(radius)
+            .throwing(BadArgumentException.class)
+            .usingMessage("radius must be > 0")
+            .is(greaterThanOrEqualTo(0.0));
+
+        request.withRadius(radius);
+    }
+
+    private void insertLimitIfPresentInto(BlackNectarSearchRequest request, QueryParamsMap queryParameters)
+    {
+        if (!hasLimitParameter(queryParameters))
+        {
+            return;
         }
         
-        String searchTerm = "";
-        if (hasSearchTermParameter(queryParams))
+        String limitString = queryParameters.value(QueryKeys.LIMIT);
+        
+        checkThat(limitString)
+            .throwing(BadArgumentException.class)
+            .usingMessage("limit must be a number")
+            .is(integerString());
+        
+        int limit = Integer.valueOf(limitString);
+        
+        checkThat(limit)
+            .throwing(BadArgumentException.class)
+            .usingMessage("limit must be > 0")
+            .is(greaterThanOrEqualTo(0));
+        
+        request.withLimit(limit);
+            
+    }
+
+    private void insertSearchTermIfPresentInto(BlackNectarSearchRequest request, QueryParamsMap queryParameters)
+    {
+        if (!hasSearchTermParameter(queryParameters))
         {
-            searchTerm = queryParams.value(QueryKeys.SEARCH_TERM);
-            searchTerm = nullToEmpty(searchTerm);
+            return;
         }
         
-        double radius = -1.0;
-        if (hasRadiusParameter(queryParams))
-        {
-            radius = queryParams.get(QueryKeys.RADIUS).doubleValue();
-        }
+        String searchTerm = queryParameters.value(QueryKeys.SEARCH_TERM);
+        checkThat(searchTerm)
+            .throwing(BadArgumentException.class)
+            .usingMessage("search term cannot be empty")
+            .is(nonEmptyString())
+            .usingMessage("search term must have at least 2 characters")
+            .is(stringWithLengthGreaterThanOrEqualTo(2));
         
-        //Search Term, Center, Radius, Limit
-        if (hasSearchTerm(searchTerm) && 
-            hasCenter(center) &&
-            hasLimit(limit) &&
-            hasRadius(radius))
-        {
-            return service.searchForStoresByName(searchTerm, center, radius, limit);
-        }
-        
-        //Search Term, Center, Radius
-        if (hasSearchTerm(searchTerm) &&
-            hasCenter(center) &&
-            hasRadius(radius))
-        {
-            return service.searchForStoresByName(searchTerm, center, radius);
-        }
-        
-        //Center, Radius, Limit
-        if (hasCenter(center) && 
-            hasRadius(radius) &&
-            hasLimit(limit))
-        {
-            return service.searchForStoresByLocation(center, radius, limit);
-        }
-        
-        //Center, Radius
-        if (hasCenter(center) && hasRadius(radius))
-        {
-            return service.searchForStoresByLocation(center, radius);
-        }
-        
-        //Search Term
-        if (hasSearchTerm(searchTerm))
-        {
-            return service.searchForStoresByName(searchTerm);
-        }
-        
-        //Limit
-        if (hasLimit(limit))
-        {
-            return service.getAllStores(limit);
-        }
-        
-        //Center
-        if (hasCenter(center))
-        {
-            return service.searchForStoresByLocation(center);
-        }
-        
-        return service.getAllStores();
+        request.withSearchTerm(searchTerm);
     }
 
     private boolean hasLocationParameters(QueryParamsMap queryParams)
@@ -261,32 +297,15 @@ public final class Server
         return queryParams.hasKey(QueryKeys.RADIUS);
     }
 
-    private boolean hasLimit(int limit)
-    {
-        return limit > 0;
-    }
 
-    private boolean hasSearchTerm(String searchTerm)
-    {
-        return !isNullOrEmpty(searchTerm);
-    }
-
-    private boolean hasRadius(double radius)
-    {
-        return radius > 0.0;
-    }
-
-    private boolean hasCenter(Location center)
-    {
-        return center != null;
-    }
-    
     static class QueryKeys
     {
+
         static final String LATITUDE = "lat";
         static final String LONGITUDE = "lon";
         static final String LIMIT = "limit";
         static final String RADIUS = "radius";
         static final String SEARCH_TERM = "searchTerm";
     }
+    
 }

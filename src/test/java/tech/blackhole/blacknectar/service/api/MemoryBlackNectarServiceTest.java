@@ -27,9 +27,11 @@ import tech.blackhole.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateDouble;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateInteger;
+import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -47,6 +49,8 @@ import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.
 @RunWith(AlchemyTestRunner.class)
 public class MemoryBlackNectarServiceTest 
 {
+    @GeneratePojo
+    private BlackNectarSearchRequest request;
 
     @GenerateString(ALPHABETIC)
     private String searchTerm;
@@ -79,6 +83,12 @@ public class MemoryBlackNectarServiceTest
         center = one(locations());
         stores = listOf(BlackNectarGenerators.stores());
         store = Lists.oneOf(stores);
+        
+        request = new BlackNectarSearchRequest()
+            .withCenter(center)
+            .withRadius(radius)
+            .withLimit(limit)
+            .withSearchTerm(searchTerm);
     }
 
     private void setupMocks() throws Exception
@@ -99,18 +109,13 @@ public class MemoryBlackNectarServiceTest
     {
         Location location = store.getLocation();
         
-        List<Store> result = instance.searchForStoresByLocation(location);
+        BlackNectarSearchRequest request = new BlackNectarSearchRequest()
+            .withCenter(location);
+        
+        List<Store> result = instance.searchForStores(request);
         assertThat(result, not(empty()));
+        assertThat(result, contains(store));
     }
 
-    @Test
-    public void testSearchForStoresByName_String()
-    {
-    }
-
-    @Test
-    public void testSearchForStoresByName_4args()
-    {
-    }
 
 }

@@ -18,8 +18,10 @@ package tech.blackhole.blacknectar.service.api;
 
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.blackhole.blacknectar.service.exceptions.OperationFailedException;
 import tech.blackhole.blacknectar.service.stores.Location;
 import tech.blackhole.blacknectar.service.stores.Store;
 import tech.blackhole.blacknectar.service.stores.StoreRepository;
@@ -85,30 +87,39 @@ final class MemoryBlackNectarService implements BlackNectarService
     }
 
     @Override
-    public List<Store> searchForStoresByLocation(Location center, double radius, int limit)
+    public List<Store> searchForStores(BlackNectarSearchRequest request) throws OperationFailedException
     {
-        return stores.parallelStream()
-            .filter(nearby(center, radius))
-            .collect(toList());
-    }
+        checkThat(request)
+            .usingMessage("request missing")
+            .is(notNull());
 
-    @Override
-    public List<Store> searchForStoresByName(String searchTerm)
-    {
-        return stores.parallelStream()
-            .filter(containsInName(searchTerm))
-            .collect(toList());
-    }
+        Stream<Store> stream = stores.parallelStream();
 
-    @Override
-    public List<Store> searchForStoresByName(String searchTerm, Location center, double radius, int limit)
-    {
-        return stores.parallelStream()
-            .filter(containsInName(searchTerm))
-            .filter(nearby(center, radius))
-            .collect(toList());
-    }
+        if (request.hasLimit())
+        {
+            stream = stream.limit(request.limit);
+        }
 
+        if (request.hasSearchTerm())
+        {
+            stream = stream.filter(containsInName(request.searchTerm));
+        }
+        
+        if (request.hasCenter())
+        {
+            if (request.hasRadius())
+            {
+                stream = stream.filter(nearby(request.center, request.radiusInMeters));
+            }
+            else 
+            {
+                stream = stream.filter(nearby(request.center, DEFAULT_RADIUS));
+            }
+        }
+
+        return stream.collect(toList());
+    }
+    
     private Predicate<Store> nearby(Location center, double radius)
     {
         return store ->
@@ -133,4 +144,5 @@ final class MemoryBlackNectarService implements BlackNectarService
             return storeName.contains(term);
         };
     }
+
 }

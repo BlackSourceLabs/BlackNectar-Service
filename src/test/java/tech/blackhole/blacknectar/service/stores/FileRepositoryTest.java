@@ -18,6 +18,7 @@ package tech.blackhole.blacknectar.service.stores;
 
 import java.util.List;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
@@ -66,6 +67,7 @@ public class FileRepositoryTest
         
     }
 
+    @Ignore
     @DontRepeat
     @Test
     public void testGetAllStores()

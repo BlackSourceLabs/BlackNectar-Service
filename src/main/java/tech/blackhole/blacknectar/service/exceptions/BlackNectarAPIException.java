@@ -17,30 +17,30 @@
 package tech.blackhole.blacknectar.service.exceptions;
 
 /**
- * Thrown when an API call fails.
- * 
+ * Public Exception for all errors thrown by the BlackNectar Service.
+ *
  * @author SirWellington
  */
-public class OperationFailedException extends BlackNectarAPIException
+public class BlackNectarAPIException extends RuntimeException
 {
 
-    public OperationFailedException()
+    public BlackNectarAPIException()
     {
     }
 
-    public OperationFailedException(String message)
+    public BlackNectarAPIException(String message)
     {
         super(message);
     }
 
-    public OperationFailedException(String message, Throwable cause)
+    public BlackNectarAPIException(String message, Throwable cause)
     {
         super(message, cause);
     }
 
-    public OperationFailedException(Throwable cause)
+    public BlackNectarAPIException(Throwable cause)
     {
         super(cause);
     }
-
+    
 }

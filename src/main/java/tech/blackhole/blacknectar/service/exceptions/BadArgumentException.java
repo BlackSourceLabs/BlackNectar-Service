@@ -14,31 +14,32 @@
  * limitations under the License.
  */
 
+ 
 package tech.blackhole.blacknectar.service.exceptions;
 
 /**
- * Thrown when an API call fails.
- * 
+ * Thrown when the service receives a bad argument.
+ *
  * @author SirWellington
  */
-public class OperationFailedException extends BlackNectarAPIException
+public class BadArgumentException extends BlackNectarAPIException
 {
 
-    public OperationFailedException()
+    public BadArgumentException()
     {
     }
 
-    public OperationFailedException(String message)
+    public BadArgumentException(String message)
     {
         super(message);
     }
 
-    public OperationFailedException(String message, Throwable cause)
+    public BadArgumentException(String message, Throwable cause)
     {
         super(message, cause);
     }
 
-    public OperationFailedException(Throwable cause)
+    public BadArgumentException(Throwable cause)
     {
         super(cause);
     }

@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import spark.QueryParamsMap;
 import spark.Request;
 import spark.Response;
 import tech.blackhole.blacknectar.service.stores.Store;
@@ -33,6 +34,7 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 
@@ -71,6 +73,7 @@ public class ServerTest
     private void setupMocks() throws Exception
     {
         when(request.ip()).thenReturn(ip);
+        when(request.queryMap()).thenReturn(mock(QueryParamsMap.class));
     }
 
     @Test

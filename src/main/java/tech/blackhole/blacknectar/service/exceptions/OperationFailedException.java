@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tech.blackhole.blacknectar.service;
+package tech.blackhole.blacknectar.service.exceptions;
 
 /**
  * Thrown when an API call fails.

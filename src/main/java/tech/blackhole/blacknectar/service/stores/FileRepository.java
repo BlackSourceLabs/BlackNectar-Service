@@ -45,12 +45,19 @@ final class FileRepository implements StoreRepository
     private final static Logger LOG = LoggerFactory.getLogger(FileRepository.class);
     private static final String FILENAME = "Stores.csv";
 
+    private final int MAXIMUM_STORES = 10_000;
+    
     @Override
     public List<Store> getAllStores()
     {
         String file = readCSVFile();
         List<String> lines = splitFileIntoLines(file);
         removeFirstLine(lines);
+        
+        if (lines.size() > MAXIMUM_STORES)
+        {
+            lines = lines.subList(0, MAXIMUM_STORES);
+        }
         
         return lines.parallelStream()
             .map(this::toStore)

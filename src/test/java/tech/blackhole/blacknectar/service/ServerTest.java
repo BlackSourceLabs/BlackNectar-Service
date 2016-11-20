@@ -29,7 +29,9 @@ import tech.sirwellington.alchemy.generator.NumberGenerators;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
@@ -87,13 +89,12 @@ public class ServerTest
         assertThat(store, is(Store.SAMPLE_STORE.asJSON()));
     }
 
-//    @Ignore
-//    @Test
-//    public void testGetStores()
-//    {
-//        JsonArray json = instance.getStores(request, response);
-//        assertThat(json, notNullValue());
-//        assertThat(json.size(), greaterThanOrEqualTo(200_000));
-//    }
+    @Test
+    public void testGetStores()
+    {
+        JsonArray json = instance.getStores(request, response);
+        assertThat(json, notNullValue());
+        assertThat(json.size(), greaterThanOrEqualTo(1_000));
+    }
 
 }

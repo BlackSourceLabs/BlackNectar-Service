@@ -80,7 +80,7 @@ public final class Server
         
         response.status(200);
         //U+1F573
-        return "BlackWhole 🕳";
+        return "🌑";
     }
     
     JsonObject getSampleStore(Request request, Response response)

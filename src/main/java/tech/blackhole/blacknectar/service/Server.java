@@ -88,7 +88,7 @@ public final class Server
         
         response.status(200);
         //U+1F573
-        return "🌑";
+        return Strings.repeat("🌑", 1000);
     }
     
     JsonArray getSampleStore(Request request, Response response)

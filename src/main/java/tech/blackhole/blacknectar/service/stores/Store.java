@@ -174,10 +174,10 @@ public class Store implements JSONRepresentable
      * Facilitates construction of {@link Store} objects.
      */
     @BuilderPattern(role = BUILDER)
-    static class Builder
+    public final static class Builder
     {
 
-        static Builder newInstance()
+        public static Builder newInstance()
         {
             return new Builder();
         }
@@ -191,7 +191,7 @@ public class Store implements JSONRepresentable
 
         }
 
-        Builder withName(@NonEmpty String name)
+        public Builder withName(@NonEmpty String name)
         {
             checkThat(name)
                 .usingMessage("name cannot be empty")
@@ -201,7 +201,7 @@ public class Store implements JSONRepresentable
             return this;
         }
 
-        Builder withAddress(@Required Address address)
+        public Builder withAddress(@Required Address address)
         {
             checkThat(address)
                 .is(validAddress());
@@ -210,7 +210,7 @@ public class Store implements JSONRepresentable
             return this;
         }
 
-        Builder withLocation(@Required Location location)
+        public Builder withLocation(@Required Location location)
         {
             checkThat(location)
                 .is(validLocation());
@@ -219,7 +219,7 @@ public class Store implements JSONRepresentable
             return this;
         }
 
-        Store build() throws IllegalStateException
+        public Store build() throws IllegalStateException
         {
             checkThat(location)
                 .usingMessage("Location is missing or invalid")

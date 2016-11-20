@@ -20,23 +20,28 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.blackhole.blacknectar.service.stores.Location;
+import tech.sirwellington.alchemy.generator.NumberGenerators;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
+import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static tech.blackhole.blacknectar.service.BlackNectarGenerators.locations;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.doubles;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
+import static tech.sirwellington.alchemy.generator.NumberGenerators.negativeIntegers;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
  *
  * @author SirWellington
  */
-@Repeat(10)
+@Repeat(50)
 @RunWith(AlchemyTestRunner.class)
 public class BlackNectarRequestTest
 {
@@ -122,36 +127,61 @@ public class BlackNectarRequestTest
     @Test
     public void testWithSearchTerm()
     {
+        BlackNectarRequest result = instance.withSearchTerm(searchTerm);
+        assertThat(result, notNullValue());
+        assertThat(result.searchTerm, is(searchTerm));
+    }
+    
+    @DontRepeat
+    @Test
+    public void testWithSearchTermWithBadArg()
+    {
+        assertThrows(() -> instance.withSearchTerm(""));
     }
 
     @Test
     public void testWithCenter()
     {
+        BlackNectarRequest result = instance.withCenter(center);
+        assertThat(result, notNullValue());
+        assertThat(result.center, is(center));
+    }
+
+    @DontRepeat
+    @Test
+    public void testWithCenterWithBadArg()
+    {
+        assertThrows(() -> instance.withCenter(null));
     }
 
     @Test
     public void testWithLimit()
     {
+        BlackNectarRequest result = instance.withLimit(limit);
+        assertThat(result, notNullValue());
+        assertThat(result.limit, is(limit));
+    }
+
+    @Test
+    public void testWithLimitWithBadArgs()
+    {
+        final int badLimit = one(negativeIntegers());
+        assertThrows(() -> instance.withLimit(badLimit));
     }
 
     @Test
     public void testWithRadius()
     {
+        BlackNectarRequest result = instance.withRadius(radiusInMeters);
+        assertThat(result, notNullValue());
+        assertThat(result.radiusInMeters, is(radiusInMeters));
     }
 
     @Test
-    public void testHashCode()
+    public void testWithRadiusWithBadArgs()
     {
-    }
-
-    @Test
-    public void testEquals()
-    {
-    }
-
-    @Test
-    public void testToString()
-    {
+        double badRadius = one(NumberGenerators.doubles(-10000, -1));
+        assertThrows(() -> instance.withRadius(badRadius));
     }
 
 }

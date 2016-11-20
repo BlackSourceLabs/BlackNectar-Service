@@ -189,7 +189,7 @@ public final class Server
         
         //Search Term, Center, Radius, Limit
         if (hasSearchTerm(searchTerm) && 
-            hasLocationParameters(queryParams) &&
+            hasCenter(center) &&
             hasLimit(limit) &&
             hasRadius(radius))
         {
@@ -198,14 +198,14 @@ public final class Server
         
         //Search Term, Center, Radius
         if (hasSearchTerm(searchTerm) &&
-            hasLocationParameters(queryParams) &&
+            hasCenter(center) &&
             hasRadius(radius))
         {
             return service.searchForStoresByName(searchTerm, center, radius);
         }
         
         //Center, Radius, Limit
-        if (hasLocationParameters(queryParams) && 
+        if (hasCenter(center) && 
             hasRadius(radius) &&
             hasLimit(limit))
         {
@@ -213,7 +213,7 @@ public final class Server
         }
         
         //Center, Radius
-        if (hasLocationParameters(queryParams) && hasRadius(radius))
+        if (hasCenter(center) && hasRadius(radius))
         {
             return service.searchForStoresByLocation(center, radius);
         }
@@ -228,6 +228,12 @@ public final class Server
         if (hasLimit(limit))
         {
             return service.getAllStores(limit);
+        }
+        
+        //Center
+        if (hasCenter(center))
+        {
+            return service.searchForStoresByLocation(center);
         }
         
         return service.getAllStores();
@@ -267,6 +273,11 @@ public final class Server
     private boolean hasRadius(double radius)
     {
         return radius > 0.0;
+    }
+
+    private boolean hasCenter(Location center)
+    {
+        return center != null;
     }
     
     static class QueryKeys

@@ -45,7 +45,7 @@ final class FileRepository implements StoreRepository
     private final static Logger LOG = LoggerFactory.getLogger(FileRepository.class);
     private static final String FILENAME = "Stores.csv";
 
-    private final int MAXIMUM_STORES = 20_000;
+    private final int MAXIMUM_STORES = 30_000;
     
     @Override
     public List<Store> getAllStores()

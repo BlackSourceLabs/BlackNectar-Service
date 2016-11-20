@@ -51,7 +51,7 @@ public interface BlackNectarService
     /**
      * Get all of the EBT stores, with a specified limit.
      * 
-     * @param limit A limit on the query, so that no more than {@code limit} stores are returned. Must be >= 0. A value of 0 mean
+     * @param limit A limit on the query, so that no more than {@code limit} stores are returned. Must be >= 0. A value of 0 means
      *              no limit.
      *
      * @return 
@@ -65,9 +65,9 @@ public interface BlackNectarService
      * 
      * @return 
      */
-    default List<Store> searchForStores(@Required Location center)
+    default List<Store> searchForStoresByLocation(@Required Location center)
     {
-        return searchForStores(center, DEFAULT_RADIUS, 0);
+        return searchForStoresByLocation(center, DEFAULT_RADIUS, 0);
     }
     
     /**
@@ -78,9 +78,9 @@ public interface BlackNectarService
      * 
      * @return 
      */
-    default List<Store> searchForStores(@Required Location center, double radius)
+    default List<Store> searchForStoresByLocation(@Required Location center, double radius)
     {
-        return searchForStores(center, radius, 0);
+        return searchForStoresByLocation(center, radius, 0);
     }
     
     
@@ -89,11 +89,11 @@ public interface BlackNectarService
      * 
      * @param center Only searches for stores close to this location.
      * @param radius Radius, in meters, of all
-     * @param limit Limit the query.
-     * 
+     * @param limit A limit on the query, so that no more than {@code limit} stores are returned. Must be >= 0. A value of 0 means
+     *              no limit.     * 
      * @return 
      */
-    List<Store> searchForStores(@Required Location center, double radius, int limit);
+    List<Store> searchForStoresByLocation(@Required Location center, double radius, int limit);
     
     /**
      * Search for all stores that match {@code searchTerm} in the Store Name.
@@ -102,7 +102,7 @@ public interface BlackNectarService
      * 
      * @return 
      */
-    List<Store> searchForStores(@NonEmpty String searchTerm);
+    List<Store> searchForStoresByName(@NonEmpty String searchTerm);
     
     /**
      * Search for all of the stores that match {@code searchTerm} and are close to {@code center}.
@@ -112,9 +112,9 @@ public interface BlackNectarService
      * 
      * @return 
      */
-    default List<Store> searchForStores(@NonEmpty String searchTerm, @Required Location center)
+    default List<Store> searchForStoresByName(@NonEmpty String searchTerm, @Required Location center)
     {
-        return this.searchForStores(searchTerm, center, DEFAULT_RADIUS);
+        return this.searchForStoresByName(searchTerm, center, DEFAULT_RADIUS);
     }
     
     /**
@@ -126,6 +126,23 @@ public interface BlackNectarService
      * 
      * @return 
      */
-    List<Store> searchForStores(@NonEmpty String searchTerm, @Required Location center, double radius);
+    default List<Store> searchForStoresByName(@NonEmpty String searchTerm, @Required Location center, double radius)
+    {
+        return this.searchForStoresByName(searchTerm, center, radius, 0);
+    }
+    
+    
+    /**
+     * Search for all of the stores that match {@code searchTerm} and are close to {@code center} within a radius of {@code radius}.
+     * 
+     * @param searchTerm Searches for stores with names matching this search term.
+     * @param center Only searches for stores close to this location.
+     * @param radius Radius, in meters, of the geo-query.
+     * @param limit A limit on the query, so that no more than {@code limit} stores are returned. Must be >= 0. A value of 0 means
+     *              no limit.
+     * 
+     * @return 
+     */
+    List<Store> searchForStoresByName(@NonEmpty String searchTerm, @Required Location center, double radius, int limit);
     
 }

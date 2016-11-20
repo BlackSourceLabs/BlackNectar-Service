@@ -53,7 +53,7 @@ public interface BlackNectarService
     /**
      * Get all of the EBT stores, with a specified limit.
      * 
-     * @param limit A limit on the query, so that no more than {@code limit} stores are returned. Must be {@cpde >= 0}. A value of 0 means
+     * @param limit A limit on the query, so that no more than {@code limit} stores are returned. Must be {@code >= 0}. A value of 0 means
      *              no limit.
      *
      * @return 

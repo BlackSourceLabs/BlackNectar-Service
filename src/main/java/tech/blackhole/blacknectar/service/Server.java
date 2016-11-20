@@ -18,7 +18,6 @@ package tech.blackhole.blacknectar.service;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import org.slf4j.Logger;
@@ -29,7 +28,6 @@ import spark.Spark;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
 import tech.blackhole.blacknectar.service.stores.Store;
-import tech.blackhole.blacknectar.service.stores.StoreRepository;
 
 /**
  *
@@ -43,8 +41,7 @@ public final class Server
     
     final static String APPLICATION_JSON = "application/json";
     
-    private final StoreRepository repository = StoreRepository.FILE;
-    private final List<Store> stores = repository.getAllStores();
+    private final BlackNectarService service = new MemoryBlackNectarService();
     
     public static void main(String[] args)
     {
@@ -134,7 +131,8 @@ public final class Server
         BiConsumer<JsonArray, JsonObject> accumulator = (array, object) -> array.add(object);
         BiConsumer<JsonArray, JsonArray> combiner = (first, second) -> first.addAll(second);
 
-        return stores.stream()
+        return service.getAllStores()
+            .stream()
             .map(Store::asJSON)
             .collect(supplier, accumulator, combiner);
     }

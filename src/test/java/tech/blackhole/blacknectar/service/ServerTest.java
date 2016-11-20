@@ -37,6 +37,10 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 
 /**
  *
@@ -93,9 +97,9 @@ public class ServerTest
     }
 
     @Test
-    public void testGetStores()
+    public void testSearchStores()
     {
-        JsonArray json = instance.getStores(request, response);
+        JsonArray json = instance.searchStores(request, response);
         assertThat(json, notNullValue());
         assertThat(json.size(), greaterThanOrEqualTo(1_000));
     }

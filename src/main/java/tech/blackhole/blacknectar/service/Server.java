@@ -85,7 +85,7 @@ public final class Server
     
     void setupRoutes()
     {
-        Spark.get("/stores", this::getStores);
+        Spark.get("/stores", this::searchStores);
         Spark.get("/sample-store", this::getSampleStore);
         Spark.get("/", this::sayHello);
     }
@@ -135,9 +135,9 @@ public final class Server
         }
     }
 
-    JsonArray getStores(Request request, Response response)
+    JsonArray searchStores(Request request, Response response)
     {
-        LOG.info("Received GET request to GET all stores from IP [{}]", request.ip());
+        LOG.info("Received GET request to search stores from IP [{}]", request.ip());
 
         AROMA.begin().titled("Request Received")
             .text("To get stores from IP [{}] with query params: [{}]", request.ip(), request.queryString())

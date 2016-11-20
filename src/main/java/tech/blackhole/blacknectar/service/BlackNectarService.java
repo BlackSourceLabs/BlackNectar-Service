@@ -35,6 +35,8 @@ public interface BlackNectarService
 {
     /**
      * The default radius, in meters, used in queries where a radius is not provided.
+     * <p>
+     * 5 Kilometers.
      */
     public double DEFAULT_RADIUS = 5_000;
 

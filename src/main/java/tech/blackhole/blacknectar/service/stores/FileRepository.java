@@ -31,8 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Urgency;
-import tech.blackhole.blacknectar.service.OperationFailedException;
 import tech.blackhole.blacknectar.service.Server;
+import tech.blackhole.blacknectar.service.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 
 /**

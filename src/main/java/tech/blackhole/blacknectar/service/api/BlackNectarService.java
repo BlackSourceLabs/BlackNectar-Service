@@ -15,7 +15,7 @@
  */
 
 
-package tech.blackhole.blacknectar.service;
+package tech.blackhole.blacknectar.service.api;
 
 import java.util.List;
 import tech.blackhole.blacknectar.service.stores.Location;
@@ -146,5 +146,15 @@ public interface BlackNectarService
      * @return 
      */
     List<Store> searchForStoresByName(@NonEmpty String searchTerm, @Required Location center, double radius, int limit);
+    
+    /**
+     * Creates a new in-memory service that performs all operations in-memory.
+     * 
+     * @return 
+     */
+    static BlackNectarService newMemoryService()
+    {
+        return new MemoryBlackNectarService();
+    }
     
 }

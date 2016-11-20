@@ -15,7 +15,7 @@
  */
 
 
-package tech.blackhole.blacknectar.service;
+package tech.blackhole.blacknectar.service.api;
 
 import tech.blackhole.blacknectar.service.stores.Location;
 import tech.sirwellington.alchemy.annotations.arguments.Required;

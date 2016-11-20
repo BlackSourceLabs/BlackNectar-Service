@@ -29,6 +29,7 @@ import spark.Response;
 import spark.Spark;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
+import tech.blackhole.blacknectar.service.api.BlackNectarService;
 import tech.blackhole.blacknectar.service.stores.Location;
 import tech.blackhole.blacknectar.service.stores.Store;
 
@@ -47,7 +48,7 @@ public final class Server
     
     final static String APPLICATION_JSON = "application/json";
     
-    private final BlackNectarService service = new MemoryBlackNectarService();
+    private final BlackNectarService service = BlackNectarService.newMemoryService();
     
     public static void main(String[] args)
     {

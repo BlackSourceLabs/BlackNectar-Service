@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package tech.blackhole.blacknectar.service;
+package tech.blackhole.blacknectar.service.api;
 
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import sir.wellington.alchemy.collections.lists.Lists;
+import tech.blackhole.blacknectar.service.BlackNectarGenerators;
 import tech.blackhole.blacknectar.service.stores.Location;
 import tech.blackhole.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;

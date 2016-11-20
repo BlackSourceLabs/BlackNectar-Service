@@ -17,7 +17,6 @@
 package tech.blackhole.blacknectar.service;
 
 import com.google.gson.JsonObject;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
@@ -41,7 +40,7 @@ public final class Server
     final static String APPLICATION_JSON = "application/json";
     
     private final StoreRepository repository = StoreRepository.FILE;
-    private final List<Store> stores = repository.getAllStores();
+//    private final List<Store> stores = repository.getAllStores();
     
     public static void main(String[] args)
     {

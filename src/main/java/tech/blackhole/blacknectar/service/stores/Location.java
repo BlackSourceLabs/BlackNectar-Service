@@ -58,7 +58,7 @@ public final class Location implements JSONRepresentable
         this.json = createJSON();
     }
     
-    static AlchemyAssertion<Location> validLocation()
+    public static AlchemyAssertion<Location> validLocation()
     {
         return location ->
         {
@@ -71,7 +71,7 @@ public final class Location implements JSONRepresentable
         };
     }
     
-    static AlchemyAssertion<Double> validLatitude()
+    public static AlchemyAssertion<Double> validLatitude()
     {
         return lat ->
         {
@@ -83,7 +83,7 @@ public final class Location implements JSONRepresentable
         
     }
     
-    static AlchemyAssertion<Double> validLongitude()
+    public static AlchemyAssertion<Double> validLongitude()
     {
         return lon ->
         {

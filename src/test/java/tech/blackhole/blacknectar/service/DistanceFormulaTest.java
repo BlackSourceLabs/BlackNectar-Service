@@ -78,7 +78,7 @@ public class DistanceFormulaTest
         first = new Location(36.12, -86.67);
         second = new Location(33.94, -118.40);
 
-        double expected = 2887.2599506071124;
+        double expected = 2887.2599506071124 * 1_000;
         double result = formula.distanceBetween(first, second);
 
         Assert.assertEquals(expected, result, 0.2);

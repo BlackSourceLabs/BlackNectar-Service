@@ -84,7 +84,7 @@ interface DistanceFormula
             final double harvesine = harvesineOfLatitude +(firstCosine * secondConsine * harvesineOfLongitude);
             final double inverseHarvesine = Math.asin(Math.sqrt(harvesine));
             
-            final double distance = 2 * inverseHarvesine * RADIUS_OF_EARTH_IN_KILOMETERS;
+            final double distance = 2 * inverseHarvesine * RADIUS_OF_EARTH_IN_KILOMETERS * 1_000;
             
             return distance;
         }

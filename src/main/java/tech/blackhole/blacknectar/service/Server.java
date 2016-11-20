@@ -92,7 +92,7 @@ public final class Server
         LOG.info("Received GET request to GET a Sample Store from IP [{}]", request.ip());
 
         AROMA.begin().titled("Request Received")
-            .text("From IP [{}]", request.ip())
+            .text("Request to get sample store from IP [{}]", request.ip())
             .withUrgency(Urgency.LOW)
             .send();
 
@@ -123,7 +123,7 @@ public final class Server
         LOG.info("Received GET request to GET all stores from IP [{}]", request.ip());
 
         AROMA.begin().titled("Request Received")
-            .text("From IP [{}]", request.ip())
+            .text("To get ALL stores from IP [{}]", request.ip())
             .withUrgency(Urgency.LOW)
             .send();
 

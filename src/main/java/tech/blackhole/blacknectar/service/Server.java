@@ -16,11 +16,8 @@
 
 package tech.blackhole.blacknectar.service;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
@@ -68,8 +65,8 @@ public final class Server
     
     void setupRoutes()
     {
-        Spark.get("/stores", this::getStores);
-        Spark.get("/sample-store", this::getStores);
+//        Spark.get("/stores", this::getStores);
+        Spark.get("/sample-store", this::getSampleStore);
         Spark.get("/", this::sayHello);
     }
     
@@ -115,24 +112,24 @@ public final class Server
         }
     }
 
-    JsonArray getStores(Request request, Response response)
-    {
-        LOG.info("Received GET request to GET all stores from IP [{}]", request.ip());
-
-        AROMA.begin().titled("Request Received")
-            .text("From IP [{}]", request.ip())
-            .withUrgency(Urgency.LOW)
-            .send();
-
-        response.status(200);
-        response.type(APPLICATION_JSON);
-        
-        Supplier<JsonArray> supplier = () -> new JsonArray();
-        BiConsumer<JsonArray, JsonObject> accumulator = (array, object) -> array.add(object);
-        BiConsumer<JsonArray, JsonArray> combiner = (first, second) -> first.addAll(second);
-        
-        return stores.stream()
-            .map(Store::asJSON)
-            .collect(supplier, accumulator, combiner);
-    }
+//    JsonArray getStores(Request request, Response response)
+//    {
+//        LOG.info("Received GET request to GET all stores from IP [{}]", request.ip());
+//
+//        AROMA.begin().titled("Request Received")
+//            .text("From IP [{}]", request.ip())
+//            .withUrgency(Urgency.LOW)
+//            .send();
+//
+//        response.status(200);
+//        response.type(APPLICATION_JSON);
+//        
+//        Supplier<JsonArray> supplier = () -> new JsonArray();
+//        BiConsumer<JsonArray, JsonObject> accumulator = (array, object) -> array.add(object);
+//        BiConsumer<JsonArray, JsonArray> combiner = (first, second) -> first.addAll(second);
+//        
+//        return stores.stream()
+//            .map(Store::asJSON)
+//            .collect(supplier, accumulator, combiner);
+//    }
 }

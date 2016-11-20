@@ -126,7 +126,7 @@ public final class Server
         LOG.info("Received GET request to GET all stores from IP [{}]", request.ip());
 
         AROMA.begin().titled("Request Received")
-            .text("To get ALL stores from IP [{}]", request.ip())
+            .text("To get stores from IP [{}] with query params: [{}]", request.ip(), request.queryMap().toMap())
             .withUrgency(Urgency.LOW)
             .send();
 

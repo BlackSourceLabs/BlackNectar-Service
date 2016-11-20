@@ -67,7 +67,7 @@ public interface BlackNectarService
      */
     default List<Store> searchForStores(@Required Location center)
     {
-        return searchForStores(center, DEFAULT_RADIUS);
+        return searchForStores(center, DEFAULT_RADIUS, 0);
     }
     
     /**
@@ -78,7 +78,22 @@ public interface BlackNectarService
      * 
      * @return 
      */
-    List<Store> searchForStores(@Required Location center, double radius);
+    default List<Store> searchForStores(@Required Location center, double radius)
+    {
+        return searchForStores(center, radius, 0);
+    }
+    
+    
+    /**
+     * Search for all of the stores around the specified location
+     * 
+     * @param center Only searches for stores close to this location.
+     * @param radius Radius, in meters, of all
+     * @param limit Limit the query.
+     * 
+     * @return 
+     */
+    List<Store> searchForStores(@Required Location center, double radius, int limit);
     
     /**
      * Search for all stores that match {@code searchTerm} in the Store Name.

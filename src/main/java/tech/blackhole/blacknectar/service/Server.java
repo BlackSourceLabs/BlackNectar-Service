@@ -16,7 +16,7 @@
 
 package tech.blackhole.blacknectar.service;
 
-import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
@@ -83,7 +83,7 @@ public final class Server
         return "🌑";
     }
     
-    JsonObject getSampleStore(Request request, Response response)
+    JsonArray getSampleStore(Request request, Response response)
     {
         LOG.info("Received GET request to GET a Sample Store from IP [{}]", request.ip());
 
@@ -98,8 +98,10 @@ public final class Server
         try
         {
             Store store = Store.SAMPLE_STORE;
-
-            return store.asJSON();
+            
+            JsonArray json = new JsonArray();
+            json.add(store.asJSON());
+            return json;
         }
         catch (Exception ex)
         {
@@ -107,7 +109,8 @@ public final class Server
                 .text("Could not load Store, {}", ex)
                 .withUrgency(Urgency.HIGH)
                 .send();
-            return new JsonObject();
+            
+            return new JsonArray();
         }
     }
 

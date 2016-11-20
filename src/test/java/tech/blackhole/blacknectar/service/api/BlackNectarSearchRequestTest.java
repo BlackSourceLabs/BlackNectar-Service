@@ -43,13 +43,13 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
  */
 @Repeat(50)
 @RunWith(AlchemyTestRunner.class)
-public class BlackNectarRequestTest
+public class BlackNectarSearchRequestTest
 {
 
     @GeneratePojo
-    private BlackNectarRequest generated;
+    private BlackNectarSearchRequest generated;
 
-    private BlackNectarRequest instance;
+    private BlackNectarSearchRequest instance;
 
     private Location center;
     private double radiusInMeters;
@@ -61,7 +61,7 @@ public class BlackNectarRequestTest
     {
         setupData();
 
-        instance = new BlackNectarRequest();
+        instance = new BlackNectarSearchRequest();
     }
 
     private void setupData() throws Exception
@@ -127,7 +127,7 @@ public class BlackNectarRequestTest
     @Test
     public void testWithSearchTerm()
     {
-        BlackNectarRequest result = instance.withSearchTerm(searchTerm);
+        BlackNectarSearchRequest result = instance.withSearchTerm(searchTerm);
         assertThat(result, notNullValue());
         assertThat(result.searchTerm, is(searchTerm));
     }
@@ -142,7 +142,7 @@ public class BlackNectarRequestTest
     @Test
     public void testWithCenter()
     {
-        BlackNectarRequest result = instance.withCenter(center);
+        BlackNectarSearchRequest result = instance.withCenter(center);
         assertThat(result, notNullValue());
         assertThat(result.center, is(center));
     }
@@ -157,7 +157,7 @@ public class BlackNectarRequestTest
     @Test
     public void testWithLimit()
     {
-        BlackNectarRequest result = instance.withLimit(limit);
+        BlackNectarSearchRequest result = instance.withLimit(limit);
         assertThat(result, notNullValue());
         assertThat(result.limit, is(limit));
     }
@@ -172,7 +172,7 @@ public class BlackNectarRequestTest
     @Test
     public void testWithRadius()
     {
-        BlackNectarRequest result = instance.withRadius(radiusInMeters);
+        BlackNectarSearchRequest result = instance.withRadius(radiusInMeters);
         assertThat(result, notNullValue());
         assertThat(result.radiusInMeters, is(radiusInMeters));
     }

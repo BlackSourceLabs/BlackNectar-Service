@@ -41,17 +41,17 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
 @Pojo
 @Mutable
 @ThreadUnsafe
-public class BlackNectarRequest
+public class BlackNectarSearchRequest
 {
 
-    private final static Logger LOG = LoggerFactory.getLogger(BlackNectarRequest.class);
+    private final static Logger LOG = LoggerFactory.getLogger(BlackNectarSearchRequest.class);
 
     public Location center;
     public double radiusInMeters;
     public int limit;
     public String searchTerm;
 
-    public BlackNectarRequest()
+    public BlackNectarSearchRequest()
     {
         this.searchTerm = "";
         this.center = null;
@@ -59,7 +59,7 @@ public class BlackNectarRequest
         this.limit = 0;
     }
 
-    public BlackNectarRequest(String searchTerm, Location center, double radiusInMeters, int limit)
+    public BlackNectarSearchRequest(String searchTerm, Location center, double radiusInMeters, int limit)
     {
         this.searchTerm = searchTerm;
         this.center = center;
@@ -87,7 +87,7 @@ public class BlackNectarRequest
         return !Strings.isNullOrEmpty(searchTerm);
     }
     
-    public BlackNectarRequest withSearchTerm(String searchTerm)
+    public BlackNectarSearchRequest withSearchTerm(String searchTerm)
     {
         checkThat(searchTerm)
             .usingMessage("searchTerm cannot be empty")
@@ -97,7 +97,7 @@ public class BlackNectarRequest
         return this;
     }
     
-    public BlackNectarRequest withCenter(@Required Location center)
+    public BlackNectarSearchRequest withCenter(@Required Location center)
     {
         checkThat(center)
             .usingMessage("center cannot be null")
@@ -107,7 +107,7 @@ public class BlackNectarRequest
         return this;
     }
     
-    public BlackNectarRequest withLimit(int limit)
+    public BlackNectarSearchRequest withLimit(int limit)
     {
         checkThat(limit)
             .is(positiveInteger());
@@ -116,7 +116,7 @@ public class BlackNectarRequest
         return this;
     }
     
-    public BlackNectarRequest withRadius(double radius)
+    public BlackNectarSearchRequest withRadius(double radius)
     {
         checkThat(radius)
             .is(greaterThanOrEqualTo(0.0));
@@ -152,7 +152,7 @@ public class BlackNectarRequest
         {
             return false;
         }
-        final BlackNectarRequest other = (BlackNectarRequest) obj;
+        final BlackNectarSearchRequest other = (BlackNectarSearchRequest) obj;
         if (Double.doubleToLongBits(this.radiusInMeters) != Double.doubleToLongBits(other.radiusInMeters))
         {
             return false;
@@ -175,7 +175,7 @@ public class BlackNectarRequest
     @Override
     public String toString()
     {
-        return "BlackNectarRequest{" + "center=" + center + ", radiusInMeters=" + radiusInMeters + ", limit=" + limit + ", searchTerm=" + searchTerm + '}';
+        return "BlackNectarSearchRequest{" + "center=" + center + ", radiusInMeters=" + radiusInMeters + ", limit=" + limit + ", searchTerm=" + searchTerm + '}';
     }
 
 }

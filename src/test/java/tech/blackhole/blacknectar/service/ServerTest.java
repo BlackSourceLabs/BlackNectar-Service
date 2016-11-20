@@ -19,6 +19,7 @@ package tech.blackhole.blacknectar.service;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -85,6 +86,7 @@ public class ServerTest
         assertThat(store, is(Store.SAMPLE_STORE.asJSON()));
     }
 
+    @Ignore
     @Test
     public void testGetStores()
     {

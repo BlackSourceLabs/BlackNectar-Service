@@ -54,7 +54,7 @@ public class BlackNectarRequest
     public BlackNectarRequest()
     {
         this.searchTerm = "";
-        this.center = new Location(0, 0);
+        this.center = null;
         this.radiusInMeters = 0;
         this.limit = 0;
     }

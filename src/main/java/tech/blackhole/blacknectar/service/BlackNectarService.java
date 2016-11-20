@@ -17,12 +17,100 @@
 
 package tech.blackhole.blacknectar.service;
 
+import java.util.List;
+import tech.blackhole.blacknectar.service.stores.Location;
+import tech.blackhole.blacknectar.service.stores.Store;
+import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
+import tech.sirwellington.alchemy.annotations.arguments.Required;
+
 
 /**
- *
+ * The BlackNectarService serves as the Backbone for the REST API.
+ * 
+ * It allows for querying EBT stores by name and location.
+ * 
  * @author SirWellington
  */
 public interface BlackNectarService 
 {
+    /**
+     * The default radius, in meters, used in queries where a radius is not provided.
+     */
+    public double DEFAULT_RADIUS = 5_000;
 
+    /**
+     * Get all of the EBT stores in the country.
+     * 
+     * @return  All of the Stores.
+     */
+    default List<Store> getAllStores()
+    {
+        return getAllStores(0);
+    }
+    
+    /**
+     * Get all of the EBT stores, with a specified limit.
+     * 
+     * @param limit A limit on the query, so that no more than {@code limit} stores are returned. Must be >= 0. A value of 0 mean
+     *              no limit.
+     *
+     * @return 
+     */
+    List<Store> getAllStores(int limit);
+    
+    /**
+     * Search for stores around the specified location.
+     * 
+     * @param center Search for stores within this center, with a radius of {@link BlackNectarService#DEFAULT_RADIUS}.
+     * 
+     * @return 
+     */
+    default List<Store> searchForStores(@Required Location center)
+    {
+        return searchForStores(center, DEFAULT_RADIUS);
+    }
+    
+    /**
+     * Search for all of the stores around the specified location
+     * 
+     * @param center Only searches for stores close to this location.
+     * @param radius Radius, in meters, of all
+     * 
+     * @return 
+     */
+    List<Store> searchForStores(@Required Location center, double radius);
+    
+    /**
+     * Search for all stores that match {@code searchTerm} in the Store Name.
+     * 
+     * @param searchTerm The query term to use when searching for stores.
+     * 
+     * @return 
+     */
+    List<Store> searchForStores(@NonEmpty String searchTerm);
+    
+    /**
+     * Search for all of the stores that match {@code searchTerm} and are close to {@code center}.
+     * 
+     * @param searchTerm Searches for stores with names matching this search term.
+     * @param center Only searches for stores close to this location.
+     * 
+     * @return 
+     */
+    default List<Store> searchForStores(@NonEmpty String searchTerm, @Required Location center)
+    {
+        return this.searchForStores(searchTerm, center, DEFAULT_RADIUS);
+    }
+    
+    /**
+     * Search for all of the stores that match {@code searchTerm} and are close to {@code center} within a radius of {@code radius}.
+     * 
+     * @param searchTerm Searches for stores with names matching this search term.
+     * @param center Only searches for stores close to this location.
+     * @param radius Radius, in meters, of the geo-query.
+     * 
+     * @return 
+     */
+    List<Store> searchForStores(@NonEmpty String searchTerm, @Required Location center, double radius);
+    
 }

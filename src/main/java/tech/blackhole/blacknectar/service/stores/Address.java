@@ -254,7 +254,7 @@ public final class Address implements JSONRepresentable
     }
 
     @BuilderPattern(role = BUILDER)
-    static class Builder
+    public final static class Builder
     {
 
         private String addressLineOne;
@@ -276,7 +276,7 @@ public final class Address implements JSONRepresentable
         {
         }
 
-        Builder withAddressLineOne(@NonEmpty String addressLine) throws IllegalArgumentException
+        public Builder withAddressLineOne(@NonEmpty String addressLine) throws IllegalArgumentException
         {
             checkThat(addressLine)
                 .usingMessage("Address Line 1 cannot be empty")
@@ -287,7 +287,7 @@ public final class Address implements JSONRepresentable
         }
 
         @Optional
-        Builder withAddressLineTwo(@NonEmpty String addressLine) throws IllegalArgumentException
+        public Builder withAddressLineTwo(@NonEmpty String addressLine) throws IllegalArgumentException
         {
             checkThat(addressLine)
                 .usingMessage("Address Line 2 should not be empty")
@@ -297,7 +297,7 @@ public final class Address implements JSONRepresentable
             return this;
         }
 
-        Builder withCity(@NonEmpty String city) throws IllegalArgumentException
+        public Builder withCity(@NonEmpty String city) throws IllegalArgumentException
         {
             checkThat(city)
                 .usingMessage("City cannot be empty")
@@ -307,7 +307,7 @@ public final class Address implements JSONRepresentable
             return this;
         }
 
-        Builder withState(@NonEmpty String state) throws IllegalArgumentException
+        public Builder withState(@NonEmpty String state) throws IllegalArgumentException
         {
             checkThat(state)
                 .usingMessage("State cannot be empty")
@@ -318,7 +318,7 @@ public final class Address implements JSONRepresentable
         }
 
         @Optional
-        Builder withCounty(@NonEmpty String county) throws IllegalArgumentException
+        public Builder withCounty(@NonEmpty String county) throws IllegalArgumentException
         {
             checkThat(county)
                 .usingMessage("County cannot be empty")
@@ -328,7 +328,7 @@ public final class Address implements JSONRepresentable
             return this;
         }
         
-        Builder withZipCode(int zipCode) throws IllegalArgumentException
+        public Builder withZipCode(int zipCode) throws IllegalArgumentException
         {
             checkThat(zipCode).is(validZipCode());
             
@@ -337,7 +337,7 @@ public final class Address implements JSONRepresentable
         }
         
         @Optional
-        Builder withLocalZipCode(int localZipCode) throws IllegalArgumentException
+        public Builder withLocalZipCode(int localZipCode) throws IllegalArgumentException
         {
             checkThat(localZipCode)
                 .usingMessage("Local Zip Code cannot be negative")
@@ -349,7 +349,7 @@ public final class Address implements JSONRepresentable
             return this;
         }
 
-        Address build() throws IllegalStateException
+        public Address build() throws IllegalStateException
         {
             checkThat(addressLineOne, city, state, county)
                 .throwing(IllegalStateException.class)

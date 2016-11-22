@@ -19,11 +19,15 @@ package tech.blackhole.blacknectar.service.api;
 
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
+import tech.aroma.client.Aroma;
+import tech.aroma.client.Urgency;
 import tech.blackhole.blacknectar.service.exceptions.OperationFailedException;
 import tech.blackhole.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
@@ -41,18 +45,22 @@ final class SQLBlackNectarService implements BlackNectarService
 {
     private final static Logger LOG = LoggerFactory.getLogger(SQLBlackNectarService.class);
     
+    private final Aroma aroma;
     private final Connection connection;
 
-    SQLBlackNectarService(@Required Connection connection) throws SQLException
+    SQLBlackNectarService(@Required Aroma aroma, @Required Connection connection) throws SQLException
     {
-        checkThat(connection).is(notNull());
-        
+        checkThat(aroma, connection)
+            .are(notNull());
+
+        this.aroma = aroma;
+
         boolean isClosed = connection.isClosed();
         checkThat(isClosed)
             .usingMessage("connection is closed")
             .throwing(SQLException.class)
             .is(falseStatement());
-        
+
         this.connection = connection;
     }
 
@@ -62,7 +70,9 @@ final class SQLBlackNectarService implements BlackNectarService
         checkThat(limit)
             .usingMessage("limit must be >= 0")
             .is(greaterThanOrEqualTo(0));
-        
+
+        Statement statement = createStatementToGetAllStores(limit);
+
         return Lists.emptyList();
     }
 
@@ -72,8 +82,154 @@ final class SQLBlackNectarService implements BlackNectarService
         checkThat(request)
             .usingMessage("request missing")
             .is(notNull());
-        
+
         return Lists.emptyList();
+    }
+
+    void addStore(@Required Store store) throws OperationFailedException
+    {
+        checkThat(store).is(notNull());
+
+        String insertStatement = createSQLToInsertStore();
+        PreparedStatement statement = tryToPrepareStatement(insertStatement, "could not save Store to Database: " + store);
+
+        try
+        {
+            prepareStatementForStore(statement, store);
+        }
+        catch (SQLException ex)
+        {
+            LOG.error("Failed to prepare statement to insert Store [{}]", store, ex);
+
+            aroma.begin().titled("SQL Failed")
+                .text("Could not prepare statement to insert Store: [{}]", store, ex)
+                .withUrgency(Urgency.HIGH)
+                .send();
+
+            throw new OperationFailedException(ex);
+        }
+
+        try
+        {
+            int count = statement.executeUpdate();
+            LOG.info("Successfully executed statement to insert Store. Received count {} for store [{}]", count, store);
+        }
+        catch (SQLException ex)
+        {
+            LOG.error("Failed to execute statement to insert Store: [{}]", store, ex);
+
+            aroma.begin().titled("SQL Failed")
+                .text("Could not execute SQL to insert Store [{}]", store, ex)
+                .withUrgency(Urgency.HIGH)
+                .send();
+
+            throw new OperationFailedException(ex);
+        }
+
+    }
+
+    private Statement createStatementToGetAllStores(int limit) throws OperationFailedException
+    {
+        String sql = createSQLTOGetAllStores(limit);
+
+        try
+        {
+            return connection.prepareStatement(sql);
+        }
+        catch (SQLException ex)
+        {
+            LOG.error("Failed to create statement to get all stores with limit {}", limit);
+            aroma.begin().titled("SQL Failed")
+                .text("Could not create statement to get all stores: {}", ex)
+                .send();
+            throw new OperationFailedException(ex);
+        }
+    }
+
+    private String createSQLTOGetAllStores(int limit)
+    {
+        if (limit > 0)
+        {
+            return "SELECT * FROM stores";
+        }
+        else
+        {
+            return "SELECT * FROM stores LIMIT " + limit;
+        }
+    }
+
+    private String createSQLToInsertStore()
+    {
+        return "INSERT INTO stores(store_name, latitude, longitude, address, address_line_two, city, state, county, zip, local_zip)\n" +
+               "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    }
+
+    private PreparedStatement tryToPrepareStatement(String insertStatement, String message)
+    {
+        try
+        {
+            return connection.prepareStatement(insertStatement);
+        }
+        catch (SQLException ex)
+        {
+            LOG.error(message, ex);
+
+            aroma.begin().titled("SQL Failed")
+                .text(message)
+                .withUrgency(Urgency.HIGH)
+                .send();
+
+            throw new OperationFailedException(ex);
+        }
+    }
+
+    void prepareStatementForStore(PreparedStatement statement, Store store) throws SQLException
+    {
+        statement.setString(0, store.getName());
+        statement.setDouble(1, store.getLocation().getLatitude());
+        statement.setDouble(2, store.getLocation().getLongitude());
+        statement.setString(3, store.getAddress().getAddressLineOne());
+        statement.setString(4, store.getAddress().getAddressLineTwo());
+        statement.setString(5, store.getAddress().getCity());
+        statement.setString(6, store.getAddress().getState());
+        statement.setString(7, store.getAddress().getCounty());
+        statement.setString(8, "" + store.getAddress().getZip5());
+        statement.setString(9, "" + store.getAddress().getZip4());
+    }
+
+    String getStatementToCreateTable()
+    {
+        return "CREATE TABLE IF NOT EXISTS stores\n" +
+               "(\n" +
+               "    store_name text,\n" +
+               "    latitude numeric,\n" +
+               "    longitude numeric,\n" +
+               "    address text,\n" +
+               "    address_line_two text,\n" +
+               "    city text,\n" +
+               "    state text,\n" +
+               "    county text,\n" +
+               "    zip text,\n" +
+               "    local_zip text,\n" +
+               "\n" +
+               "    PRIMARY KEY(store_name, latitude, longitude)\n" +
+               ");\n" +
+               "";
+    }
+
+    static class Keys
+    {
+
+        static final String STORE_NAME = "store_name";
+        static final String LATITUDE = "latitude";
+        static final String LONGITUDE = "longitude";
+        static final String ADDRESS = "address";
+        static final String ADDRESS_LINE_TWO = "address_line_two";
+        static final String CITY = "city";
+        static final String STATE = "state";
+        static final String COUNTY = "county";
+        static final String ZIP_CODE = "zip_code";
+        static final String LOCAL_ZIP_CODE = "local_zip_code";
     }
 
 }

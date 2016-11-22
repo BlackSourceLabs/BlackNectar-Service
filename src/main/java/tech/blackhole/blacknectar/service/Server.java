@@ -31,6 +31,7 @@ import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
 import tech.blackhole.blacknectar.service.api.BlackNectarSearchRequest;
 import tech.blackhole.blacknectar.service.api.BlackNectarService;
+import tech.blackhole.blacknectar.service.api.operations.GetSampleStoreOperation;
 import tech.blackhole.blacknectar.service.api.operations.SayHelloOperation;
 import tech.blackhole.blacknectar.service.exceptions.BadArgumentException;
 import tech.blackhole.blacknectar.service.exceptions.BlackNectarAPIException;
@@ -38,6 +39,7 @@ import tech.blackhole.blacknectar.service.exceptions.BlackNectarExceptionHandler
 import tech.blackhole.blacknectar.service.stores.Location;
 import tech.blackhole.blacknectar.service.stores.Store;
 
+import static tech.blackhole.blacknectar.service.api.MediaTypes.APPLICATION_JSON;
 import static tech.blackhole.blacknectar.service.stores.Location.validLatitude;
 import static tech.blackhole.blacknectar.service.stores.Location.validLongitude;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
@@ -60,11 +62,11 @@ public final class Server
     //STATIC VARIABLES
     private final static Logger LOG = LoggerFactory.getLogger(Server.class);
     public final static Aroma AROMA = Aroma.create("ec07e6fe-7203-4f18-abf4-f33b48ec904d");
-    final static String APPLICATION_JSON = "application/json";
     private final BlackNectarService service = BlackNectarService.newMemoryService();
     
     //INSTANCE VARIABLES
     private final SayHelloOperation sayHelloOperation = new SayHelloOperation(AROMA);
+    private final GetSampleStoreOperation getSampleStoreOperation = new GetSampleStoreOperation(AROMA);
     
     public static void main(String[] args)
     {
@@ -90,7 +92,7 @@ public final class Server
     void setupRoutes()
     {
         Spark.get("/stores", this::searchStores);
-        Spark.get("/sample-store", this::getSampleStore);
+        Spark.get("/sample-store", this.getSampleStoreOperation);
         Spark.get("/", this.sayHelloOperation);
     }
     
@@ -99,37 +101,6 @@ public final class Server
         Spark.exception(BlackNectarAPIException.class, new BlackNectarExceptionHandler(AROMA));
     }
     
-    JsonArray getSampleStore(Request request, Response response)
-    {
-        LOG.info("Received GET request to GET a Sample Store from IP [{}]", request.ip());
-
-        AROMA.begin().titled("Request Received")
-            .text("Request to get sample store from IP [{}]", request.ip())
-            .withUrgency(Urgency.LOW)
-            .send();
-
-        response.status(200);
-        response.type(APPLICATION_JSON);
-
-        try
-        {
-            Store store = Store.SAMPLE_STORE;
-            
-            JsonArray json = new JsonArray();
-            json.add(store.asJSON());
-            return json;
-        }
-        catch (Exception ex)
-        {
-            AROMA.begin().titled("Request Failed")
-                .text("Could not load Store, {}", ex)
-                .withUrgency(Urgency.HIGH)
-                .send();
-            
-            return new JsonArray();
-        }
-    }
-
     JsonArray searchStores(Request request, Response response)
     {
         LOG.info("Received GET request to search stores from IP [{}]", request.ip());

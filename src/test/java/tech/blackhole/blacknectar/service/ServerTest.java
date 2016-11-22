@@ -17,7 +17,6 @@
 package tech.blackhole.blacknectar.service;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,13 +24,10 @@ import org.mockito.Mock;
 import spark.QueryParamsMap;
 import spark.Request;
 import spark.Response;
-import tech.blackhole.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.generator.NumberGenerators;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -74,16 +70,6 @@ public class ServerTest
     {
         when(request.ip()).thenReturn(ip);
         when(request.queryMap()).thenReturn(mock(QueryParamsMap.class));
-    }
-
-    @Test
-    public void testGetSampleStore()
-    {
-        JsonArray stores = instance.getSampleStore(request, response);
-        assertThat(stores.size(), greaterThan(0));
-        
-        JsonElement store = stores.get(0);
-        assertThat(store, is(Store.SAMPLE_STORE.asJSON()));
     }
 
     @Test

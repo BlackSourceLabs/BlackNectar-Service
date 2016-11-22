@@ -14,25 +14,15 @@
  * limitations under the License.
  */
 
-package tech.blackhole.blacknectar.service.stores;
-
-import com.google.inject.ImplementedBy;
-import java.util.List;
+ 
+package tech.blackhole.blacknectar.service.api;
 
 /**
  *
  * @author SirWellington
  */
-@ImplementedBy(FileRepository.class)
-public interface StoreRepository
+public interface MediaTypes 
 {
-
-    /**
-     * Returns all of the {@linkplain Store Stores} saved in the Repository;
-     *
-     * @return
-     */
-    List<Store> getAllStores();
-    
-    static StoreRepository FILE = new FileRepository();
+    final static String APPLICATION_JSON = "application/json";
+    final static String TEXT_PLAIN = "text/plain";
 }

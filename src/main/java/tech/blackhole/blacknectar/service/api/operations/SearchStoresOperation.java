@@ -76,6 +76,11 @@ public class SearchStoresOperation implements Route
     @Override
     public JsonArray handle(Request request, Response response) throws Exception
     {
+        checkThat(request, response)
+            .usingMessage("request and response cannot be null")
+            .throwing(BadArgumentException.class)
+            .are(notNull());
+        
         LOG.info("Received GET request to search stores from IP [{}]", request.ip());
 
         aroma.begin().titled("Request Received")
@@ -133,8 +138,8 @@ public class SearchStoresOperation implements Route
             return;
         }
 
-        String latitudeString = queryParameters.get(QueryKeys.LATITUDE).value();
-        String longitudeString = queryParameters.get(QueryKeys.LONGITUDE).value();
+        String latitudeString = queryParameters.value(QueryKeys.LATITUDE);
+        String longitudeString = queryParameters.value(QueryKeys.LONGITUDE);
 
         checkThat(latitudeString, longitudeString)
             .usingMessage("latitude and longitude must be numerical")
@@ -243,7 +248,7 @@ public class SearchStoresOperation implements Route
         return queryParams.hasKey(QueryKeys.RADIUS);
     }
 
-    private static class QueryKeys
+    static class QueryKeys
     {
 
         static final String LATITUDE = "lat";

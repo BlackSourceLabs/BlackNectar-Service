@@ -37,10 +37,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
 
 /**
  *
@@ -78,12 +74,6 @@ public class ServerTest
     {
         when(request.ip()).thenReturn(ip);
         when(request.queryMap()).thenReturn(mock(QueryParamsMap.class));
-    }
-
-    @Test
-    public void testSayHello()
-    {
-        instance.sayHello(request, response);
     }
 
     @Test

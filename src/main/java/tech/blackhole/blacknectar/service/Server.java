@@ -16,7 +16,6 @@
 
 package tech.blackhole.blacknectar.service;
 
-import com.google.common.base.Strings;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.util.List;
@@ -32,6 +31,7 @@ import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
 import tech.blackhole.blacknectar.service.api.BlackNectarSearchRequest;
 import tech.blackhole.blacknectar.service.api.BlackNectarService;
+import tech.blackhole.blacknectar.service.api.operations.SayHelloOperation;
 import tech.blackhole.blacknectar.service.exceptions.BadArgumentException;
 import tech.blackhole.blacknectar.service.exceptions.BlackNectarAPIException;
 import tech.blackhole.blacknectar.service.exceptions.BlackNectarExceptionHandler;
@@ -57,13 +57,14 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.s
  */
 public final class Server
 {
-    
+    //STATIC VARIABLES
     private final static Logger LOG = LoggerFactory.getLogger(Server.class);
     public final static Aroma AROMA = Aroma.create("ec07e6fe-7203-4f18-abf4-f33b48ec904d");
-    
     final static String APPLICATION_JSON = "application/json";
-    
     private final BlackNectarService service = BlackNectarService.newMemoryService();
+    
+    //INSTANCE VARIABLES
+    private final SayHelloOperation sayHelloOperation = new SayHelloOperation(AROMA);
     
     public static void main(String[] args)
     {
@@ -90,26 +91,12 @@ public final class Server
     {
         Spark.get("/stores", this::searchStores);
         Spark.get("/sample-store", this::getSampleStore);
-        Spark.get("/", this::sayHello);
+        Spark.get("/", this.sayHelloOperation);
     }
     
     void setupExceptionHandler()
     {
         Spark.exception(BlackNectarAPIException.class, new BlackNectarExceptionHandler(AROMA));
-    }
-    
-    String sayHello(Request request, Response response)
-    {
-        LOG.info("Received GET request from IP [{}]", request.ip());
-        
-        AROMA.begin().titled("Request Received")
-            .text("From IP [{}]", request.ip())
-            .withUrgency(Urgency.LOW)
-            .send();
-        
-        response.status(200);
-        //U+1F573
-        return Strings.repeat("🌑", 1000);
     }
     
     JsonArray getSampleStore(Request request, Response response)

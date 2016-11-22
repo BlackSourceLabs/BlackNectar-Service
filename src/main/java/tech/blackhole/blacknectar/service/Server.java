@@ -33,6 +33,8 @@ import tech.aroma.client.Urgency;
 import tech.blackhole.blacknectar.service.api.BlackNectarSearchRequest;
 import tech.blackhole.blacknectar.service.api.BlackNectarService;
 import tech.blackhole.blacknectar.service.exceptions.BadArgumentException;
+import tech.blackhole.blacknectar.service.exceptions.BlackNectarAPIException;
+import tech.blackhole.blacknectar.service.exceptions.BlackNectarExceptionHandler;
 import tech.blackhole.blacknectar.service.stores.Location;
 import tech.blackhole.blacknectar.service.stores.Store;
 
@@ -70,6 +72,7 @@ public final class Server
         Server server = new Server();
         server.serveAtPort(port);
         server.setupRoutes();
+        server.setupExceptionHandler();
     }
     
     void serveAtPort(int port)
@@ -88,6 +91,11 @@ public final class Server
         Spark.get("/stores", this::searchStores);
         Spark.get("/sample-store", this::getSampleStore);
         Spark.get("/", this::sayHello);
+    }
+    
+    void setupExceptionHandler()
+    {
+        Spark.exception(BlackNectarAPIException.class, new BlackNectarExceptionHandler(AROMA));
     }
     
     String sayHello(Request request, Response response)

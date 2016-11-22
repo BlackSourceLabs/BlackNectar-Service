@@ -27,7 +27,6 @@ import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
@@ -84,12 +83,10 @@ public class SayHelloOperationTest
     @Test
     public void testHandle() throws Exception
     {
-        Object result = instance.handle(request, response);
+        String result = instance.handle(request, response);
         assertThat(result, notNullValue());
-        assertThat(result, instanceOf(String.class));
         
-        String message = result.toString();
-        assertThat(message, not(isEmptyOrNullString()));
+        assertThat(result, not(isEmptyOrNullString()));
     }
     
     @DontRepeat

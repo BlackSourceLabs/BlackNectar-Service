@@ -33,7 +33,6 @@ import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -93,9 +92,8 @@ public class GetSampleStoreOperationTest
     @Test
     public void testHandle() throws Exception
     {
-        Object result = instance.handle(request, response);
+        JsonArray result = instance.handle(request, response);
         assertThat(result, notNullValue());
-        assertThat(result, instanceOf(JsonArray.class));
         
         JsonArray array = (JsonArray) result;
         assertThat(array.size(), greaterThan(0));

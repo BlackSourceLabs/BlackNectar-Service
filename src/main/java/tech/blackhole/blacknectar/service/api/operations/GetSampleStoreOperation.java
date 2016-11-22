@@ -54,7 +54,7 @@ public class GetSampleStoreOperation implements Route
     }
     
     @Override
-    public Object handle(Request request, Response response) throws Exception
+    public JsonArray handle(Request request, Response response) throws Exception
     {
         checkThat(request, response)
             .usingMessage("Received null arguments")

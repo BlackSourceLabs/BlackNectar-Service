@@ -81,10 +81,4 @@ public class ServerTest
         assertThrows(() -> new Server(aroma, sayHelloOperation, getSampleStoreOperation, null, exceptionHandler));
         assertThrows(() -> new Server(aroma, sayHelloOperation, getSampleStoreOperation, searchStoresOperation, null));
     }
-
-    @Test
-    public void testLaunch()
-    {
-        
-    }
 }

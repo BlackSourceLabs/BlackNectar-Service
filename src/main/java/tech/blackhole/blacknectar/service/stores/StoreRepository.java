@@ -16,12 +16,14 @@
 
 package tech.blackhole.blacknectar.service.stores;
 
+import com.google.inject.ImplementedBy;
 import java.util.List;
 
 /**
  *
  * @author SirWellington
  */
+@ImplementedBy(FileRepository.class)
 public interface StoreRepository
 {
 

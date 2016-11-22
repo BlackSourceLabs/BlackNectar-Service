@@ -27,6 +27,7 @@ import spark.Response;
 import spark.Route;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
+import tech.blackhole.blacknectar.service.exceptions.BadArgumentException;
 import tech.blackhole.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
@@ -56,6 +57,11 @@ public class GetSampleStoreOperation implements Route
     @Override
     public Object handle(Request request, Response response) throws Exception
     {
+        checkThat(request, response)
+            .usingMessage("Received null arguments")
+            .throwing(BadArgumentException.class)
+            .are(notNull());
+        
         LOG.info("Received GET request to GET a Sample Store from IP [{}]", request.ip());
 
         AROMA.begin().titled("Request Received")

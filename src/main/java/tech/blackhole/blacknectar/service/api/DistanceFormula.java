@@ -17,6 +17,7 @@
 
 package tech.blackhole.blacknectar.service.api;
 
+import com.google.inject.ImplementedBy;
 import tech.blackhole.blacknectar.service.stores.Location;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
@@ -30,6 +31,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
  * 
  * @author SirWellington
  */
+@ImplementedBy(DistanceFormula.HarvesineDistance.class)
 interface DistanceFormula 
 {
     /**

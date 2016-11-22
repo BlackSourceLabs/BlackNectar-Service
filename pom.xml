@@ -139,7 +139,7 @@
         <dependency>
             <groupId>tech.sirwellington.alchemy</groupId>
             <artifactId>alchemy-generator</artifactId>
-            <version>1.5</version>
+            <version>1.6-SNAPSHOT</version>
         </dependency>
 
         <!--=======================-->

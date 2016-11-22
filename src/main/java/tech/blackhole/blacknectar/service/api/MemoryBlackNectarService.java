@@ -19,12 +19,12 @@ package tech.blackhole.blacknectar.service.api;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.blackhole.blacknectar.service.exceptions.OperationFailedException;
 import tech.blackhole.blacknectar.service.stores.Location;
 import tech.blackhole.blacknectar.service.stores.Store;
-import tech.blackhole.blacknectar.service.stores.StoreRepository;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -46,12 +46,7 @@ final class MemoryBlackNectarService implements BlackNectarService
     private final List<Store> stores;
     private final DistanceFormula distanceFormula;
 
-    MemoryBlackNectarService()
-    {
-        this.stores = loadDefaultStores();
-        this.distanceFormula = DistanceFormula.HARVESINE;
-    }
-
+    @Inject 
     MemoryBlackNectarService(List<Store> stores, DistanceFormula distanceFormula)
     {
         checkThat(stores, distanceFormula)
@@ -76,14 +71,6 @@ final class MemoryBlackNectarService implements BlackNectarService
         return stores.stream()
             .limit(limit)
             .collect(toList());
-    }
-
-    private List<Store> loadDefaultStores()
-    {
-        List<Store> stores = StoreRepository.FILE.getAllStores();
-        LOG.debug("Found {} stores in the File Repository", stores.size());
-
-        return stores;
     }
 
     @Override

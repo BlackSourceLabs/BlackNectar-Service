@@ -20,6 +20,7 @@ package tech.blackhole.blacknectar.service.api;
 import java.util.List;
 import tech.blackhole.blacknectar.service.exceptions.OperationFailedException;
 import tech.blackhole.blacknectar.service.stores.Store;
+import tech.blackhole.blacknectar.service.stores.StoreRepository;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 
@@ -76,7 +77,10 @@ public interface BlackNectarService
      */
     static BlackNectarService newMemoryService()
     {
-        return new MemoryBlackNectarService();
+        List<Store> stores = StoreRepository.FILE.getAllStores();
+        DistanceFormula formula = DistanceFormula.HARVESINE;
+
+        return new MemoryBlackNectarService(stores, formula);
     }
-    
+
 }

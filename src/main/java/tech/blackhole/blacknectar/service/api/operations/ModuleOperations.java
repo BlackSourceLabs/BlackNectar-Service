@@ -14,25 +14,28 @@
  * limitations under the License.
  */
 
-package tech.blackhole.blacknectar.service.stores;
+ 
+package tech.blackhole.blacknectar.service.api.operations;
 
-import com.google.inject.ImplementedBy;
-import java.util.List;
+
+import com.google.inject.AbstractModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author SirWellington
  */
-@ImplementedBy(FileRepository.class)
-public interface StoreRepository
+public final class ModuleOperations extends AbstractModule
 {
+    private final static Logger LOG = LoggerFactory.getLogger(ModuleOperations.class);
 
-    /**
-     * Returns all of the {@linkplain Store Stores} saved in the Repository;
-     *
-     * @return
-     */
-    List<Store> getAllStores();
-    
-    static StoreRepository FILE = new FileRepository();
+    @Override
+    protected void configure()
+    {
+        bind(GetSampleStoreOperation.class);
+        bind(SayHelloOperation.class);
+        bind(SearchStoresOperation.class);
+    }
+
 }

@@ -16,92 +16,69 @@
 
 package tech.blackhole.blacknectar.service;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import spark.QueryParamsMap;
-import spark.Request;
-import spark.Response;
-import tech.blackhole.blacknectar.service.stores.Store;
-import tech.sirwellington.alchemy.generator.NumberGenerators;
+import spark.ExceptionHandler;
+import tech.aroma.client.Aroma;
+import tech.blackhole.blacknectar.service.api.operations.GetSampleStoreOperation;
+import tech.blackhole.blacknectar.service.api.operations.SayHelloOperation;
+import tech.blackhole.blacknectar.service.api.operations.SearchStoresOperation;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
  *
  * @author SirWellington
  */
 @RunWith(AlchemyTestRunner.class)
-public class ServerTest 
+public class ServerTest
 {
+    
+    private Aroma aroma;
+    
+    @Mock
+    private SayHelloOperation sayHelloOperation;
+    
+    @Mock
+    private GetSampleStoreOperation getSampleStoreOperation;
+    
+    @Mock
+    private SearchStoresOperation searchStoresOperation;
+    
+    @Mock
+    private ExceptionHandler exceptionHandler;
 
     private Server instance;
-    @Mock
-    private Request request;
-    @Mock
-    private Response response;
-    
-    private String ip;
-    
+
     @Before
     public void setUp() throws Exception
     {
-    
-        instance = new Server();
         setupData();
         setupMocks();
-    }
+        
+        instance = new Server(aroma, sayHelloOperation, getSampleStoreOperation, searchStoresOperation, exceptionHandler);
 
+    }
 
     private void setupData() throws Exception
     {
-        int number = one(NumberGenerators.positiveIntegers());
-        ip = String.valueOf(number);
     }
 
     private void setupMocks() throws Exception
     {
-        when(request.ip()).thenReturn(ip);
-        when(request.queryMap()).thenReturn(mock(QueryParamsMap.class));
+        aroma = Aroma.create();
     }
 
     @Test
-    public void testSayHello()
+    public void  testConstructor()
     {
-        instance.sayHello(request, response);
+        assertThrows(() -> new Server(null, sayHelloOperation, getSampleStoreOperation, searchStoresOperation, exceptionHandler));
+        assertThrows(() -> new Server(aroma, null, getSampleStoreOperation, searchStoresOperation, exceptionHandler));
+        assertThrows(() -> new Server(aroma, sayHelloOperation, null, searchStoresOperation, exceptionHandler));
+        assertThrows(() -> new Server(aroma, sayHelloOperation, getSampleStoreOperation, null, exceptionHandler));
+        assertThrows(() -> new Server(aroma, sayHelloOperation, getSampleStoreOperation, searchStoresOperation, null));
     }
-
-    @Test
-    public void testGetSampleStore()
-    {
-        JsonArray stores = instance.getSampleStore(request, response);
-        assertThat(stores.size(), greaterThan(0));
-        
-        JsonElement store = stores.get(0);
-        assertThat(store, is(Store.SAMPLE_STORE.asJSON()));
-    }
-
-    @Test
-    public void testSearchStores()
-    {
-        JsonArray json = instance.searchStores(request, response);
-        assertThat(json, notNullValue());
-        assertThat(json.size(), greaterThanOrEqualTo(1_000));
-    }
-
 }

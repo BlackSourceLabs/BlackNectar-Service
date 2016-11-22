@@ -76,10 +76,25 @@ public final class Server
     public static void main(String[] args)
     {
         final int port = 9100;
-        
-        Injector injector = Guice.createInjector(new ModuleServer());
-        Server server = injector.getInstance(Server.class);
-        
+    
+        Injector injector;
+        Server server;
+
+        try
+        {
+            injector = Guice.createInjector(new ModuleServer());
+            server = injector.getInstance(Server.class);
+        }
+        catch (RuntimeException ex)
+        {
+            AROMA.begin().titled("Server Launch Failed")
+                .text("Could not create Guice Injector: {}", ex)
+                .withUrgency(Urgency.HIGH)
+                .send();
+
+            throw ex;
+        }
+
         server.serveAtPort(port);
         server.setupRoutes();
         server.setupExceptionHandler();

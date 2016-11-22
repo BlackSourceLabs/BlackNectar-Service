@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
- 
 package tech.blackhole.blacknectar.service;
-
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.ExceptionHandler;
@@ -36,22 +38,32 @@ import tech.sirwellington.alchemy.annotations.access.Internal;
 @Internal
 class ModuleServer extends AbstractModule
 {
+
     private final static Logger LOG = LoggerFactory.getLogger(ModuleServer.class);
 
     @Override
     protected void configure()
     {
         install(new ModuleOperations());
-        
+
         bind(ExceptionHandler.class).to(BlackNectarExceptionHandler.class);
         bind(BlackNectarService.class).toInstance(BlackNectarService.newMemoryService());
         bind(Server.class);
     }
 
     @Provides
+    @Singleton
     Aroma provideAromaClient()
     {
         return Aroma.create("ec07e6fe-7203-4f18-abf4-f33b48ec904d");
     }
-    
+
+    @Provides
+    @Singleton
+    Connection provideSQLConnection() throws SQLException
+    {
+        String file = "/Users/SirWellington/Documents/Code/BlackWholeLabs/BlackNectar/BlackNectar-Service/src/main/resources/Stores.db";
+        return DriverManager.getConnection("jdbc:sqlite:" + file);
+    }
+
 }

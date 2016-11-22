@@ -35,6 +35,4 @@ public interface StoreRepository
     List<Store> getAllStores();
     
     static StoreRepository FILE = new FileRepository();
-
-
 }

@@ -23,6 +23,7 @@ import org.mockito.Mock;
 import spark.Request;
 import spark.Response;
 import tech.aroma.client.Aroma;
+import tech.blackhole.blacknectar.service.exceptions.BadArgumentException;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
@@ -93,8 +94,8 @@ public class SayHelloOperationTest
     @Test
     public void testHandleWithBadArguments() throws Exception
     {
-        assertThrows(() -> instance.handle(null, response));
-        assertThrows(() -> instance.handle(request, null));
+        assertThrows(() -> instance.handle(null, response)).isInstanceOf(BadArgumentException.class);
+        assertThrows(() -> instance.handle(request, null)).isInstanceOf(BadArgumentException.class);
     }
 
 }

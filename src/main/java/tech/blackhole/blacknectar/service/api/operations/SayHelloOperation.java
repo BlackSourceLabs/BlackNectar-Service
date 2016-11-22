@@ -27,6 +27,7 @@ import spark.Response;
 import spark.Route;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
+import tech.blackhole.blacknectar.service.exceptions.BadArgumentException;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
@@ -53,6 +54,11 @@ public class SayHelloOperation implements Route
     @Override
     public String handle(Request request, Response response) throws Exception
     {
+        checkThat(request, response)
+            .usingMessage("Request and response cannot be null")
+            .throwing(BadArgumentException.class)
+            .is(notNull());
+        
         LOG.info("Received GET request from IP [{}]", request.ip());
         
         aroma.begin().titled("Request Received")

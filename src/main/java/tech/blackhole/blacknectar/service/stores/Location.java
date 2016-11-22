@@ -58,6 +58,11 @@ public final class Location implements JSONRepresentable
         this.json = createJSON();
     }
     
+    public static Location with(double latitude, double longitude)
+    {
+        return new Location(latitude, longitude);
+    }
+    
     public static AlchemyAssertion<Location> validLocation()
     {
         return location ->

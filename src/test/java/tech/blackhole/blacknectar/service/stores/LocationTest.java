@@ -119,4 +119,13 @@ public class LocationTest
         assertThat(lon, is(location.getLongitude()));
     }
 
+    @Test
+    public void testWith()
+    {
+        Location result = Location.with(latitude, longitude);
+        assertThat(result, notNullValue());
+        assertThat(result, is(location));
+    }
+
+
 }

@@ -17,6 +17,8 @@
 
 package tech.blackhole.blacknectar.service.api;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import tech.blackhole.blacknectar.service.exceptions.OperationFailedException;
 import tech.blackhole.blacknectar.service.stores.Store;
@@ -83,4 +85,19 @@ public interface BlackNectarService
         return new MemoryBlackNectarService(stores, formula);
     }
 
+    
+    /**
+     * Creates a new SQL-backed Service that performs all operations against 
+     * a JDBC connection.
+     * 
+     * @param connection The JDBC connection, must be open.
+     * 
+     * @return
+     * 
+     * @throws SQLException 
+     */
+    static BlackNectarService newSQLService(@Required Connection connection) throws SQLException
+    {
+        return new SQLBlackNectarService(connection);
+    }
 }

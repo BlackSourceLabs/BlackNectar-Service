@@ -31,7 +31,6 @@ import tech.blackhole.blacknectar.service.exceptions.BadArgumentException;
 import tech.blackhole.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
-import static tech.blackhole.blacknectar.service.Server.AROMA;
 import static tech.blackhole.blacknectar.service.api.MediaTypes.APPLICATION_JSON;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
@@ -64,7 +63,7 @@ public class GetSampleStoreOperation implements Route
         
         LOG.info("Received GET request to GET a Sample Store from IP [{}]", request.ip());
 
-        AROMA.begin().titled("Request Received")
+        aroma.begin().titled("Request Received")
             .text("Request to get sample store from IP [{}]", request.ip())
             .withUrgency(Urgency.LOW)
             .send();
@@ -82,7 +81,7 @@ public class GetSampleStoreOperation implements Route
         }
         catch (Exception ex)
         {
-            AROMA.begin().titled("Request Failed")
+            aroma.begin().titled("Request Failed")
                 .text("Could not load Store, {}", ex)
                 .withUrgency(Urgency.HIGH)
                 .send();

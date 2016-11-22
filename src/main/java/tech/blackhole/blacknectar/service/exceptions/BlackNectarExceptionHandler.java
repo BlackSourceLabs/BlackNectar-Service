@@ -70,7 +70,7 @@ public final class BlackNectarExceptionHandler implements ExceptionHandler
             response.status(((BadArgumentException) ex).getStatusCode());
         }
         
-        if (ex instanceof OperationFailedException || ex instanceof BlackNectarAPIException)
+        if (ex instanceof BlackNectarAPIException)
         {
             LOG.error("Internal Operation failed", ex);
             
@@ -79,7 +79,16 @@ public final class BlackNectarExceptionHandler implements ExceptionHandler
                 .withUrgency(Urgency.HIGH)
                 .send();
             
-            response.status(((OperationFailedException) ex).getStatusCode());
+            response.status(((BlackNectarAPIException) ex).getStatusCode());
+        }
+        else if (ex instanceof RuntimeException)
+        {
+            LOG.error("Unexpected Exception", ex);
+            
+            aroma.begin().titled("Operation Failed")
+                .text("Unexpected Exception occured: {}", ex)
+                .withUrgency(Urgency.HIGH)
+                .send();
         }
         
         response.body(ex.getMessage());

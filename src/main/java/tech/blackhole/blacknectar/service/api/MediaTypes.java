@@ -24,4 +24,5 @@ package tech.blackhole.blacknectar.service.api;
 public interface MediaTypes 
 {
     final static String APPLICATION_JSON = "application/json";
+    final static String TEXT_PLAIN = "text/plain";
 }

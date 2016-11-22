@@ -161,6 +161,13 @@ public final class Server
 
         List<Store> stores = findStores(request);
         
+        LOG.debug("Found {} stores to match query parameters: {}", stores.size(), request.queryString());
+        
+        AROMA.begin().titled("Request Complete")
+            .text("Found {} stores to match query parameters {}", stores.size(), request.queryString())
+            .withUrgency(Urgency.LOW)
+            .send();
+        
         return stores.stream()
             .map(Store::asJSON)
             .collect(supplier, accumulator, combiner);

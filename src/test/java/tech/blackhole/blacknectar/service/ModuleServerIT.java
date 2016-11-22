@@ -16,62 +16,36 @@
 
 package tech.blackhole.blacknectar.service;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import java.sql.Connection;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import tech.aroma.client.Aroma;
-import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  *
  * @author SirWellington
  */
-@IntegrationTest
 @RunWith(AlchemyTestRunner.class)
-public class ModuleServerTest
+public class ModuleServerIT 
 {
-
     private ModuleServer instance;
 
     @Before
     public void setUp() throws Exception
     {
-
-        setupData();
-        setupMocks();
         instance = new ModuleServer();
     }
 
-    private void setupData() throws Exception
-    {
-
-    }
-
-    private void setupMocks() throws Exception
-    {
-
-    }
 
     @Test
-    public void testBindings()
+    public void testProvideSQLConnection() throws Exception
     {
-        Injector injector = Guice.createInjector(instance);
-
-        Server server = injector.getInstance(Server.class);
-        assertThat(server, notNullValue());
-    }
-
-    @Test
-    public void testProvideAromaClient()
-    {
-        Aroma aroma = instance.provideAromaClient();
-        assertThat(aroma, notNullValue());
+        Connection connection = instance.provideSQLConnection();
+        assertThat(connection.isClosed(), is(false));
     }
 
 }

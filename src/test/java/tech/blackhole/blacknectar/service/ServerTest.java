@@ -17,8 +17,17 @@
 package tech.blackhole.blacknectar.service;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import spark.ExceptionHandler;
+import tech.aroma.client.Aroma;
+import tech.blackhole.blacknectar.service.api.operations.GetSampleStoreOperation;
+import tech.blackhole.blacknectar.service.api.operations.SayHelloOperation;
+import tech.blackhole.blacknectar.service.api.operations.SearchStoresOperation;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
+
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
  *
@@ -27,15 +36,31 @@ import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 @RunWith(AlchemyTestRunner.class)
 public class ServerTest
 {
+    
+    private Aroma aroma;
+    
+    @Mock
+    private SayHelloOperation sayHelloOperation;
+    
+    @Mock
+    private GetSampleStoreOperation getSampleStoreOperation;
+    
+    @Mock
+    private SearchStoresOperation searchStoresOperation;
+    
+    @Mock
+    private ExceptionHandler exceptionHandler;
 
     private Server instance;
 
     @Before
     public void setUp() throws Exception
     {
-        instance = new Server();
         setupData();
         setupMocks();
+        
+        instance = new Server(aroma, sayHelloOperation, getSampleStoreOperation, searchStoresOperation, exceptionHandler);
+
     }
 
     private void setupData() throws Exception
@@ -44,6 +69,22 @@ public class ServerTest
 
     private void setupMocks() throws Exception
     {
+        aroma = Aroma.create();
     }
 
+    @Test
+    public void  testConstructor()
+    {
+        assertThrows(() -> new Server(null, sayHelloOperation, getSampleStoreOperation, searchStoresOperation, exceptionHandler));
+        assertThrows(() -> new Server(aroma, null, getSampleStoreOperation, searchStoresOperation, exceptionHandler));
+        assertThrows(() -> new Server(aroma, sayHelloOperation, null, searchStoresOperation, exceptionHandler));
+        assertThrows(() -> new Server(aroma, sayHelloOperation, getSampleStoreOperation, null, exceptionHandler));
+        assertThrows(() -> new Server(aroma, sayHelloOperation, getSampleStoreOperation, searchStoresOperation, null));
+    }
+
+    @Test
+    public void testLaunch()
+    {
+        
+    }
 }

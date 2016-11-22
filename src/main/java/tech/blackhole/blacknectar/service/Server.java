@@ -16,17 +16,22 @@
 
 package tech.blackhole.blacknectar.service;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spark.ExceptionHandler;
 import spark.Spark;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
-import tech.blackhole.blacknectar.service.api.BlackNectarService;
 import tech.blackhole.blacknectar.service.api.operations.GetSampleStoreOperation;
 import tech.blackhole.blacknectar.service.api.operations.SayHelloOperation;
 import tech.blackhole.blacknectar.service.api.operations.SearchStoresOperation;
 import tech.blackhole.blacknectar.service.exceptions.BlackNectarAPIException;
-import tech.blackhole.blacknectar.service.exceptions.BlackNectarExceptionHandler;
+
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
  *
@@ -40,19 +45,41 @@ public final class Server
 {
     //STATIC VARIABLES
     private final static Logger LOG = LoggerFactory.getLogger(Server.class);
+    
     public final static Aroma AROMA = Aroma.create("ec07e6fe-7203-4f18-abf4-f33b48ec904d");
     
     //INSTANCE VARIABLES
-    private final SayHelloOperation sayHelloOperation = new SayHelloOperation(AROMA);
-    private final GetSampleStoreOperation getSampleStoreOperation = new GetSampleStoreOperation(AROMA);
-    private final BlackNectarService service = BlackNectarService.newMemoryService();
-    private final SearchStoresOperation searchStoresOperation = new SearchStoresOperation(AROMA, service);
+    private final Aroma aroma;
+    private final SayHelloOperation sayHelloOperation;
+    private final GetSampleStoreOperation getSampleStoreOperation;
+    private final SearchStoresOperation searchStoresOperation;
+    private final ExceptionHandler exceptionHandler;
+
+    @Inject
+    Server(Aroma aroma,
+           SayHelloOperation sayHelloOperation,
+           GetSampleStoreOperation getSampleStoreOperation,
+           SearchStoresOperation searchStoresOperation,
+           ExceptionHandler exceptionHandler)
+    {
+        checkThat(aroma, sayHelloOperation, getSampleStoreOperation, searchStoresOperation, exceptionHandler)
+            .are(notNull());
+        
+        this.aroma = aroma;
+        this.sayHelloOperation = sayHelloOperation;
+        this.getSampleStoreOperation = getSampleStoreOperation;
+        this.searchStoresOperation = searchStoresOperation;
+        this.exceptionHandler = exceptionHandler;
+    }
     
+
     public static void main(String[] args)
     {
         final int port = 9100;
         
-        Server server = new Server();
+        Injector injector = Guice.createInjector(new ModuleServer());
+        Server server = injector.getInstance(Server.class);
+        
         server.serveAtPort(port);
         server.setupRoutes();
         server.setupExceptionHandler();
@@ -60,11 +87,12 @@ public final class Server
     
     void serveAtPort(int port)
     {
-        LOG.info("Starting server at {}");
+        LOG.info("Starting server at {}", port);
         Spark.port(port);
         
-        AROMA.begin()
+        aroma.begin()
             .titled("Service Launched")
+            .text("At port {}", port)
             .withUrgency(Urgency.LOW)
             .send();
     }
@@ -78,8 +106,8 @@ public final class Server
     
     void setupExceptionHandler()
     {
-        Spark.exception(BlackNectarAPIException.class, new BlackNectarExceptionHandler(AROMA));
+        Spark.exception(BlackNectarAPIException.class, exceptionHandler);
     }
     
-    
+
 }

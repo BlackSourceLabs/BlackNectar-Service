@@ -16,68 +16,34 @@
 
 package tech.blackhole.blacknectar.service;
 
-import com.google.gson.JsonArray;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import spark.QueryParamsMap;
-import spark.Request;
-import spark.Response;
-import tech.sirwellington.alchemy.generator.NumberGenerators;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
-
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 
 /**
  *
  * @author SirWellington
  */
 @RunWith(AlchemyTestRunner.class)
-public class ServerTest 
+public class ServerTest
 {
 
     private Server instance;
-    @Mock
-    private Request request;
-    @Mock
-    private Response response;
-    
-    private String ip;
-    
+
     @Before
     public void setUp() throws Exception
     {
-    
         instance = new Server();
         setupData();
         setupMocks();
     }
 
-
     private void setupData() throws Exception
     {
-        int number = one(NumberGenerators.positiveIntegers());
-        ip = String.valueOf(number);
     }
 
     private void setupMocks() throws Exception
     {
-        when(request.ip()).thenReturn(ip);
-        when(request.queryMap()).thenReturn(mock(QueryParamsMap.class));
-    }
-
-    @Test
-    public void testSearchStores()
-    {
-        JsonArray json = instance.searchStores(request, response);
-        assertThat(json, notNullValue());
-        assertThat(json.size(), greaterThanOrEqualTo(1_000));
     }
 
 }

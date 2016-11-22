@@ -44,4 +44,10 @@ public class BadArgumentException extends BlackNectarAPIException
         super(cause);
     }
 
+    @Override
+    public int getStatusCode()
+    {
+        return 400;
+    }
+    
 }

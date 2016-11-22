@@ -23,7 +23,6 @@ package tech.blackhole.blacknectar.service.exceptions;
  */
 public class BlackNectarAPIException extends RuntimeException
 {
-
     public BlackNectarAPIException()
     {
     }
@@ -43,4 +42,8 @@ public class BlackNectarAPIException extends RuntimeException
         super(cause);
     }
     
+    public int getStatusCode()
+    {
+        return 500;
+    }
 }

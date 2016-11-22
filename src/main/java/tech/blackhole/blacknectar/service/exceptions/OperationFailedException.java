@@ -18,7 +18,7 @@ package tech.blackhole.blacknectar.service.exceptions;
 
 /**
  * Thrown when an API call fails.
- * 
+ *
  * @author SirWellington
  */
 public class OperationFailedException extends BlackNectarAPIException
@@ -41,6 +41,12 @@ public class OperationFailedException extends BlackNectarAPIException
     public OperationFailedException(Throwable cause)
     {
         super(cause);
+    }
+
+    @Override
+    public int getStatusCode()
+    {
+        return super.getStatusCode();
     }
 
 }

@@ -81,7 +81,7 @@ public interface BlackNectarService
     static BlackNectarService newMemoryService()
     {
         List<Store> stores = StoreRepository.FILE.getAllStores();
-        DistanceFormula formula = DistanceFormula.HARVESINE;
+        GeoCalculator formula = GeoCalculator.HARVESINE;
 
         return new MemoryBlackNectarService(stores, formula);
     }

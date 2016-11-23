@@ -40,6 +40,7 @@ import static tech.blackhole.blacknectar.service.BlackNectarGenerators.locations
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.ALPHABETIC;
+import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 
 /**
  *
@@ -74,7 +75,7 @@ public class MemoryBlackNectarServiceTest
         setupData();
         setupMocks();
         
-        instance = new MemoryBlackNectarService(stores, DistanceFormula.HARVESINE);
+        instance = new MemoryBlackNectarService(stores, GeoCalculator.HARVESINE);
     }
 
 

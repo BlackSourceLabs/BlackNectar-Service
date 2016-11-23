@@ -35,16 +35,20 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThan;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThanOrEqualTo;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.lessThanOrEqualTo;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThan;
+import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThanOrEqualTo;
+import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.lessThanOrEqualTo;
 
 
 /**
- * A {@code DistanceFormula} is responsible for calculating the distance between
- * two {@linkplain Location Points}.
- * 
+ * A {@code GeoCalculator} is responsible for performing various geodetic calculations, like the distance between two
+ * {@linkplain Location Points}.
+ *
  * @author SirWellington
  */
-@ImplementedBy(DistanceFormula.HarvesineDistance.class)
-interface DistanceFormula 
+@ImplementedBy(GeoCalculator.HarvesineCalculator.class)
+interface GeoCalculator 
 {
     /**
      * Calculates the distance, in meters, between {@code first} and {@code second}.
@@ -79,10 +83,10 @@ interface DistanceFormula
     
     
     /**
-     * This Singleton {@link DistanceFormula} computes the distance between two points
+     * This Singleton {@link GeoCalculator} computes the distance between two points
      * using the Harvesine formula.
      */
-    static DistanceFormula HARVESINE = new HarvesineDistance();
+    static GeoCalculator HARVESINE = new HarvesineCalculator();
     
     /**
      * Uses the <a href="https://rosettacode.org/wiki/Haversine_formula">Harvesine Formula</a> to calculate
@@ -93,7 +97,7 @@ interface DistanceFormula
      * 
      * @see <a href="https://rosettacode.org/wiki/Haversine_formula">https://rosettacode.org/wiki/Haversine_formula</a>
      */
-    static class HarvesineDistance implements DistanceFormula
+    static class HarvesineCalculator implements GeoCalculator
     {
 
         private static final double RADIUS_OF_EARTH_IN_KILOMETERS = 6372.8;

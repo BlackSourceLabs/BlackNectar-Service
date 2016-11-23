@@ -46,7 +46,7 @@ public class DistanceFormulaTest
 {
     private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
-    private DistanceFormula formula;
+    private GeoCalculator formula;
     
     private Location first;
     private Location second;
@@ -54,7 +54,7 @@ public class DistanceFormulaTest
     @Before
     public void setUp() throws Exception
     {
-        formula = new DistanceFormula.HarvesineDistance();
+        formula = new GeoCalculator.HarvesineCalculator();
 
         setupData();
     }
@@ -79,7 +79,7 @@ public class DistanceFormulaTest
     @Test
     public void testHarvesineAccuracy()
     {
-        formula = new DistanceFormula.HarvesineDistance();
+        formula = new GeoCalculator.HarvesineCalculator();
 
         first = new Location(36.12, -86.67);
         second = new Location(33.94, -118.40);
@@ -94,7 +94,7 @@ public class DistanceFormulaTest
     @Test
     public void testHarvesineWithBadArguments()
     {
-        formula = new DistanceFormula.HarvesineDistance();
+        formula = new GeoCalculator.HarvesineCalculator();
         assertThrows(() -> formula.distanceBetween(null, null));
     }
 

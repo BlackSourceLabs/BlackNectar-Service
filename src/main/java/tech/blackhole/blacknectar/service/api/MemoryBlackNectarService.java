@@ -32,6 +32,8 @@ import static java.util.stream.Collectors.toList;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThanOrEqualTo;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThanOrEqualTo;
 
 /**
  *
@@ -44,10 +46,10 @@ final class MemoryBlackNectarService implements BlackNectarService
     private final static Logger LOG = LoggerFactory.getLogger(MemoryBlackNectarService.class);
 
     private final List<Store> stores;
-    private final DistanceFormula distanceFormula;
+    private final GeoCalculator distanceFormula;
 
     @Inject 
-    MemoryBlackNectarService(List<Store> stores, DistanceFormula distanceFormula)
+    MemoryBlackNectarService(List<Store> stores, GeoCalculator distanceFormula)
     {
         checkThat(stores, distanceFormula)
             .are(notNull());

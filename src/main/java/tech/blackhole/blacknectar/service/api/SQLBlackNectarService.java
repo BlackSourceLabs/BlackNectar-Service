@@ -82,6 +82,8 @@ final class SQLBlackNectarService implements BlackNectarService
         checkThat(request)
             .usingMessage("request missing")
             .is(notNull());
+        
+        String query = createQueryForRequest(request);
 
         return Lists.emptyList();
     }
@@ -185,16 +187,16 @@ final class SQLBlackNectarService implements BlackNectarService
 
     void prepareStatementForStore(PreparedStatement statement, Store store) throws SQLException
     {
-        statement.setString(0, store.getName());
-        statement.setDouble(1, store.getLocation().getLatitude());
-        statement.setDouble(2, store.getLocation().getLongitude());
-        statement.setString(3, store.getAddress().getAddressLineOne());
-        statement.setString(4, store.getAddress().getAddressLineTwo());
-        statement.setString(5, store.getAddress().getCity());
-        statement.setString(6, store.getAddress().getState());
-        statement.setString(7, store.getAddress().getCounty());
-        statement.setString(8, "" + store.getAddress().getZip5());
-        statement.setString(9, "" + store.getAddress().getZip4());
+        statement.setString(1, store.getName());
+        statement.setDouble(2, store.getLocation().getLatitude());
+        statement.setDouble(3, store.getLocation().getLongitude());
+        statement.setString(4, store.getAddress().getAddressLineOne());
+        statement.setString(5, store.getAddress().getAddressLineTwo());
+        statement.setString(6, store.getAddress().getCity());
+        statement.setString(7, store.getAddress().getState());
+        statement.setString(8, store.getAddress().getCounty());
+        statement.setString(9, "" + store.getAddress().getZip5());
+        statement.setString(10, "" + store.getAddress().getZip4());
     }
 
     String getStatementToCreateTable()
@@ -215,6 +217,11 @@ final class SQLBlackNectarService implements BlackNectarService
                "    PRIMARY KEY(store_name, latitude, longitude)\n" +
                ");\n" +
                "";
+    }
+
+    private String createQueryForRequest(BlackNectarSearchRequest request)
+    {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     static class Keys

@@ -20,6 +20,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tech.blackhole.blacknectar.service.stores.Location;
 import tech.sirwellington.alchemy.generator.AlchemyGenerator;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
@@ -27,8 +29,11 @@ import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.doubles;
+import static tech.sirwellington.alchemy.generator.NumberGenerators.negativeIntegers;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
@@ -39,6 +44,7 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
 @RunWith(AlchemyTestRunner.class)
 public class DistanceFormulaTest
 {
+    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     private DistanceFormula formula;
     
@@ -92,4 +98,53 @@ public class DistanceFormulaTest
         assertThrows(() -> formula.distanceBetween(null, null));
     }
 
+    @DontRepeat
+    @Test
+    public void testBearing()
+    {
+        LOG.info("First: {}, Second: {}", first, second);
+        
+        Location start = Location.with(-20.179275814170015, 127.56747344883186);
+        Location end = Location.with(-45.62360109416997, 37.51602010912128);
+        double bearing = formula.calculateBearingFromTo(start, end);
+        double expected = 226.1;
+        
+        assertEquals(expected, bearing, 0.1);
+    }
+    
+    @DontRepeat
+    @Test
+    public void testCalculateBearingWithBadArguments()
+    {
+        assertThrows(() -> formula.calculateBearingFromTo(null, second)).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(() -> formula.calculateBearingFromTo(first, null)).isInstanceOf(IllegalArgumentException.class);
+    }
+    
+    @Test
+    public void testCalculateDestination()
+    {
+
+        double distanceInMeters = formula.distanceBetween(first, second);
+        double distanceInKM = distanceInMeters / 1000;
+        double bearing = formula.calculateBearingFromTo(first, second);
+        
+        Location expected = second;
+        
+        Location destination = formula.calculateDestinationFrom(first, distanceInMeters, bearing);
+        assertEquals(expected.getLatitude(), destination.getLatitude(), 1.0);
+        assertEquals(expected.getLongitude(), destination.getLongitude(), 1.0);
+    }
+    
+    @DontRepeat
+    @Test
+    public void testCalculateDestinationWithBadArgs()
+    {
+        AlchemyGenerator<Integer> negatives = negativeIntegers();
+        AlchemyGenerator<Double> badBearings = doubles(360, 1000);
+        
+        assertThrows(() -> formula.calculateDestinationFrom(null, 0, 0)).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(() -> formula.calculateDestinationFrom(first, one(negatives), 0)).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(() -> formula.calculateDestinationFrom(first, 0, 0)).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(() -> formula.calculateDestinationFrom(first, 10, one(badBearings))).isInstanceOf(IllegalArgumentException.class);
+    }
 }

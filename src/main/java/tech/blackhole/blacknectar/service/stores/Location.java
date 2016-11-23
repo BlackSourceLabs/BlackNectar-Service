@@ -81,7 +81,7 @@ public final class Location implements JSONRepresentable
         return lat ->
         {
             checkThat(lat)
-                .usingMessage("Latitude must be between -90 and 90")
+                .usingMessage("Latitude must be between -90 and 90, but was " + lat)
                 .is(lessThanOrEqualTo(90.0))
                 .is(greaterThanOrEqualTo(-90.0));
         };
@@ -93,7 +93,7 @@ public final class Location implements JSONRepresentable
         return lon ->
         {
             checkThat(lon)
-                .usingMessage("Longitude must be between -180 and 180")
+                .usingMessage("Longitude must be between -180 and 180, but was " + lon)
                 .is(greaterThanOrEqualTo(-180.0))
                 .is(lessThanOrEqualTo(180.0));
         };

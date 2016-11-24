@@ -162,7 +162,7 @@ final class SQLBlackNectarService implements BlackNectarService
 
     private String createSQLToInsertStore()
     {
-        return "INSERT INTO stores(store_name, latitude, longitude, address, address_line_two, city, state, county, zip, local_zip)\n" +
+        return "INSERT INTO Stores(store_name, latitude, longitude, address, address_line_two, city, state, county, zip, local_zip)\n" +
                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     }
 
@@ -201,7 +201,7 @@ final class SQLBlackNectarService implements BlackNectarService
 
     String getStatementToCreateTable()
     {
-        return "CREATE TABLE IF NOT EXISTS stores\n" +
+        return "CREATE TABLE IF NOT EXISTS Stores\n" +
                "(\n" +
                "    store_name text,\n" +
                "    latitude numeric,\n" +

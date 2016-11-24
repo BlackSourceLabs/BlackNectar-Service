@@ -25,6 +25,8 @@ import tech.blackhole.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
  * This interface is a {@link FunctionalInterface} responsible for extracting a 
@@ -55,6 +57,8 @@ interface SQLStoreMapper
         @Override
         public Store mapToStore(ResultSet results) throws SQLException
         {
+            checkThat(results).is(notNull());
+            
             //Pull data from the ResultSet
             String name = results.getString(SQLColumns.STORE_NAME);
             Double latitude = results.getDouble(SQLColumns.LATITUDE);

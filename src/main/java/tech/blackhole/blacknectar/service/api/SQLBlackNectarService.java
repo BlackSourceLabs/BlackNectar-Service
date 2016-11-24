@@ -22,6 +22,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,10 +52,11 @@ final class SQLBlackNectarService implements BlackNectarService
     
     private final Aroma aroma;
     private final Connection connection;
+    private final GeoCalculator geoCalculator;
 
-    SQLBlackNectarService(@Required Aroma aroma, @Required Connection connection) throws SQLException
+    SQLBlackNectarService(@Required Aroma aroma, @Required Connection connection, @Required GeoCalculator geoCalculator) throws SQLException
     {
-        checkThat(aroma, connection)
+        checkThat(aroma, connection, geoCalculator)
             .are(notNull());
 
         this.aroma = aroma;
@@ -66,6 +68,7 @@ final class SQLBlackNectarService implements BlackNectarService
             .is(falseStatement());
 
         this.connection = connection;
+        this.geoCalculator = geoCalculator;
     }
 
     @Override

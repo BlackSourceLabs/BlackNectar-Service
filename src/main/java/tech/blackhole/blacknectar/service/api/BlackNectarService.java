@@ -99,7 +99,9 @@ public interface BlackNectarService
      */
     static BlackNectarService newSQLService(@Required Connection connection) throws SQLException
     {
-        return new SQLBlackNectarService(Aroma.create(), connection, GeoCalculator.HARVESINE);
+        return newSQLService(Aroma.create(),
+                             connection,
+                             GeoCalculator.HARVESINE);
     }
     
     /**
@@ -114,8 +116,10 @@ public interface BlackNectarService
      * 
      * @throws SQLException 
      */
-    static BlackNectarService newSQLService(@Required Aroma aroma, @Required Connection connection, @Required GeoCalculator geoCalculator) throws SQLException
+    static BlackNectarService newSQLService(@Required Aroma aroma,
+                                            @Required Connection connection,
+                                            @Required GeoCalculator geoCalculator) throws SQLException
     {
-        return new SQLBlackNectarService(aroma, connection, geoCalculator);
+        return new SQLBlackNectarService(aroma, connection, geoCalculator, SQLStoreMapper.INSTANCE);
     }
 }

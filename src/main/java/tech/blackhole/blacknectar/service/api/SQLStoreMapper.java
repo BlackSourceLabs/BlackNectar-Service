@@ -56,26 +56,26 @@ interface SQLStoreMapper
         public Store mapToStore(ResultSet results) throws SQLException
         {
             //Pull data from the ResultSet
-            String name = results.getString(SQLKeys.STORE_NAME);
-            Double latitude = results.getDouble(SQLKeys.LATITUDE);
+            String name = results.getString(SQLColumns.STORE_NAME);
+            Double latitude = results.getDouble(SQLColumns.LATITUDE);
             if (results.wasNull())
             {
                 latitude = null;
             }
 
-            Double longitude = results.getDouble(SQLKeys.LONGITUDE);
+            Double longitude = results.getDouble(SQLColumns.LONGITUDE);
             if (results.wasNull())
             {
                 longitude = null;
             }
 
-            String address = results.getString(SQLKeys.ADDRESS);
-            String addressTwo = results.getString(SQLKeys.ADDRESS_LINE_TWO);
-            String city = results.getString(SQLKeys.CITY);
-            String state = results.getString(SQLKeys.STATE);
-            String county = results.getString(SQLKeys.COUNTY);
-            Integer zipCode = results.getInt(SQLKeys.ZIP_CODE);
-            Integer localZip = results.getInt(SQLKeys.LOCAL_ZIP_CODE);
+            String address = results.getString(SQLColumns.ADDRESS);
+            String addressTwo = results.getString(SQLColumns.ADDRESS_LINE_TWO);
+            String city = results.getString(SQLColumns.CITY);
+            String state = results.getString(SQLColumns.STATE);
+            String county = results.getString(SQLColumns.COUNTY);
+            Integer zipCode = results.getInt(SQLColumns.ZIP_CODE);
+            Integer localZip = results.getInt(SQLColumns.LOCAL_ZIP_CODE);
 
             if (results.wasNull())
             {

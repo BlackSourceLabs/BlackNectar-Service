@@ -17,21 +17,26 @@
  
 package tech.blackhole.blacknectar.service.api;
 
+
+import com.google.inject.AbstractModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  *
  * @author SirWellington
  */
-class SQLKeys 
+public final class ModuleBlackNectarService extends AbstractModule
 {
-    static final String STORE_NAME = "store_name";
-    static final String LATITUDE = "latitude";
-    static final String LONGITUDE = "longitude";
-    static final String ADDRESS = "address";
-    static final String ADDRESS_LINE_TWO = "address_line_two";
-    static final String CITY = "city";
-    static final String STATE = "state";
-    static final String COUNTY = "county";
-    static final String ZIP_CODE = "zip_code";
-    static final String LOCAL_ZIP_CODE = "local_zip_code";
+    private final static Logger LOG = LoggerFactory.getLogger(ModuleBlackNectarService.class);
+
+    @Override
+    protected void configure()
+    {
+        bind(BlackNectarService.class).to(SQLBlackNectarService.class).asEagerSingleton();
+        bind(SQLStoreMapper.class).asEagerSingleton();
+        bind(GeoCalculator.class).toInstance(GeoCalculator.HARVESINE);
+        
+    }
 
 }

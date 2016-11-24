@@ -20,19 +20,24 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.blackhole.blacknectar.service.exceptions.BadArgumentException;
+import tech.blackhole.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
+import static tech.blackhole.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.negativeIntegers;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
@@ -54,6 +59,11 @@ public class SQLBlackNectarServiceTest
     private ResultSet resultSet;
     @Mock
     private GeoCalculator geoCalculator;
+    @Mock
+    private SQLStoreMapper storeMapper;
+    
+    private List<Store> stores;
+    private Store store;
     
     private Aroma aroma ;
     
@@ -67,13 +77,14 @@ public class SQLBlackNectarServiceTest
         setupData();
         setupMocks();
         
-        instance = new SQLBlackNectarService(aroma, connection, geoCalculator);
+        instance = new SQLBlackNectarService(aroma, connection, geoCalculator, storeMapper);
     }
 
 
     private void setupData() throws Exception
     {
-        
+        stores = listOf(stores());
+        store = Lists.oneOf(stores);
     }
 
     private void setupMocks() throws Exception
@@ -92,14 +103,18 @@ public class SQLBlackNectarServiceTest
     @Test
     public void testConstructorWithBadArguments()
     {
-        assertThrows(() -> new SQLBlackNectarService(null, connection, geoCalculator))
+        assertThrows(() -> new SQLBlackNectarService(null, connection, geoCalculator, storeMapper))
             .isInstanceOf(IllegalArgumentException.class);
         
-        assertThrows(() -> new SQLBlackNectarService(aroma, null, geoCalculator))
+        assertThrows(() -> new SQLBlackNectarService(aroma, null, geoCalculator, storeMapper))
             .isInstanceOf(IllegalArgumentException.class);
         
-        assertThrows(() -> new SQLBlackNectarService(aroma, connection, null))
+        assertThrows(() -> new SQLBlackNectarService(aroma, connection, null, storeMapper))
             .isInstanceOf(IllegalArgumentException.class);
+        
+        assertThrows(() -> new SQLBlackNectarService(aroma, connection, geoCalculator, null))
+            .isInstanceOf(IllegalArgumentException.class);
+        
     }
     
     @DontRepeat
@@ -108,7 +123,8 @@ public class SQLBlackNectarServiceTest
     {
         when(connection.isClosed()).thenReturn(true);
         
-        assertThrows(() -> new SQLBlackNectarService(aroma, connection, geoCalculator)).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(() -> new SQLBlackNectarService(aroma, connection, geoCalculator, storeMapper))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test

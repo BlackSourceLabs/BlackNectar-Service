@@ -32,12 +32,10 @@ import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
 import tech.blackhole.blacknectar.service.exceptions.BadArgumentException;
 import tech.blackhole.blacknectar.service.exceptions.OperationFailedException;
-import tech.blackhole.blacknectar.service.stores.Address;
 import tech.blackhole.blacknectar.service.stores.Location;
 import tech.blackhole.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
@@ -57,10 +55,14 @@ final class SQLBlackNectarService implements BlackNectarService
     private final Aroma aroma;
     private final Connection connection;
     private final GeoCalculator geoCalculator;
+    private final SQLStoreMapper storeMapper;
 
-    SQLBlackNectarService(@Required Aroma aroma, @Required Connection connection, @Required GeoCalculator geoCalculator) throws IllegalArgumentException, SQLException
+    SQLBlackNectarService(@Required Aroma aroma, 
+                          @Required Connection connection,
+                          @Required GeoCalculator geoCalculator,
+                          @Required SQLStoreMapper storeMapper) throws IllegalArgumentException, SQLException
     {
-        checkThat(aroma, connection, geoCalculator)
+        checkThat(aroma, connection, geoCalculator, storeMapper)
             .are(notNull());
 
         this.aroma = aroma;
@@ -72,6 +74,7 @@ final class SQLBlackNectarService implements BlackNectarService
 
         this.connection = connection;
         this.geoCalculator = geoCalculator;
+        this.storeMapper = storeMapper;
     }
 
     @Override
@@ -294,9 +297,9 @@ final class SQLBlackNectarService implements BlackNectarService
                 Store store;
                 try
                 {
-                    store = getStoreFrom(results);
+                    store = storeMapper.mapToStore(results);
                 }
-                catch (RuntimeException ex)
+                catch (SQLException ex)
                 {
                     String message = "Could not extract store from row: {}";
                     LOG.info(message, results, ex);
@@ -327,69 +330,6 @@ final class SQLBlackNectarService implements BlackNectarService
         return stores;
     }
 
-    private Store getStoreFrom(ResultSet results) throws SQLException
-    {
-        //Pull data from the ResultSet
-        String name = results.getString(Keys.STORE_NAME);
-        Double latitude = results.getDouble(Keys.LATITUDE);
-        if (results.wasNull())
-        {
-            latitude = null;
-        }
-        
-        Double longitude = results.getDouble(Keys.LONGITUDE);
-        if (results.wasNull())
-        {
-            longitude = null;
-        }
-        
-        String address = results.getString(Keys.ADDRESS);
-        String addressTwo = results.getString(Keys.ADDRESS_LINE_TWO);
-        String city = results.getString(Keys.CITY);
-        String state = results.getString(Keys.STATE);
-        String county = results.getString(Keys.COUNTY);
-        Integer zipCode = results.getInt(Keys.ZIP_CODE);
-        Integer localZip = results.getInt(Keys.LOCAL_ZIP_CODE);
-        
-        if (results.wasNull())
-        {
-            localZip = null;
-        }
-
-        //Use the data to start creating a Store object, piece by piece
-        Address.Builder addressBuilder = Address.Builder.newBuilder()
-            .withAddressLineOne(address)
-            .withCity(city)
-            .withState(state)
-            .withZipCode(zipCode);
-
-        if (!isNullOrEmpty(county))
-        {
-            addressBuilder.withCounty(county);
-        }
-        
-        if (!isNullOrEmpty(addressTwo))
-        {
-            addressBuilder.withAddressLineTwo(addressTwo);
-        }
-        
-        if (localZip != null && localZip > 0)
-        {
-            addressBuilder.withLocalZipCode(localZip);
-        }
-        
-        Store.Builder storeBuilder = Store.Builder.newInstance()
-            .withAddress(addressBuilder.build())
-            .withName(name);
-        
-        if (latitude != null && longitude != null)
-        {
-            Location location = Location.with(latitude, longitude);
-            storeBuilder.withLocation(location);
-        }
-        
-        return storeBuilder.build();
-    }
 
     private Statement tryToCreateStatement()
     {
@@ -440,8 +380,7 @@ final class SQLBlackNectarService implements BlackNectarService
         if (request.hasSearchTerm())
         {
             clauses += 1;
-            
-            query += format("WHERE %s LIKE \"%%%s%%\" ", Keys.STORE_NAME, request.searchTerm);
+            query += format("WHERE %s LIKE \"%%%s%%\" ", SQLColumns.STORE_NAME, request.searchTerm);
         }
         
         if (request.hasCenter())
@@ -481,10 +420,10 @@ final class SQLBlackNectarService implements BlackNectarService
         Location left = geoCalculator.calculateDestinationFrom(request.center, request.radiusInMeters, leftBearing);
         Location right = geoCalculator.calculateDestinationFrom(request.center, request.radiusInMeters, rightBearing);
         
-        String clause = format("%s <= %f ", Keys.LATITUDE, top.getLatitude()) +
-                        format("AND %s >= %f ", Keys.LATITUDE, bottom.getLatitude()) +
-                        format("AND %s <= %f ", Keys.LONGITUDE, right.getLongitude()) +
-                        format("AND %s >= %f", Keys.LONGITUDE, left.getLongitude());
+        String clause = format("%s <= %f ", SQLColumns.LATITUDE, top.getLatitude()) +
+                        format("AND %s >= %f ", SQLColumns.LATITUDE, bottom.getLatitude()) +
+                        format("AND %s <= %f ", SQLColumns.LONGITUDE, right.getLongitude()) +
+                        format("AND %s >= %f", SQLColumns.LONGITUDE, left.getLongitude());
         
         return clause;
     }
@@ -498,19 +437,5 @@ final class SQLBlackNectarService implements BlackNectarService
         };
     }
 
-    static class Keys
-    {
-
-        static final String STORE_NAME = "store_name";
-        static final String LATITUDE = "latitude";
-        static final String LONGITUDE = "longitude";
-        static final String ADDRESS = "address";
-        static final String ADDRESS_LINE_TWO = "address_line_two";
-        static final String CITY = "city";
-        static final String STATE = "state";
-        static final String COUNTY = "county";
-        static final String ZIP_CODE = "zip_code";
-        static final String LOCAL_ZIP_CODE = "local_zip_code";
-    }
 
 }

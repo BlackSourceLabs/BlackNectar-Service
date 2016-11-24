@@ -59,6 +59,7 @@ public class SQLBlackNectarServiceIT
     private Aroma aroma;
     private Connection connection;
     private GeoCalculator geoCalculator;
+    private SQLStoreMapper storeMapper;
     
     private SQLBlackNectarService instance;
     
@@ -73,7 +74,7 @@ public class SQLBlackNectarServiceIT
         
         setupData();
         setupMocks();
-        instance = new SQLBlackNectarService(aroma, connection, geoCalculator);
+        instance = new SQLBlackNectarService(aroma, connection, geoCalculator, storeMapper);
     }
 
 
@@ -88,6 +89,7 @@ public class SQLBlackNectarServiceIT
         aroma = TestingResources.getAroma();
         connection = TestingResources.createSQLConnection();
         geoCalculator = GeoCalculator.HARVESINE;
+        storeMapper = SQLStoreMapper.INSTANCE;
     }
 
     @Test

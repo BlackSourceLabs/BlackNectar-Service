@@ -81,6 +81,8 @@ public class SearchStoresOperation implements Route
             .throwing(BadArgumentException.class)
             .are(notNull());
         
+        long begin = System.currentTimeMillis();
+        
         LOG.info("Received GET request to search stores from IP [{}]", request.ip());
 
         aroma.begin().titled("Request Received")
@@ -97,16 +99,22 @@ public class SearchStoresOperation implements Route
 
         List<Store> stores = findStores(request);
         
-        LOG.debug("Found {} stores to match query parameters: {}", stores.size(), request.queryString());
-        
-        aroma.begin().titled("Request Complete")
-            .text("Found {} stores to match query parameters {}", stores.size(), request.queryString())
-            .withUrgency(Urgency.LOW)
-            .send();
-        
-        return stores.stream()
+        JsonArray json = stores.stream()
             .map(Store::asJSON)
             .collect(supplier, accumulator, combiner);
+        
+        {
+            long delay = System.currentTimeMillis() - begin;
+            String message = "Operation to search for stores with query paramters {} took {}ms and resulted in {} stores";
+            LOG.debug(message, request.queryString(), delay, json.size());
+
+            aroma.begin().titled("Request Complete")
+                .text(message, request.queryString(), delay, json.size())
+                .withUrgency(Urgency.LOW)
+                .send();
+        }
+        
+        return json;
     }
 
     private List<Store> findStores(Request request)

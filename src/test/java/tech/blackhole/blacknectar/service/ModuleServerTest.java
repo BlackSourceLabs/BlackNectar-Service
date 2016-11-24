@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.aroma.client.Aroma;
+import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
 import static org.hamcrest.Matchers.*;
@@ -31,6 +32,7 @@ import static org.junit.Assert.*;
  *
  * @author SirWellington
  */
+@IntegrationTest
 @RunWith(AlchemyTestRunner.class)
 public class ModuleServerTest
 {

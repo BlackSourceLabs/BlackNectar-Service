@@ -20,12 +20,13 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import tech.aroma.client.Aroma;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
-import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
@@ -57,7 +58,7 @@ public class FileRepositoryTest
     {
         
         setupData();
-        instance = new FileRepository();
+        instance = new FileRepository(Aroma.create());
     }
 
 
@@ -72,9 +73,10 @@ public class FileRepositoryTest
     {
         List<Store> stores = instance.getAllStores();
         assertThat(stores, notNullValue());
-        assertThat(stores.size(), greaterThan(1_000));
+        assertThat(stores.size(), greaterThanOrEqualTo(30_000));
     }
 
+    @DontRepeat
     @Test
     public void testReadCSVFile()
     {
@@ -91,11 +93,6 @@ public class FileRepositoryTest
         
         List<String> result = instance.splitFileIntoLines(file);
         assertThat(result, is(lines));
-    }
-
-    @Test
-    public void testToStore()
-    {
     }
 
     @Test

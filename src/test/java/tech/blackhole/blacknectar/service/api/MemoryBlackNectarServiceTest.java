@@ -74,7 +74,7 @@ public class MemoryBlackNectarServiceTest
         setupData();
         setupMocks();
         
-        instance = new MemoryBlackNectarService(stores, DistanceFormula.HARVESINE);
+        instance = new MemoryBlackNectarService(stores, GeoCalculator.HARVESINE);
     }
 
 

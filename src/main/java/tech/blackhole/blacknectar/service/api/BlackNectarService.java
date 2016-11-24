@@ -17,7 +17,10 @@
 
 package tech.blackhole.blacknectar.service.api;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
+import tech.aroma.client.Aroma;
 import tech.blackhole.blacknectar.service.exceptions.OperationFailedException;
 import tech.blackhole.blacknectar.service.stores.Store;
 import tech.blackhole.blacknectar.service.stores.StoreRepository;
@@ -78,9 +81,45 @@ public interface BlackNectarService
     static BlackNectarService newMemoryService()
     {
         List<Store> stores = StoreRepository.FILE.getAllStores();
-        DistanceFormula formula = DistanceFormula.HARVESINE;
+        GeoCalculator formula = GeoCalculator.HARVESINE;
 
         return new MemoryBlackNectarService(stores, formula);
     }
 
+    
+    /**
+     * Creates a new SQL-backed Service that performs all operations against 
+     * a JDBC connection.
+     * 
+     * @param connection The JDBC connection, must be open.
+     * 
+     * @return
+     * 
+     * @throws SQLException 
+     */
+    static BlackNectarService newSQLService(@Required Connection connection) throws SQLException
+    {
+        return newSQLService(Aroma.create(),
+                             connection,
+                             GeoCalculator.HARVESINE);
+    }
+    
+    /**
+     * Creates a new SQL-backed Service that performs all operations against 
+     * a JDBC connection.
+     * 
+     * @param aroma
+     * @param connection The JDBC connection, must be open.
+     * @param geoCalculator Used to make Geodetic calculations
+     * 
+     * @return
+     * 
+     * @throws SQLException 
+     */
+    static BlackNectarService newSQLService(@Required Aroma aroma,
+                                            @Required Connection connection,
+                                            @Required GeoCalculator geoCalculator) throws SQLException
+    {
+        return new SQLBlackNectarService(aroma, connection, geoCalculator, SQLStoreMapper.INSTANCE);
+    }
 }

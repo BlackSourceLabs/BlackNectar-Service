@@ -17,6 +17,8 @@
 package tech.blackhole.blacknectar.service.api;
 
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -55,7 +57,7 @@ public class SQLBlackNectarServiceIT
     private static final Location NYC = Location.with(40.758659, -73.985217);
 
     private Aroma aroma;
-    private Connection sql;
+    private Connection connection;
     private GeoCalculator geoCalculator;
     
     private SQLBlackNectarService instance;
@@ -71,7 +73,7 @@ public class SQLBlackNectarServiceIT
         
         setupData();
         setupMocks();
-        instance = new SQLBlackNectarService(aroma, sql, geoCalculator);
+        instance = new SQLBlackNectarService(aroma, connection, geoCalculator);
     }
 
 
@@ -84,7 +86,7 @@ public class SQLBlackNectarServiceIT
     private void setupMocks() throws Exception
     {
         aroma = TestingResources.getAroma();
-        sql = TestingResources.createSQLConnection();
+        connection = TestingResources.createSQLConnection();
         geoCalculator = GeoCalculator.HARVESINE;
     }
 
@@ -176,13 +178,11 @@ public class SQLBlackNectarServiceIT
     }
 
     @Test
-    public void testPrepareStatementForStore() throws Exception
+    public void testGetStatementToCreateTable() throws SQLException
     {
-    }
-
-    @Test
-    public void testGetStatementToCreateTable()
-    {
+        String sql = instance.getStatementToCreateTable();
+        Statement statement = connection.createStatement();
+        statement.execute(sql);
     }
 
 }

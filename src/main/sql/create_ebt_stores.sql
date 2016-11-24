@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS Stores
     city text,
     state text,
     county text,
-    zip text,
-    local_zip text,
+    zip_code text,
+    local_zip_code text,
 
     PRIMARY KEY(store_name, latitude, longitude)
 );

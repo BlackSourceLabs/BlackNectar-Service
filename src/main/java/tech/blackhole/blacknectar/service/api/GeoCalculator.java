@@ -35,10 +35,6 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThan;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThanOrEqualTo;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.lessThanOrEqualTo;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
-import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThan;
-import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThanOrEqualTo;
-import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.lessThanOrEqualTo;
 
 
 /**
@@ -48,7 +44,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.l
  * @author SirWellington
  */
 @ImplementedBy(GeoCalculator.HarvesineCalculator.class)
-interface GeoCalculator 
+public interface GeoCalculator 
 {
     /**
      * Calculates the distance, in meters, between {@code first} and {@code second}.

@@ -224,6 +224,25 @@ final class SQLBlackNectarService implements BlackNectarService
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    private ResultSet tryToGetResults(PreparedStatement statement, String errorMessage)
+    {
+        try 
+        {
+            return statement.executeQuery();
+        }
+        catch(SQLException ex)
+        {
+            LOG.error("Failed to execute SQL statement: {}", errorMessage, ex);
+            
+            aroma.begin().titled("SQL Exception")
+                .text("Failed to execute SQL: {}", errorMessage, ex)
+                .withUrgency(Urgency.HIGH)
+                .send();
+            
+            throw new OperationFailedException(errorMessage, ex);
+        }
+    }
+
     static class Keys
     {
 

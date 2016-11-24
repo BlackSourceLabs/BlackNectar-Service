@@ -99,8 +99,8 @@ public final class Server
             throw ex;
         }
 
-        server.setupSecurity();
         server.serveAtPort(port);
+//        server.setupSecurity();
         server.setupRoutes();
         server.setupExceptionHandler();
     }

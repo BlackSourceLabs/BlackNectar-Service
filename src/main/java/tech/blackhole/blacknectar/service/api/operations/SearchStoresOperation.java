@@ -180,6 +180,7 @@ public class SearchStoresOperation implements Route
     {
         if (!hasRadiusParameter(queryParameters))
         {
+            request.withRadius(BlackNectarService.DEFAULT_RADIUS);
             return;
         }
         

@@ -23,6 +23,7 @@ import com.google.inject.Injector;
 import java.sql.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.aroma.client.Aroma;
 
 /**
  *
@@ -42,6 +43,11 @@ public class TestingResources
     public static Connection createSQLConnection()
     {
         return INJECTOR.getInstance(Connection.class);
+    }
+    
+    public static Aroma getAroma()
+    {
+        return INJECTOR.getInstance(Aroma.class);
     }
     
 }

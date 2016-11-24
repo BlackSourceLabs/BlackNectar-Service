@@ -26,6 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.stubbing.OngoingStubbing;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.blackhole.blacknectar.service.exceptions.BadArgumentException;
@@ -143,6 +144,28 @@ public class SQLBlackNectarServiceTest
         
         Store first = results.get(0);
         assertThat(first, is(store));
+    }
+
+    @Test
+    public void testGetAllStoresWithAllStores() throws SQLException
+    {
+        OngoingStubbing<Boolean> resultStubbing = when(resultSet.next());
+        for (Store store : stores)
+        {
+            resultStubbing = resultStubbing.thenReturn(true);
+        }
+        resultStubbing.thenReturn(false);
+
+        OngoingStubbing<Store> mapperStubbing = when(storeMapper.mapToStore(resultSet));
+        for (Store store : stores)
+        {
+            resultStubbing = resultStubbing.thenReturn(true);
+            mapperStubbing = mapperStubbing.thenReturn(store);
+        }
+        mapperStubbing.thenReturn(null);
+        
+        List<Store> results = instance.getAllStores(0);
+        assertThat(results, is(stores));
     }
 
     @Test

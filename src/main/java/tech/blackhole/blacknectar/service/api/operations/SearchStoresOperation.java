@@ -141,8 +141,8 @@ public class SearchStoresOperation implements Route
 
         insertLocationIfPresentInto(searchRequest, queryParameters);
         insertRadiusIfPresentInto(searchRequest, queryParameters);
-        insertLimitIfPresentInto(searchRequest, queryParameters);
         insertSearchTermIfPresentInto(searchRequest, queryParameters);
+        insertLimitIfPresentInto(searchRequest, queryParameters);
 
         return searchRequest;
     }

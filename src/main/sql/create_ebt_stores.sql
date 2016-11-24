@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS stores
+CREATE TABLE IF NOT EXISTS Stores
 (
     store_name text,
     latitude numeric,

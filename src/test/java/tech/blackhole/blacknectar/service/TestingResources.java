@@ -41,13 +41,23 @@ public class TestingResources
     {
         return INJECTOR;
     }
-    
+
     public static Connection createSQLConnection() throws SQLException
+    {
+        return createReadOnlySQLConnection();
+    }
+
+    private static Connection createReadOnlySQLConnection() throws SQLException
+    {
+        return INJECTOR.getInstance(Connection.class);
+    }
+
+    private static Connection createWritableSQLConnection() throws SQLException
     {
         String file = "/Users/SirWellington/Documents/Code/BlackWholeLabs/BlackNectar/BlackNectar-Service/src/main/resources/Stores.db";
         return DriverManager.getConnection("jdbc:sqlite:" + file);
     }
-    
+
     public static Aroma getAroma()
     {
         return INJECTOR.getInstance(Aroma.class);

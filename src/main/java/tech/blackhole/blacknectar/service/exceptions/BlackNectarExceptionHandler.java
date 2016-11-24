@@ -80,7 +80,7 @@ public final class BlackNectarExceptionHandler implements ExceptionHandler
             
             response.status(((BlackNectarAPIException) ex).getStatusCode());
         }
-        else if (ex instanceof RuntimeException)
+        else
         {
             LOG.error("Unexpected Exception", ex);
             

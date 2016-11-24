@@ -19,6 +19,7 @@ package tech.blackhole.blacknectar.service.api;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import org.junit.Before;
@@ -33,6 +34,10 @@ import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 import static tech.blackhole.blacknectar.service.BlackNectarGenerators.stores;
@@ -96,6 +101,9 @@ public class SQLBlackNectarServiceTest
         
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(statement.executeQuery(anyString())).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true).thenReturn(false);
+        
+        setupResultsWithStore(resultSet, store);
         
     }
     
@@ -130,6 +138,11 @@ public class SQLBlackNectarServiceTest
     @Test
     public void testGetAllStores()
     {
+        List<Store> results = instance.getAllStores(0);
+        assertThat(results, not(empty()));
+        
+        Store first = results.get(0);
+        assertThat(first, is(store));
     }
 
     @Test
@@ -157,6 +170,11 @@ public class SQLBlackNectarServiceTest
     @Test
     public void testGetStatementToCreateTable()
     {
+    }
+
+    private void setupResultsWithStore(ResultSet resultSet, Store store) throws SQLException
+    {
+        when(storeMapper.mapToStore(resultSet)).thenReturn(store);
     }
 
 }

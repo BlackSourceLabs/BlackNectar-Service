@@ -20,8 +20,8 @@ package tech.blackhole.blacknectar.service.api;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,16 +29,20 @@ import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
 import tech.blackhole.blacknectar.service.exceptions.OperationFailedException;
+import tech.blackhole.blacknectar.service.stores.Address;
+import tech.blackhole.blacknectar.service.stores.Location;
 import tech.blackhole.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.BooleanAssertions.falseStatement;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThanOrEqualTo;
 
 /**
- *
+ * Uses an SQL Connection to interact with Store Data.
+ * 
  * @author SirWellington
  */
 final class SQLBlackNectarService implements BlackNectarService
@@ -71,9 +75,19 @@ final class SQLBlackNectarService implements BlackNectarService
             .usingMessage("limit must be >= 0")
             .is(greaterThanOrEqualTo(0));
 
-        Statement statement = createStatementToGetAllStores(limit);
+        PreparedStatement statement = createStatementToGetAllStores(limit);
 
-        return Lists.emptyList();
+        ResultSet results = tryToGetResults(statement, "Failed to get all stores with limit: " + limit);
+        
+        List<Store> stores = tryToGetStoresFrom(results);
+        
+        LOG.trace("SQL query to get all stores with limit {} turned up {} stores", limit, stores.size());
+        aroma.begin().titled("SQL Query Complete")
+            .text("Query to get all stores with limit {} turned up {} stores", limit, stores.size())
+            .withUrgency(Urgency.LOW)
+            .send();
+        
+        return stores;
     }
 
     @Override
@@ -84,7 +98,8 @@ final class SQLBlackNectarService implements BlackNectarService
             .is(notNull());
         
         String query = createQueryForRequest(request);
-
+        
+        
         return Lists.emptyList();
     }
 
@@ -130,13 +145,13 @@ final class SQLBlackNectarService implements BlackNectarService
 
     }
 
-    private Statement createStatementToGetAllStores(int limit) throws OperationFailedException
+    private PreparedStatement createStatementToGetAllStores(int limit) throws OperationFailedException
     {
-        String sql = createSQLTOGetAllStores(limit);
+        String query = createSQLTOGetAllStores(limit);
 
         try
         {
-            return connection.prepareStatement(sql);
+            return connection.prepareStatement(query);
         }
         catch (SQLException ex)
         {
@@ -156,7 +171,7 @@ final class SQLBlackNectarService implements BlackNectarService
         }
         else
         {
-            return "SELECT * FROM Stores" +
+            return "SELECT * FROM Stores " +
                    "LIMIT " + limit;
         }
     }
@@ -241,6 +256,112 @@ final class SQLBlackNectarService implements BlackNectarService
             
             throw new OperationFailedException(errorMessage, ex);
         }
+    }
+
+    private List<Store> tryToGetStoresFrom(ResultSet results)
+    {
+        List<Store> stores = Lists.create();
+        
+        try
+        {
+            while (results.next())
+            {
+                Store store;
+                try
+                {
+                    store = getStoreFrom(results);
+                }
+                catch (RuntimeException ex)
+                {
+                    String message = "Could not extract store from row: {}";
+                    LOG.info(message, results, ex);
+                    aroma.begin().titled("SQL Exception")
+                        .text(message, results, ex)
+                        .send();
+
+                    continue;
+                }
+
+                if (store != null)
+                {
+                    stores.add(store);
+                }
+            }
+        }
+        catch (SQLException ex)
+        {
+            String message = "Failed to extract store from ResultSet: {}";
+            LOG.error(message, results, ex);
+
+            aroma.begin().titled("SQL Exception")
+                .text(message, results, ex)
+                .withUrgency(Urgency.HIGH)
+                .send();
+        }
+        
+        return stores;
+    }
+
+    private Store getStoreFrom(ResultSet results) throws SQLException
+    {
+        String name = results.getString(Keys.STORE_NAME);
+        Double latitude = results.getDouble(Keys.LATITUDE);
+        if (results.wasNull())
+        {
+            latitude = null;
+        }
+        
+        Double longitude = results.getDouble(Keys.LONGITUDE);
+        if (results.wasNull())
+        {
+            longitude = null;
+        }
+        
+        String address = results.getString(Keys.ADDRESS);
+        String addressTwo = results.getString(Keys.ADDRESS_LINE_TWO);
+        String city = results.getString(Keys.CITY);
+        String state = results.getString(Keys.STATE);
+        String county = results.getString(Keys.COUNTY);
+        Integer zipCode = results.getInt(Keys.ZIP_CODE);
+        Integer localZip = results.getInt(Keys.LOCAL_ZIP_CODE);
+        
+        if (results.wasNull())
+        {
+            localZip = null;
+        }
+
+        Address.Builder addressBuilder = Address.Builder.newBuilder()
+            .withAddressLineOne(address)
+            .withCity(city)
+            .withState(state)
+            .withZipCode(zipCode);
+
+        if (!isNullOrEmpty(county))
+        {
+            addressBuilder.withCounty(county);
+        }
+        
+        if (!isNullOrEmpty(addressTwo))
+        {
+            addressBuilder.withAddressLineTwo(addressTwo);
+        }
+        
+        if (localZip != null && localZip > 0)
+        {
+            addressBuilder.withLocalZipCode(localZip);
+        }
+        
+        Store.Builder storeBuilder = Store.Builder.newInstance()
+            .withAddress(addressBuilder.build())
+            .withName(name);
+        
+        if (latitude != null && longitude != null)
+        {
+            Location location = Location.with(latitude, longitude);
+            storeBuilder.withLocation(location);
+        }
+        
+        return storeBuilder.build();
     }
 
     static class Keys

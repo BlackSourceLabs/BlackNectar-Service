@@ -19,7 +19,6 @@ package tech.blackhole.blacknectar.service.api;
 import java.sql.Connection;
 import java.util.List;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.aroma.client.Aroma;
@@ -30,8 +29,14 @@ import tech.blackhole.blacknectar.service.stores.StoreRepository;
 import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertThat;
 import static tech.blackhole.blacknectar.service.BlackNectarGenerators.stores;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
+import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
 
 /**
  *
@@ -73,8 +78,21 @@ public class SQLBlackNectarServiceIT
     }
 
     @Test
-    public void testGetAllStores()
+    public void testGetAllStoresWithNoLimit()
     {
+        List<Store> result = instance.getAllStores();
+        assertThat(result, not(empty()));
+    }
+    
+    @Test
+    public void testGetAllStoresWithLimit()
+    {
+        int limit = one(integers(10, 1_000));
+        
+        List<Store> result = instance.getAllStores(limit);
+        
+        assertThat(result, not(empty()));
+        assertThat(result.size(), lessThanOrEqualTo(limit));
     }
 
     @Test
@@ -83,7 +101,6 @@ public class SQLBlackNectarServiceIT
         
     }
 
-    @Ignore
     @Test
     public void testAddAllStores()
     {
@@ -95,7 +112,6 @@ public class SQLBlackNectarServiceIT
             }
             catch (OperationFailedException ex)
             {
-                continue;
             }
         }
 

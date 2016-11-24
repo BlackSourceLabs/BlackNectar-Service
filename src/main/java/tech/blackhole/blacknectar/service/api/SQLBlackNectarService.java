@@ -57,7 +57,7 @@ final class SQLBlackNectarService implements BlackNectarService
     private final Connection connection;
     private final GeoCalculator geoCalculator;
 
-    SQLBlackNectarService(@Required Aroma aroma, @Required Connection connection, @Required GeoCalculator geoCalculator) throws SQLException
+    SQLBlackNectarService(@Required Aroma aroma, @Required Connection connection, @Required GeoCalculator geoCalculator) throws IllegalArgumentException, SQLException
     {
         checkThat(aroma, connection, geoCalculator)
             .are(notNull());
@@ -67,7 +67,6 @@ final class SQLBlackNectarService implements BlackNectarService
         boolean isClosed = connection.isClosed();
         checkThat(isClosed)
             .usingMessage("connection is closed")
-            .throwing(SQLException.class)
             .is(falseStatement());
 
         this.connection = connection;

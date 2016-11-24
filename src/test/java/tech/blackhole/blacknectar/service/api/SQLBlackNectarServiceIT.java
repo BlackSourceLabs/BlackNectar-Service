@@ -90,6 +90,7 @@ public class SQLBlackNectarServiceIT
         connection = TestingResources.createSQLConnection();
         geoCalculator = GeoCalculator.HARVESINE;
         storeMapper = SQLStoreMapper.INSTANCE;
+        
     }
 
     @Test

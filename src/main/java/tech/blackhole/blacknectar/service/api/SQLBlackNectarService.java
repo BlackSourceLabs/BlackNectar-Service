@@ -24,6 +24,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
@@ -37,6 +38,7 @@ import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.BooleanAssertions.falseStatement;
@@ -115,7 +117,16 @@ final class SQLBlackNectarService implements BlackNectarService
             .withUrgency(Urgency.LOW)
             .send();
         
-        return stores;
+        if (request.hasCenter())
+        {
+            return stores.stream()
+                .filter(nearby(request.center, request.radiusInMeters))
+                .collect(toList());
+        }
+        else 
+        {
+            return stores;
+        }
     }
 
     void addStore(@Required Store store) throws OperationFailedException
@@ -437,6 +448,10 @@ final class SQLBlackNectarService implements BlackNectarService
             {
                 query += " AND ";
             }
+            else 
+            {
+                query += " WHERE ";
+            }
             
            String locationClause = createLocationClauseFor(request);
            query += locationClause;
@@ -462,12 +477,21 @@ final class SQLBlackNectarService implements BlackNectarService
         Location left = geoCalculator.calculateDestinationFrom(request.center, request.radiusInMeters, leftBearing);
         Location right = geoCalculator.calculateDestinationFrom(request.center, request.radiusInMeters, rightBearing);
         
-        String clause = format("WHERE %S <= %f AND ", Keys.LATITUDE, top.getLatitude()) +
-                        format("WHERE %s >= %f AND ", Keys.LATITUDE, bottom.getLatitude()) +
-                        format("WHERE %s <= %f AND ", Keys.LONGITUDE, right.getLongitude()) +
-                        format("WHERE %s >= %f", Keys.LONGITUDE, left.getLongitude());
+        String clause = format("%s <= %f ", Keys.LATITUDE, top.getLatitude()) +
+                        format("AND %s >= %f ", Keys.LATITUDE, bottom.getLatitude()) +
+                        format("AND %s <= %f ", Keys.LONGITUDE, right.getLongitude()) +
+                        format("AND %s >= %f", Keys.LONGITUDE, left.getLongitude());
         
         return clause;
+    }
+
+    private Predicate<? super Store> nearby(Location center, double radiusInMeters)
+    {
+        return store ->
+        {
+            double distance = geoCalculator.distanceBetween(store.getLocation(), center);
+            return distance <= radiusInMeters;
+        };
     }
 
     static class Keys

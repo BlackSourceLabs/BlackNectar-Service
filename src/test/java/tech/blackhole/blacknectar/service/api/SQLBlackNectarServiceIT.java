@@ -25,6 +25,7 @@ import org.junit.runner.RunWith;
 import tech.aroma.client.Aroma;
 import tech.blackhole.blacknectar.service.TestingResources;
 import tech.blackhole.blacknectar.service.exceptions.OperationFailedException;
+import tech.blackhole.blacknectar.service.stores.Location;
 import tech.blackhole.blacknectar.service.stores.Store;
 import tech.blackhole.blacknectar.service.stores.StoreRepository;
 import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
@@ -40,6 +41,7 @@ import static org.junit.Assert.assertThat;
 import static tech.blackhole.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
+import static tech.sirwellington.alchemy.generator.NumberGenerators.doubles;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
 
 /**
@@ -50,6 +52,8 @@ import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
 @RunWith(AlchemyTestRunner.class)
 public class SQLBlackNectarServiceIT 
 {
+    private static final Location NYC = Location.with(40.758659, -73.985217);
+
     private Aroma aroma;
     private Connection sql;
     private GeoCalculator geoCalculator;
@@ -59,6 +63,7 @@ public class SQLBlackNectarServiceIT
     private List<Store> stores;
     
     private List<Store> allStores;
+
     
     @Before
     public void setUp() throws Exception
@@ -119,7 +124,40 @@ public class SQLBlackNectarServiceIT
             assertThat(store.getName(), anyOf(containsString(name), containsString(name.toUpperCase())));
         }
     }
+    
+    @Test
+    public void testSearchForStoreWithCenter()
+    {
+        double radius = one(doubles(3_000, 30_000));
+        
+        BlackNectarSearchRequest request = new BlackNectarSearchRequest()
+            .withCenter(NYC)
+            .withRadius(radius);
+        
+        List<Store> results = instance.searchForStores(request);
+        assertThat(results, not(empty()));
+        
+    }
 
+    @Test
+    public void testSearchForStoresWithNameAndCenter()
+    {
+        double radius = one(doubles(5_000, 10_000));
+        String searchTerm = "Duane";
+        
+        BlackNectarSearchRequest request = new BlackNectarSearchRequest()
+            .withCenter(NYC)
+            .withRadius(radius)
+            .withSearchTerm(searchTerm);
+        
+        List<Store> results = instance.searchForStores(request);
+        assertThat(results, not(empty()));
+        
+        results.forEach(store -> assertThat(store.getName(), 
+                                              anyOf(containsString(searchTerm),
+                                                    containsString(searchTerm.toUpperCase()))));
+    }
+    
     @Ignore
     @Test
     public void testAddAllStores()

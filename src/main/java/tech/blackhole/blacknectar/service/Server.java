@@ -79,7 +79,7 @@ public final class Server
 
     public static void main(String[] args)
     {
-        final int port = 9101;
+        final int port = 9100;
     
         Injector injector;
         Server server;

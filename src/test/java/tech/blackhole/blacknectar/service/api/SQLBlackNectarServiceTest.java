@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -30,6 +31,7 @@ import org.mockito.stubbing.OngoingStubbing;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.blackhole.blacknectar.service.exceptions.BadArgumentException;
+import tech.blackhole.blacknectar.service.stores.Location;
 import tech.blackhole.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
@@ -39,12 +41,18 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static tech.blackhole.blacknectar.service.BlackNectarGenerators.locations;
 import static tech.blackhole.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
+import static tech.sirwellington.alchemy.generator.NumberGenerators.doubles;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.negativeIntegers;
+import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
@@ -91,6 +99,12 @@ public class SQLBlackNectarServiceTest
     {
         stores = listOf(stores());
         store = Lists.oneOf(stores);
+
+        Location center = one(locations());
+        request = new BlackNectarSearchRequest()
+            .withCenter(center)
+            .withRadius(one(doubles(1000, 10_000)))
+            .withSearchTerm(one(alphabeticString()));
     }
 
     private void setupMocks() throws Exception
@@ -105,6 +119,12 @@ public class SQLBlackNectarServiceTest
         when(resultSet.next()).thenReturn(true).thenReturn(false);
         
         setupResultsWithStore(resultSet, store);
+        
+        when(geoCalculator.calculateDestinationFrom(eq(request.center), eq(request.radiusInMeters), anyDouble()))
+            .thenReturn(one(locations()))
+            .thenReturn(one(locations()))
+            .thenReturn(one(locations()))
+            .thenReturn(one(locations()));
         
     }
     
@@ -178,8 +198,15 @@ public class SQLBlackNectarServiceTest
     @Test
     public void testSearchForStores()
     {
+            
+        List<Store> results = instance.searchForStores(request);
+        
+        assertThat(results, not(empty()));
+        Store first = results.get(0);
+        assertThat(first, is(store));
     }
 
+    @Ignore
     @Test
     public void testAddStore()
     {
@@ -188,11 +215,25 @@ public class SQLBlackNectarServiceTest
     @Test
     public void testPrepareStatementForStore() throws Exception
     {
+        instance.prepareStatementForStore(preparedStatement, store);
+        
+        verify(preparedStatement).setString(1, store.getName());
+        verify(preparedStatement).setDouble(2, store.getLocation().getLatitude());
+        verify(preparedStatement).setDouble(3, store.getLocation().getLongitude());;
+        verify(preparedStatement).setString(4, store.getAddress().getAddressLineOne());
+        verify(preparedStatement).setString(5, store.getAddress().getAddressLineTwo());
+        verify(preparedStatement).setString(6, store.getAddress().getCity());
+        verify(preparedStatement).setString(7, store.getAddress().getState());
+        verify(preparedStatement).setString(8, store.getAddress().getCounty());
+        verify(preparedStatement).setString(9, "" + store.getAddress().getZip5());
+        verify(preparedStatement).setString(10, "" + store.getAddress().getZip4());
     }
 
     @Test
     public void testGetStatementToCreateTable()
     {
+        String statement = instance.getStatementToCreateTable();
+        assertThat(statement.isEmpty(), is(false));
     }
 
     private void setupResultsWithStore(ResultSet resultSet, Store store) throws SQLException

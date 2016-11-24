@@ -37,7 +37,6 @@ import tech.blackhole.blacknectar.service.Server;
 import tech.blackhole.blacknectar.service.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 
-import static tech.blackhole.blacknectar.service.Server.AROMA;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
@@ -118,7 +117,7 @@ final class FileRepository implements StoreRepository
         {
             LOG.error("Failed to load URL into a String: {}", url, ex);
 
-            Server.AROMA.begin()
+            aroma.begin()
                 .titled("Operation Failed")
                 .text("Could not load URL into String: [{}]", url.toString(), ex)
                 .withUrgency(Urgency.HIGH)
@@ -176,7 +175,7 @@ final class FileRepository implements StoreRepository
         {
             LOG.error("Failed to convert Geo-Coordinate: [{},{}]", latitudeString, longitudeString, ex);
 
-            AROMA.begin()
+            aroma.begin()
                 .titled("Conversion Failed")
                 .text("Failed to convert to Geo-Point: [{}, {}]", latitudeString, longitudeString, ex)
                 .withUrgency(Urgency.MEDIUM)
@@ -248,7 +247,7 @@ final class FileRepository implements StoreRepository
         {
             LOG.error("Failed to parse Zip codes: {}", zipCode, ex);
 
-            AROMA.begin()
+            aroma.begin()
                 .titled("Conversion Failed")
                 .text("Could not parse Zip Code: {}", zipCode, ex)
                 .withUrgency(Urgency.MEDIUM)

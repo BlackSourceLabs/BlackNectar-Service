@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
+import tech.blackhole.blacknectar.service.exceptions.BadArgumentException;
 import tech.blackhole.blacknectar.service.exceptions.OperationFailedException;
 import tech.blackhole.blacknectar.service.stores.Address;
 import tech.blackhole.blacknectar.service.stores.Location;
@@ -78,6 +79,7 @@ final class SQLBlackNectarService implements BlackNectarService
     {
         checkThat(limit)
             .usingMessage("limit must be >= 0")
+            .throwing(BadArgumentException.class)
             .is(greaterThanOrEqualTo(0));
 
         PreparedStatement statement = createStatementToGetAllStores(limit);
@@ -100,6 +102,7 @@ final class SQLBlackNectarService implements BlackNectarService
     {
         checkThat(request)
             .usingMessage("request missing")
+            .throwing(BadArgumentException.class)
             .is(notNull());
         
         Statement statement = tryToCreateStatement();
@@ -130,7 +133,9 @@ final class SQLBlackNectarService implements BlackNectarService
 
     void addStore(@Required Store store) throws OperationFailedException
     {
-        checkThat(store).is(notNull());
+        checkThat(store)
+            .throwing(BadArgumentException.class)
+            .is(notNull());
 
         String insertStatement = createSQLToInsertStore();
         PreparedStatement statement = tryToPrepareStatement(insertStatement, "could not save Store to Database: " + store);

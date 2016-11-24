@@ -25,12 +25,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import tech.aroma.client.Aroma;
+import tech.blackhole.blacknectar.service.exceptions.BadArgumentException;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.NumberGenerators.negativeIntegers;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
@@ -111,6 +114,13 @@ public class SQLBlackNectarServiceTest
     @Test
     public void testGetAllStores()
     {
+    }
+
+    @Test
+    public void testGetAllStoresWithBadLimit()
+    {
+        int limit = one(negativeIntegers());
+        assertThrows(() -> instance.getAllStores(limit)).isInstanceOf(BadArgumentException.class);
     }
 
     @Test

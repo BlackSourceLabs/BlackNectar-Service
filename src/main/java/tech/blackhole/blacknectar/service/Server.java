@@ -16,8 +16,12 @@
 
 package tech.blackhole.blacknectar.service;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import java.io.File;
+import java.io.IOException;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +33,7 @@ import tech.blackhole.blacknectar.service.api.operations.GetSampleStoreOperation
 import tech.blackhole.blacknectar.service.api.operations.SayHelloOperation;
 import tech.blackhole.blacknectar.service.api.operations.SearchStoresOperation;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
@@ -74,7 +79,7 @@ public final class Server
 
     public static void main(String[] args)
     {
-        final int port = 9100;
+        final int port = 9101;
     
         Injector injector;
         Server server;
@@ -94,6 +99,7 @@ public final class Server
             throw ex;
         }
 
+        server.setupSecurity();
         server.serveAtPort(port);
         server.setupRoutes();
         server.setupExceptionHandler();
@@ -118,9 +124,35 @@ public final class Server
         Spark.get("/", this.sayHelloOperation);
     }
     
+    void setupSecurity()
+    {
+        String keystore = "../Certificates/keystore.jks";
+        String keystorePasswordFile = "../Certificates/keystore-password.txt";
+        String keystorePassword = readFile(keystorePasswordFile);
+        
+        if (!isNullOrEmpty(keystorePassword))
+        {
+            Spark.secure(keystore, keystorePassword, null, null);
+        }
+    }
+    
     void setupExceptionHandler()
     {
         Spark.exception(Exception.class, exceptionHandler);
+    }
+    
+    private String readFile(String filename)
+    {
+        File file = new File(filename);
+        try
+        {
+            return Files.toString(file, Charsets.UTF_8);
+        }
+        catch (IOException ex)
+        {
+            LOG.warn("Failed to read file: {}", ex);
+            return "";
+        }
     }
 
 }

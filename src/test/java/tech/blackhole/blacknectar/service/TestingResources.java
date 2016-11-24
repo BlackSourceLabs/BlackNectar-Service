@@ -21,6 +21,8 @@ package tech.blackhole.blacknectar.service;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.client.Aroma;
@@ -40,9 +42,10 @@ public class TestingResources
         return INJECTOR;
     }
     
-    public static Connection createSQLConnection()
+    public static Connection createSQLConnection() throws SQLException
     {
-        return INJECTOR.getInstance(Connection.class);
+        String file = "/Users/SirWellington/Documents/Code/BlackWholeLabs/BlackNectar/BlackNectar-Service/src/main/resources/Stores.db";
+        return DriverManager.getConnection("jdbc:sqlite:" + file);
     }
     
     public static Aroma getAroma()

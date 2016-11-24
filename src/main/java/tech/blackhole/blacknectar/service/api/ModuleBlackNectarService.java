@@ -21,6 +21,7 @@ package tech.blackhole.blacknectar.service.api;
 import com.google.inject.AbstractModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.blackhole.blacknectar.service.stores.StoreRepository;
 
 /**
  *
@@ -36,7 +37,8 @@ public final class ModuleBlackNectarService extends AbstractModule
         bind(BlackNectarService.class).to(SQLBlackNectarService.class).asEagerSingleton();
         bind(SQLStoreMapper.class).asEagerSingleton();
         bind(GeoCalculator.class).toInstance(GeoCalculator.HARVESINE);
-        
+        bind(StoreRepository.class).asEagerSingleton();
+
     }
 
 }

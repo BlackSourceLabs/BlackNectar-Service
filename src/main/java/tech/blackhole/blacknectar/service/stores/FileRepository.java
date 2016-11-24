@@ -24,8 +24,10 @@ import com.google.common.io.Resources;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,10 +49,17 @@ final class FileRepository implements StoreRepository
     private final static Logger LOG = LoggerFactory.getLogger(FileRepository.class);
     private static final String FILENAME = "Stores.csv";
 
-    private final int MAXIMUM_STORES = 30_000;
+    private final List<Store> stores = loadAllStores();
+    private final int MAXIMUM_STORES = 300_000;
     
     @Override
     public List<Store> getAllStores()
+    {
+        return stores;
+    }
+    
+    @Internal
+    private List<Store> loadAllStores()
     {
         String file = readCSVFile();
         List<String> lines = splitFileIntoLines(file);
@@ -64,9 +73,10 @@ final class FileRepository implements StoreRepository
         return lines.parallelStream()
             .map(this::toStore)
             .filter(Objects::nonNull)
+            .distinct()
             .collect(Collectors.toList());
     }
-
+    
     String readCSVFile()
     {
         URL url;
@@ -237,6 +247,13 @@ final class FileRepository implements StoreRepository
     private void removeFirstLine(List<String> lines)
     {
         lines.remove(0);
+    }
+
+    private void removeDuplicates(List<String> lines)
+    {
+        Set<String> set = new LinkedHashSet<>(lines);
+        lines.clear();
+        lines.addAll(set);
     }
 
 }

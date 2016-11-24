@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.ExceptionHandler;
 import tech.aroma.client.Aroma;
-import tech.blackhole.blacknectar.service.api.BlackNectarService;
+import tech.blackhole.blacknectar.service.api.ModuleBlackNectarService;
 import tech.blackhole.blacknectar.service.api.operations.ModuleOperations;
 import tech.blackhole.blacknectar.service.exceptions.BlackNectarExceptionHandler;
 import tech.sirwellington.alchemy.annotations.access.Internal;
@@ -45,9 +45,9 @@ class ModuleServer extends AbstractModule
     protected void configure()
     {
         install(new ModuleOperations());
+        install(new ModuleBlackNectarService());
 
         bind(ExceptionHandler.class).to(BlackNectarExceptionHandler.class);
-        bind(BlackNectarService.class).toInstance(BlackNectarService.newMemoryService());
         bind(Server.class);
     }
 

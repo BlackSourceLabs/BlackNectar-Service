@@ -99,7 +99,7 @@ public interface BlackNectarService
      */
     static BlackNectarService newSQLService(@Required Connection connection) throws SQLException
     {
-        return new SQLBlackNectarService(Aroma.create(), connection);
+        return new SQLBlackNectarService(Aroma.create(), connection, GeoCalculator.HARVESINE);
     }
     
     /**
@@ -108,13 +108,14 @@ public interface BlackNectarService
      * 
      * @param aroma
      * @param connection The JDBC connection, must be open.
+     * @param geoCalculator Used to make Geodetic calculations
      * 
      * @return
      * 
      * @throws SQLException 
      */
-    static BlackNectarService newSQLService(@Required Aroma aroma, @Required Connection connection) throws SQLException
+    static BlackNectarService newSQLService(@Required Aroma aroma, @Required Connection connection, @Required GeoCalculator geoCalculator) throws SQLException
     {
-        return new SQLBlackNectarService(aroma, connection);
+        return new SQLBlackNectarService(aroma, connection, geoCalculator);
     }
 }

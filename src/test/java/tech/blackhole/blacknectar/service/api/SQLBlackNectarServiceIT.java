@@ -19,6 +19,7 @@ package tech.blackhole.blacknectar.service.api;
 import java.sql.Connection;
 import java.util.List;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.aroma.client.Aroma;
@@ -29,7 +30,10 @@ import tech.blackhole.blacknectar.service.stores.StoreRepository;
 import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
@@ -48,6 +52,7 @@ public class SQLBlackNectarServiceIT
 {
     private Aroma aroma;
     private Connection sql;
+    private GeoCalculator geoCalculator;
     
     private SQLBlackNectarService instance;
     
@@ -61,7 +66,7 @@ public class SQLBlackNectarServiceIT
         
         setupData();
         setupMocks();
-        instance = new SQLBlackNectarService(aroma, sql);
+        instance = new SQLBlackNectarService(aroma, sql, geoCalculator);
     }
 
 
@@ -75,6 +80,7 @@ public class SQLBlackNectarServiceIT
     {
         aroma = TestingResources.getAroma();
         sql = TestingResources.createSQLConnection();
+        geoCalculator = GeoCalculator.HARVESINE;
     }
 
     @Test
@@ -96,11 +102,25 @@ public class SQLBlackNectarServiceIT
     }
 
     @Test
-    public void testSearchForStores()
+    public void testSearchForStoresWithName()
     {
+        String name = "Duane";
         
+        BlackNectarSearchRequest request = new BlackNectarSearchRequest()
+            .withSearchTerm(name);
+
+        List<Store> results = instance.searchForStores(request);
+        assertThat(results, not(empty()));
+        
+        results.forEach(store -> assertThat(store.getName(), not(isEmptyOrNullString())));
+        
+        for (Store store : results)
+        {
+            assertThat(store.getName(), anyOf(containsString(name), containsString(name.toUpperCase())));
+        }
     }
 
+    @Ignore
     @Test
     public void testAddAllStores()
     {

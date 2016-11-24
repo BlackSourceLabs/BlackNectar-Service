@@ -36,6 +36,7 @@ import tech.blackhole.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.lang.String.format;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.BooleanAssertions.falseStatement;
@@ -100,10 +101,21 @@ final class SQLBlackNectarService implements BlackNectarService
             .usingMessage("request missing")
             .is(notNull());
         
-        String query = createQueryForRequest(request);
+        Statement statement = tryToCreateStatement();
+        String query = createSearchQueryForRequest(request);
         
+        ResultSet results = tryToExecute(statement, query, "Could not execute SQL to search: " + request);
         
-        return Lists.emptyList();
+        List<Store> stores = tryToGetStoresFrom(results);
+        
+        String message = "Found {} stores for Search Request {}";
+        LOG.debug(message, stores.size(), request);
+        aroma.begin().titled("SQL Complete")
+            .text(message, stores.size(), request)
+            .withUrgency(Urgency.LOW)
+            .send();
+        
+        return stores;
     }
 
     void addStore(@Required Store store) throws OperationFailedException
@@ -237,11 +249,6 @@ final class SQLBlackNectarService implements BlackNectarService
                ")";
     }
 
-    private String createQueryForRequest(BlackNectarSearchRequest request)
-    {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
     private ResultSet tryToGetResults(PreparedStatement statement, String errorMessage)
     {
         try 
@@ -307,6 +314,7 @@ final class SQLBlackNectarService implements BlackNectarService
 
     private Store getStoreFrom(ResultSet results) throws SQLException
     {
+        //Pull data from the ResultSet
         String name = results.getString(Keys.STORE_NAME);
         Double latitude = results.getDouble(Keys.LATITUDE);
         if (results.wasNull())
@@ -333,6 +341,7 @@ final class SQLBlackNectarService implements BlackNectarService
             localZip = null;
         }
 
+        //Use the data to start creating a Store object, piece by piece
         Address.Builder addressBuilder = Address.Builder.newBuilder()
             .withAddressLineOne(address)
             .withCity(city)
@@ -365,6 +374,100 @@ final class SQLBlackNectarService implements BlackNectarService
         }
         
         return storeBuilder.build();
+    }
+
+    private Statement tryToCreateStatement()
+    {
+        try 
+        {
+            return connection.createStatement();
+        }
+        catch(SQLException ex)
+        {
+            String message = "Could not prepare statement to SQL Database.";
+            LOG.error(message);
+            aroma.begin().titled("SQL Exception")
+                .text(message)
+                .withUrgency(Urgency.HIGH)
+                .send();
+            
+            throw new OperationFailedException("Failed to open Database connection", ex);
+        }
+    }
+
+    private ResultSet tryToExecute(Statement statement, String query, String errorMessage)
+    {
+        try 
+        {
+            return statement.executeQuery(query);
+        }
+        catch(SQLException ex)
+        {
+            String message = "Failed to execute SQL Statement: {}";
+            LOG.error(message, errorMessage, ex);
+            aroma.begin().titled("SQL Exception")
+                .text(message, errorMessage, ex)
+                .withUrgency(Urgency.HIGH)
+                .send();
+            
+            throw new OperationFailedException(errorMessage, ex);
+        }
+    }
+    
+    
+    private String createSearchQueryForRequest(BlackNectarSearchRequest request)
+    {
+        String query = "SELECT * " +
+            "FROM Stores ";
+        
+        int clauses = 0;
+        
+        if (request.hasSearchTerm())
+        {
+            clauses += 1;
+            
+            query += format("WHERE %s LIKE \"%%%s%%\" ", Keys.STORE_NAME, request.searchTerm);
+        }
+        
+        if (request.hasCenter())
+        {
+            clauses += 1;
+            
+            if (clauses > 1)
+            {
+                query += " AND ";
+            }
+            
+           String locationClause = createLocationClauseFor(request);
+           query += locationClause;
+        }
+        
+        if (request.hasLimit())
+        {
+            query += " LIMIT " + request.limit;
+        }
+
+        return query;
+    }
+
+    private String createLocationClauseFor(BlackNectarSearchRequest request)
+    {
+        double topBearing = 0.0;
+        double rightBearing = 90;
+        double bottomBearing = 180;
+        double leftBearing = 270;
+        
+        Location top = geoCalculator.calculateDestinationFrom(request.center, request.radiusInMeters, topBearing);
+        Location bottom = geoCalculator.calculateDestinationFrom(request.center, request.radiusInMeters, bottomBearing);
+        Location left = geoCalculator.calculateDestinationFrom(request.center, request.radiusInMeters, leftBearing);
+        Location right = geoCalculator.calculateDestinationFrom(request.center, request.radiusInMeters, rightBearing);
+        
+        String clause = format("WHERE %S <= %f AND ", Keys.LATITUDE, top.getLatitude()) +
+                        format("WHERE %s >= %f AND ", Keys.LATITUDE, bottom.getLatitude()) +
+                        format("WHERE %s <= %f AND ", Keys.LONGITUDE, right.getLongitude()) +
+                        format("WHERE %s >= %f", Keys.LONGITUDE, left.getLongitude());
+        
+        return clause;
     }
 
     static class Keys

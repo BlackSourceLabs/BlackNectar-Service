@@ -150,13 +150,14 @@ final class SQLBlackNectarService implements BlackNectarService
 
     private String createSQLTOGetAllStores(int limit)
     {
-        if (limit > 0)
+        if (limit <= 0)
         {
-            return "SELECT * FROM stores";
+            return "SELECT * FROM Stores";
         }
         else
         {
-            return "SELECT * FROM stores LIMIT " + limit;
+            return "SELECT * FROM Stores" +
+                   "LIMIT " + limit;
         }
     }
 

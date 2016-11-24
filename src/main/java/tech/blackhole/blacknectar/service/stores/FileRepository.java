@@ -35,6 +35,8 @@ import tech.blackhole.blacknectar.service.Server;
 import tech.blackhole.blacknectar.service.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 
+import static tech.blackhole.blacknectar.service.Server.AROMA;
+
 /**
  *
  * @author SirWellington
@@ -115,16 +117,19 @@ final class FileRepository implements StoreRepository
 
     Store toStore(String line)
     {
-        String[] components = line.split(",");
+        String[] components = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
         if (components == null || components.length == 0)
         {
+            LOG.debug("Received empty components");
             return null;
         }
-        if (components.length != 10)
+        
+        if (components.length > 10)
         {
-            LOG.warn("Expected 10 values, but instead {}, in line {}", components.length, line);
+            LOG.warn("Expected at most 11 values, but instead {}, in line {}", components.length, line);
             return null;
         }
+        
         try
         {
             Store store = extractStoreFrom(components);
@@ -147,7 +152,7 @@ final class FileRepository implements StoreRepository
         {
             LOG.error("Failed to convert Geo-Coordinate: [{},{}]", latitudeString, longitudeString, ex);
            
-            Server.AROMA.begin()
+            AROMA.begin()
                 .titled("Conversion Failed")
                 .text("Failed to convert to Geo-Point: [{}, {}]", latitudeString, longitudeString, ex)
                 .withUrgency(Urgency.MEDIUM)
@@ -181,9 +186,15 @@ final class FileRepository implements StoreRepository
             .withZipCode(zipCode);
 
         if (!Strings.isNullOrEmpty(zip4))
-        {
-            int localZipCode = extractZipCode(zip4);
-            addressBuilder = addressBuilder.withLocalZipCode(localZipCode);
+        { 
+            try
+            {
+                int localZipCode = extractZipCode(zip4);
+                addressBuilder = addressBuilder.withLocalZipCode(localZipCode);
+            }
+            catch (RuntimeException ex)
+            {
+            }
         }
 
         if (!Strings.isNullOrEmpty(addressLineTwo))
@@ -213,7 +224,7 @@ final class FileRepository implements StoreRepository
         {
             LOG.error("Failed to parse Zip codes: {}", zipCode, ex);
            
-            Server.AROMA.begin()
+            AROMA.begin()
                 .titled("Conversion Failed")
                 .text("Could not parse Zip Code: {}", zipCode, ex)
                 .withUrgency(Urgency.MEDIUM)

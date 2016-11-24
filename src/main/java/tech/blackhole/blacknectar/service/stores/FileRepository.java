@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
- 
 package tech.blackhole.blacknectar.service.stores;
-
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
@@ -29,54 +27,70 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
+import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
 import tech.blackhole.blacknectar.service.Server;
 import tech.blackhole.blacknectar.service.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 
 import static tech.blackhole.blacknectar.service.Server.AROMA;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
  *
  * @author SirWellington
  */
 @Internal
-final class FileRepository implements StoreRepository 
+final class FileRepository implements StoreRepository
 {
+
     private final static Logger LOG = LoggerFactory.getLogger(FileRepository.class);
     private static final String FILENAME = "Stores.csv";
 
     private final List<Store> stores = loadAllStores();
     private final int MAXIMUM_STORES = 30_000;
-    
+
+    private final Aroma aroma;
+
+    @Inject
+    FileRepository(Aroma aroma)
+    {
+        checkThat(aroma)
+            .is(notNull());
+
+        this.aroma = aroma;
+    }
+
     @Override
     public List<Store> getAllStores()
     {
         return stores;
     }
-    
+
     @Internal
     private List<Store> loadAllStores()
     {
         String file = readCSVFile();
         List<String> lines = splitFileIntoLines(file);
         removeFirstLine(lines);
-        
+
         if (lines.size() > MAXIMUM_STORES)
         {
             lines = lines.subList(0, MAXIMUM_STORES);
         }
-        
+
         return lines.parallelStream()
             .map(this::toStore)
             .filter(Objects::nonNull)
             .distinct()
             .collect(Collectors.toList());
     }
-    
+
     String readCSVFile()
     {
         URL url;
@@ -87,13 +101,13 @@ final class FileRepository implements StoreRepository
         catch (Exception ex)
         {
             LOG.error("Failed to load resource at {}", FILENAME, ex);
-           
+
             Server.AROMA.begin()
                 .titled("Operation Failed")
                 .text("Could not load CSV file at {}", FILENAME, ex)
                 .withUrgency(Urgency.HIGH)
                 .send();
-            
+
             return "";
         }
         try
@@ -103,13 +117,13 @@ final class FileRepository implements StoreRepository
         catch (IOException ex)
         {
             LOG.error("Failed to load URL into a String: {}", url, ex);
-           
+
             Server.AROMA.begin()
                 .titled("Operation Failed")
                 .text("Could not load URL into String: [{}]", url.toString(), ex)
                 .withUrgency(Urgency.HIGH)
                 .send();
-            
+
             return "";
         }
     }
@@ -121,7 +135,7 @@ final class FileRepository implements StoreRepository
         {
             return Lists.emptyList();
         }
-        
+
         return Lists.copy(Arrays.asList(lines));
     }
 
@@ -133,13 +147,13 @@ final class FileRepository implements StoreRepository
             LOG.debug("Received empty components");
             return null;
         }
-        
+
         if (components.length > 10)
         {
             LOG.warn("Expected at most 11 values, but instead {}, in line {}", components.length, line);
             return null;
         }
-        
+
         try
         {
             Store store = extractStoreFrom(components);
@@ -161,13 +175,13 @@ final class FileRepository implements StoreRepository
         catch (NumberFormatException ex)
         {
             LOG.error("Failed to convert Geo-Coordinate: [{},{}]", latitudeString, longitudeString, ex);
-           
+
             AROMA.begin()
                 .titled("Conversion Failed")
                 .text("Failed to convert to Geo-Point: [{}, {}]", latitudeString, longitudeString, ex)
                 .withUrgency(Urgency.MEDIUM)
                 .send();
-            
+
             throw ex;
         }
     }
@@ -184,11 +198,11 @@ final class FileRepository implements StoreRepository
         String zip5 = components[7].replaceAll("\"", "");
         String zip4 = components[8].replaceAll("\"", "").replaceAll(" ", "");
         String county = components[9].replaceAll("\"", "").replaceAll("\r", "");
-        
+
         Location location = extractLocationFrom(latitudeString, longitudeString);
-        
+
         int zipCode = extractZipCode(zip5);
-      
+
         Address.Builder addressBuilder = Address.Builder.newBuilder()
             .withAddressLineOne(addressLineOne)
             .withCity(city)
@@ -196,7 +210,7 @@ final class FileRepository implements StoreRepository
             .withZipCode(zipCode);
 
         if (!Strings.isNullOrEmpty(zip4))
-        { 
+        {
             try
             {
                 int localZipCode = extractZipCode(zip4);
@@ -233,13 +247,13 @@ final class FileRepository implements StoreRepository
         catch (NumberFormatException ex)
         {
             LOG.error("Failed to parse Zip codes: {}", zipCode, ex);
-           
+
             AROMA.begin()
                 .titled("Conversion Failed")
                 .text("Could not parse Zip Code: {}", zipCode, ex)
                 .withUrgency(Urgency.MEDIUM)
                 .send();
-            
+
             throw new OperationFailedException(ex);
         }
     }

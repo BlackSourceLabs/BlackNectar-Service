@@ -18,6 +18,7 @@ package tech.blackhole.blacknectar.service.stores;
 
 import com.google.inject.ImplementedBy;
 import java.util.List;
+import tech.aroma.client.Aroma;
 
 /**
  *
@@ -34,5 +35,5 @@ public interface StoreRepository
      */
     List<Store> getAllStores();
     
-    static StoreRepository FILE = new FileRepository();
+    static StoreRepository FILE = new FileRepository(Aroma.create());
 }

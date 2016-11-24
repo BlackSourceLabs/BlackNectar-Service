@@ -27,6 +27,7 @@ import spark.Response;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
+import tech.sirwellington.alchemy.arguments.FailedAssertionException;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
@@ -58,7 +59,7 @@ public final class BlackNectarExceptionHandler implements ExceptionHandler
             return;
         }
         
-        if (ex instanceof BadArgumentException)
+        if (ex instanceof BadArgumentException || ex instanceof FailedAssertionException)
         {
             LOG.error("Received BadArgumentException");
             
@@ -67,7 +68,7 @@ public final class BlackNectarExceptionHandler implements ExceptionHandler
                 .withUrgency(Urgency.MEDIUM)
                 .send();
             
-            response.status(((BadArgumentException) ex).getStatusCode());
+            response.status(400);
         }
         else if (ex instanceof BlackNectarAPIException)
         {

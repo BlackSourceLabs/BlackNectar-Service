@@ -172,7 +172,7 @@ final class FileRepository implements StoreRepository
         String city = components[5].replaceAll("\"", "");
         String state = components[6].replaceAll("\"", "");
         String zip5 = components[7].replaceAll("\"", "");
-        String zip4 = components[8].replaceAll("\"", "");
+        String zip4 = components[8].replaceAll("\"", "").replaceAll(" ", "");
         String county = components[9].replaceAll("\"", "").replaceAll("\r", "");
         
         Location location = extractLocationFrom(latitudeString, longitudeString);

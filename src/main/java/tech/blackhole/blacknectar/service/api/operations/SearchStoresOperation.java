@@ -35,6 +35,7 @@ import tech.aroma.client.Urgency;
 import tech.blackhole.blacknectar.service.api.BlackNectarSearchRequest;
 import tech.blackhole.blacknectar.service.api.BlackNectarService;
 import tech.blackhole.blacknectar.service.exceptions.BadArgumentException;
+import tech.blackhole.blacknectar.service.exceptions.OperationFailedException;
 import tech.blackhole.blacknectar.service.stores.Location;
 import tech.blackhole.blacknectar.service.stores.Store;
 
@@ -90,9 +91,6 @@ public class SearchStoresOperation implements Route
             .withUrgency(Urgency.LOW)
             .send();
 
-        response.status(200);
-        response.type(APPLICATION_JSON);
-
         Supplier<JsonArray> supplier = () -> new JsonArray();
         BiConsumer<JsonArray, JsonObject> accumulator = (array, object) -> array.add(object);
         BiConsumer<JsonArray, JsonArray> combiner = (first, second) -> first.addAll(second);
@@ -113,16 +111,26 @@ public class SearchStoresOperation implements Route
                 .withUrgency(Urgency.LOW)
                 .send();
         }
+
+        response.status(200);
+        response.type(APPLICATION_JSON);
         
         return json;
     }
 
     private List<Store> findStores(Request request)
     {
-
+        
         BlackNectarSearchRequest searchRequest = createSearchRequestFrom(request);
-
-        return service.searchForStores(searchRequest);
+        
+        try
+        {
+            return service.searchForStores(searchRequest);
+        }
+        catch (Exception ex)
+        {
+            throw new OperationFailedException(ex);
+        }
     }
 
     private BlackNectarSearchRequest createSearchRequestFrom(Request request)

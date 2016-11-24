@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.function.Predicate;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
@@ -57,6 +58,7 @@ final class SQLBlackNectarService implements BlackNectarService
     private final GeoCalculator geoCalculator;
     private final SQLStoreMapper storeMapper;
 
+    @Inject
     SQLBlackNectarService(@Required Aroma aroma, 
                           @Required Connection connection,
                           @Required GeoCalculator geoCalculator,

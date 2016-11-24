@@ -133,6 +133,17 @@ public final class Server
         if (!isNullOrEmpty(keystorePassword))
         {
             Spark.secure(keystore, keystorePassword, null, null);
+            AROMA.begin().titled("SSL Enabled")
+                .withUrgency(Urgency.LOW)
+                .send();
+        }
+        else 
+        {
+            AROMA.begin().titled("SSL Disabled")
+                .text("Could not load Keystore File [{}] and Password [{}]", keystore, keystorePasswordFile)
+                .withUrgency(Urgency.MEDIUM)
+                .send();
+            
         }
     }
     

@@ -81,7 +81,10 @@
     
     
     <!-- END OF POM METADATA -->
-
+    <ciManagement>
+        <system>hudson</system>
+        <url>http://jenkins.redroma.tech/job/BlackNectarService/</url>
+    </ciManagement>
     <dependencies>
 
         <!--=======================-->

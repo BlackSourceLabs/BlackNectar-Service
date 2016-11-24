@@ -28,7 +28,6 @@ import tech.aroma.client.Urgency;
 import tech.blackhole.blacknectar.service.api.operations.GetSampleStoreOperation;
 import tech.blackhole.blacknectar.service.api.operations.SayHelloOperation;
 import tech.blackhole.blacknectar.service.api.operations.SearchStoresOperation;
-import tech.blackhole.blacknectar.service.exceptions.BlackNectarAPIException;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
@@ -121,8 +120,7 @@ public final class Server
     
     void setupExceptionHandler()
     {
-        Spark.exception(BlackNectarAPIException.class, exceptionHandler);
+        Spark.exception(Exception.class, exceptionHandler);
     }
-    
 
 }

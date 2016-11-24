@@ -50,7 +50,7 @@ final class FileRepository implements StoreRepository
     private static final String FILENAME = "Stores.csv";
 
     private final List<Store> stores = loadAllStores();
-    private final int MAXIMUM_STORES = 300_000;
+    private final int MAXIMUM_STORES = 30_000;
     
     @Override
     public List<Store> getAllStores()

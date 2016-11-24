@@ -62,7 +62,6 @@ class ModuleServer extends AbstractModule
     @Singleton
     Connection provideSQLConnection() throws SQLException
     {
-        String file = "/Users/SirWellington/Documents/Code/BlackWholeLabs/BlackNectar/BlackNectar-Service/src/main/resources/Stores.db";
         return DriverManager.getConnection("jdbc:sqlite::resource:Stores.db");
     }
 

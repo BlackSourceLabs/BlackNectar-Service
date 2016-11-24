@@ -163,7 +163,7 @@ final class SQLBlackNectarService implements BlackNectarService
 
     private String createSQLToInsertStore()
     {
-        return "INSERT INTO Stores(store_name, latitude, longitude, address, address_line_two, city, state, county, zip, local_zip)\n" +
+        return "INSERT INTO Stores(store_name, latitude, longitude, address, address_line_two, city, state, county, zip_code, local_zip_code)\n" +
                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     }
 
@@ -212,12 +212,11 @@ final class SQLBlackNectarService implements BlackNectarService
                "    city text,\n" +
                "    state text,\n" +
                "    county text,\n" +
-               "    zip text,\n" +
-               "    local_zip text,\n" +
+               "    zip_code text,\n" +
+               "    local_zip_code text,\n" +
                "\n" +
                "    PRIMARY KEY(store_name, latitude, longitude)\n" +
-               ");\n" +
-               "";
+               ")";
     }
 
     private String createQueryForRequest(BlackNectarSearchRequest request)

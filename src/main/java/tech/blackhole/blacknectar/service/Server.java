@@ -100,7 +100,7 @@ public final class Server
         }
 
         server.serveAtPort(port);
-//        server.setupSecurity();
+        server.setupSecurity();
         server.setupRoutes();
         server.setupExceptionHandler();
     }

@@ -26,7 +26,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.ExceptionHandler;
-import spark.Spark;
+import spark.Service;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
 import tech.blackhole.blacknectar.service.api.operations.GetSampleStoreOperation;
@@ -79,7 +79,6 @@ public final class Server
 
     public static void main(String[] args)
     {
-        final int port = 9100;
     
         Injector injector;
         Server server;
@@ -99,16 +98,40 @@ public final class Server
             throw ex;
         }
 
-        server.serveAtPort(port);
-        server.setupSecurity();
-        server.setupRoutes();
-        server.setupExceptionHandler();
+        server.setup();
     }
     
-    void serveAtPort(int port)
+    void setup()
+    {
+        setupNonSecureServer();
+        setupSecureServer();
+    }
+    
+    void setupNonSecureServer()
+    {
+        Service http = Service.ignite();
+        final int port = 9100;
+        
+        setupPort(http, port);
+        setupExceptionHandler(http);
+        setupRoutes(http);
+    }
+    
+    void setupSecureServer()
+    {
+        Service https = Service.ignite();
+        final int securePort = 9102;
+
+        setupPort(https, securePort);
+        setupSecurity(https);
+        setupExceptionHandler(https);
+        setupRoutes(https);
+    }
+
+    void setupPort(Service service, int port)
     {
         LOG.info("Starting server at {}", port);
-        Spark.port(port);
+        service.port(port);
         
         aroma.begin()
             .titled("Service Launched")
@@ -117,22 +140,23 @@ public final class Server
             .send();
     }
     
-    void setupRoutes()
+    void setupRoutes(Service service)
     {
-        Spark.get("/stores", this.searchStoresOperation);
-        Spark.get("/sample-store", this.getSampleStoreOperation);
-        Spark.get("/", this.sayHelloOperation);
+        service.get("/stores", this.searchStoresOperation);
+        service.get("/sample-store", this.getSampleStoreOperation);
+        service.get("/", this.sayHelloOperation);
     }
     
-    void setupSecurity()
+    void setupSecurity(Service service)
     {
         String keystore = "../Certificates/keystore.jks";
         String keystorePasswordFile = "../Certificates/keystore-password.txt";
         String keystorePassword = readFile(keystorePasswordFile);
-        
+
         if (!isNullOrEmpty(keystorePassword))
         {
-            Spark.secure(keystore, keystorePassword, null, null);
+            service.secure(keystore, keystorePassword, null, null);
+            
             AROMA.begin().titled("SSL Enabled")
                 .withUrgency(Urgency.LOW)
                 .send();
@@ -147,9 +171,9 @@ public final class Server
         }
     }
     
-    void setupExceptionHandler()
+    void setupExceptionHandler(Service service)
     {
-        Spark.exception(Exception.class, exceptionHandler);
+        service.exception(Exception.class, exceptionHandler);
     }
     
     private String readFile(String filename)

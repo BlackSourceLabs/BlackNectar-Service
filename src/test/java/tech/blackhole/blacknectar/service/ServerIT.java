@@ -45,9 +45,7 @@ public class ServerIT
     @Test
     public void testLaunch()
     {
-        instance.serveAtPort(9900);
-        instance.setupRoutes();
-        instance.setupExceptionHandler();
+        instance.setupNonSecureServer();
     }
 
 }

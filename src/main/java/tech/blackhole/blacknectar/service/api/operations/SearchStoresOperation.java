@@ -271,8 +271,8 @@ public class SearchStoresOperation implements Route
     static class QueryKeys
     {
 
-        static final String LATITUDE = "lat";
-        static final String LONGITUDE = "lon";
+        static final String LATITUDE = "latitude";
+        static final String LONGITUDE = "longitude";
         static final String LIMIT = "limit";
         static final String RADIUS = "radius";
         static final String SEARCH_TERM = "searchTerm";

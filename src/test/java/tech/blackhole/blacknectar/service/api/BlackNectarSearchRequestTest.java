@@ -31,9 +31,9 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static tech.blackhole.blacknectar.service.BlackNectarGenerators.locations;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
-import static tech.sirwellington.alchemy.generator.NumberGenerators.doubles;
-import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.negativeIntegers;
+import static tech.sirwellington.alchemy.generator.NumberGenerators.positiveDoubles;
+import static tech.sirwellington.alchemy.generator.NumberGenerators.positiveIntegers;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
@@ -67,8 +67,8 @@ public class BlackNectarSearchRequestTest
     private void setupData() throws Exception
     {
         center = one(locations());
-        limit = one(integers(0, 1_000));
-        radiusInMeters = one(doubles(0, 10_000));
+        limit = one(positiveIntegers());
+        radiusInMeters = one(positiveDoubles());
         searchTerm = one(alphabeticString());
 
     }

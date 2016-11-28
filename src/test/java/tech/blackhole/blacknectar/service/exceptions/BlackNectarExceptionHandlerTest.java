@@ -30,6 +30,7 @@ import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.anyVararg;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
@@ -42,7 +43,7 @@ import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticSt
  *
  * @author SirWellington
  */
-@Repeat(10)
+@Repeat(50)
 @RunWith(AlchemyTestRunner.class)
 public class BlackNectarExceptionHandlerTest 
 {
@@ -79,7 +80,7 @@ public class BlackNectarExceptionHandlerTest
     {
         when(aroma.begin()).thenReturn(request);
         when(request.titled(anyString())).thenReturn(request);
-        when(request.text(anyString(), anyObject())).thenReturn(request);
+        when(request.text(anyString(), anyVararg())).thenReturn(request);
         when(request.withUrgency(anyObject())).thenReturn(request);
     }
 
@@ -113,6 +114,6 @@ public class BlackNectarExceptionHandlerTest
         
         verify(aroma, atLeastOnce()).begin();
         verify(request, atLeastOnce()).send();
-        verify(request, atLeastOnce()).text(anyString(), eq(ex));
+        verify(request, atLeastOnce()).text(anyString(), anyObject(), eq(ex));
     }
 }

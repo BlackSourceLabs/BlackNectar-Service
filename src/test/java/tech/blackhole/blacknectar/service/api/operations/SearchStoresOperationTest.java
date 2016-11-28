@@ -18,6 +18,7 @@ package tech.blackhole.blacknectar.service.api.operations;
 
 import com.google.gson.JsonArray;
 import java.util.List;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,12 +44,14 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static sir.wellington.alchemy.collections.sets.Sets.toSet;
 import static tech.blackhole.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.generator.GeolocationGenerators.latitudes;
 import static tech.sirwellington.alchemy.generator.GeolocationGenerators.longitudes;
 import static tech.sirwellington.alchemy.generator.NetworkGenerators.ip4Addresses;
+import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateInteger.Type.POSITIVE;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.ALPHANUMERIC;
@@ -57,7 +60,7 @@ import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.
  *
  * @author SirWellington
  */
-@Repeat(10)
+@Repeat(50)
 @RunWith(AlchemyTestRunner.class)
 public class SearchStoresOperationTest 
 {
@@ -161,6 +164,17 @@ public class SearchStoresOperationTest
     {
         assertThrows(() -> instance.handle(request, null)).isInstanceOf(BadArgumentException.class);
         assertThrows(() -> instance.handle(null, response)).isInstanceOf(BadArgumentException.class);
+    }
+    
+    @DontRepeat
+    @Test
+    public void testHandleWithUnrecognizedQueryKeys() throws Exception
+    {
+        Set<String> params = toSet(listOf(alphabeticString()));
+        when(request.queryParams()).thenReturn(params);
+        
+        assertThrows(() -> instance.handle(request, response))
+            .isInstanceOf(BadArgumentException.class);
     }
 
     private BlackNectarSearchRequest createExpectedRequest()

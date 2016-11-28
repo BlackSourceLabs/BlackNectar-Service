@@ -18,6 +18,7 @@
 package tech.blackhole.blacknectar.service.exceptions;
 
 
+import com.google.common.base.Strings;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,12 +60,15 @@ public final class BlackNectarExceptionHandler implements ExceptionHandler
             return;
         }
         
+        String ip = request.ip();
+        ip = Strings.nullToEmpty(ip);
+        
         if (ex instanceof BadArgumentException || ex instanceof FailedAssertionException)
         {
             LOG.error("Received BadArgumentException");
             
             aroma.begin().titled("Received Bad Argument")
-                .text("{}", ex)
+                .text("From IP: [{}] | {}", ip, ex)
                 .withUrgency(Urgency.MEDIUM)
                 .send();
             
@@ -75,7 +79,7 @@ public final class BlackNectarExceptionHandler implements ExceptionHandler
             LOG.error("Internal Operation failed", ex);
             
             aroma.begin().titled("Operation Failed")
-                .text("{}", ex)
+                .text("From IP [{}] | {}", ip, ex)
                 .withUrgency(Urgency.HIGH)
                 .send();
             
@@ -86,7 +90,7 @@ public final class BlackNectarExceptionHandler implements ExceptionHandler
             LOG.error("Unexpected Exception", ex);
             
             aroma.begin().titled("Operation Failed")
-                .text("Unexpected Exception occured: {}", ex)
+                .text("Unexpected Exception occured From IP: [{}] | {}", ip, ex)
                 .withUrgency(Urgency.HIGH)
                 .send();
             

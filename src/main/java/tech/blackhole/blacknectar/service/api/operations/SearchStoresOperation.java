@@ -105,7 +105,7 @@ public class SearchStoresOperation implements Route
         
         {
             long delay = System.currentTimeMillis() - begin;
-            String message = "Operation to search for stores with query paramters {} took {}ms and resulted in {} stores";
+            String message = "Operation to search for stores with query parameters [{}] took {}ms and resulted in {} stores";
             LOG.debug(message, request.queryString(), delay, json.size());
 
             aroma.begin().titled("Request Complete")

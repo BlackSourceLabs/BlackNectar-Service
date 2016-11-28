@@ -11,16 +11,31 @@ for Stores in the United States that support EBT (Electronic Benefits Transfer) 
 
 Resources related to Stores
 
-## Search Stores [/stores{?limit}]
+## Search Stores [/stores{?limit,searchTerm,latitude,longitude,radius}]
 
-Allows you to search for stores
+Search for available EBT Stores.
+
++ Parameters
+    
+    + limit (number, optional)      - The maximum number of results to return.
+        + Default: 200
+    + searchTerm (string, optional) - Searches for stores with this in their names.
+    + latitude (number, optional)   - Used in conjunction with `longitude` to specify a location-based search.
+    + longitude (number, optional)  - Used in conjunction with `latitude` to specify a location-based search. 
+                                      Searches for stores near the specified geo-coordinate.
+    + radius (number, optional)     - Defines the radius (in meters) for the geo-query.
+
 
 ### Search [GET]
 
 Search for Stores using the specified query parameters.
 
+
 + Response 200 (application/json)
     + Attributes (array[Store])
+
++ Response 400 (text/plain)
+
 
 ## Data Structures
 

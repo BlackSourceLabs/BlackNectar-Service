@@ -60,6 +60,8 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.s
 public class SearchStoresOperation implements Route
 {
     private final static Logger LOG = LoggerFactory.getLogger(SearchStoresOperation.class);
+    /** In the event that queries do not include a limit, this one is injected. */
+    private final static int DEFAULT_LIMIT = 250;
     
     private final Aroma aroma;
     private final BlackNectarService service;
@@ -205,6 +207,7 @@ public class SearchStoresOperation implements Route
     {
         if (!hasLimitParameter(queryParameters))
         {
+            request.withLimit(DEFAULT_LIMIT);
             return;
         }
 

@@ -21,11 +21,13 @@ package tech.blackhole.blacknectar.service.api.operations;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sir.wellington.alchemy.collections.sets.Sets;
 import spark.QueryParamsMap;
 import spark.Request;
 import spark.Response;
@@ -38,12 +40,14 @@ import tech.blackhole.blacknectar.service.exceptions.BadArgumentException;
 import tech.blackhole.blacknectar.service.exceptions.OperationFailedException;
 import tech.blackhole.blacknectar.service.stores.Location;
 import tech.blackhole.blacknectar.service.stores.Store;
+import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 
 import static tech.blackhole.blacknectar.service.api.MediaTypes.APPLICATION_JSON;
 import static tech.blackhole.blacknectar.service.stores.Location.validLatitude;
 import static tech.blackhole.blacknectar.service.stores.Location.validLongitude;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+import static tech.sirwellington.alchemy.arguments.assertions.CollectionAssertions.elementInCollection;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThanOrEqualTo;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.decimalString;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.integerString;
@@ -83,6 +87,10 @@ public class SearchStoresOperation implements Route
             .usingMessage("request and response cannot be null")
             .throwing(BadArgumentException.class)
             .are(notNull());
+        
+        checkThat(request)
+            .throwing(ex -> new BadArgumentException(ex))
+            .is(validRequest());
         
         long begin = System.currentTimeMillis();
         
@@ -268,6 +276,23 @@ public class SearchStoresOperation implements Route
         return queryParams.hasKey(QueryKeys.RADIUS);
     }
 
+    private AlchemyAssertion<Request> validRequest()
+    {
+        return request ->
+        {
+            Set<String> queryParams = request.queryParams();
+            
+            for (String key : queryParams)
+            {
+                checkThat(key)
+                    .usingMessage("Unexpected empty query parameter")
+                    .is(nonEmptyString())
+                    .usingMessage("Unrecognized Query Parameter: " + key)
+                    .is(elementInCollection(QueryKeys.KEYS));
+            }
+        };
+    }
+
     static class QueryKeys
     {
 
@@ -276,5 +301,7 @@ public class SearchStoresOperation implements Route
         static final String LIMIT = "limit";
         static final String RADIUS = "radius";
         static final String SEARCH_TERM = "searchTerm";
+        
+        static Set<String> KEYS = Sets.createFrom(LATITUDE, LONGITUDE, LIMIT, RADIUS, SEARCH_TERM);
     }
 }

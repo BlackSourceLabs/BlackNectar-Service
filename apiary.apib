@@ -3,32 +3,40 @@ HOST: https://blacknectar-api.sirwellington.tech:9102/
 
 # BlackNectar API
 
-The BlackNectar API is a simple API that allows you to view and search for Stores in the United States that support EBT (Electronic Benefits Transfer) cards.
+The BlackNectar API is a simple API that allows you to view and search 
+for Stores in the United States that support EBT (Electronic Benefits Transfer) cards.
 
 
 # Group Stores
 
 Resources related to Stores
 
-## Search Stores [/stores(?limit)]
+## Search Stores [/stores{?limit}]
 
 Allows you to search for stores
+
+### Search [GET]
+
+Search for Stores using the specified query parameters.
+
++ Response 200 (application/json)
+    + Attributes (array[Store])
 
 ## Data Structures
 
 ### Store
-+ store_name: Angelica's Market (string, required)
++ store_name: Angelica's Market (string, required) - The name of the Store.
 + address (Address, required)
 + location (Location, required)
 
 ### Address
-+ address_line_1: 243 E 53rd St (string, required)
-+ address_line_2: Suite #200 (string, optional)
++ address_line_1: 243 E 53rd St (string, required) - The first part of the address.
++ address_line_2: Suite #200 (string, optional) - The second part of the address present on some stores.
 + city: Los Angeles (string, required)
 + state: CA (string, required)
 + county: Los Angeles (string, required)
-+ zip_code: `90210` (number, required)
-+ local_zip_code: 0401 (number, optional)
++ zip_code: `90210` (number, required) - The 5-Digit Zip Code.
++ local_zip_code: 0401 (number, optional) - The Local 4-Digit Zip Code.
 
 ### Location
 + latitude: 33.994267 (number, required)

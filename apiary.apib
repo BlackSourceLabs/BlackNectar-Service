@@ -3,16 +3,24 @@ HOST: https://blacknectar-api.sirwellington.tech:9102/
 
 # BlackNectar API
 
-The BlackNectar API is a simple API that allows you to view and search for Stores in the United States that support EBT (Electronic Benefits Transfer) cards.
+The BlackNectar API is a simple API that allows you to view and search 
+for Stores in the United States that support EBT (Electronic Benefits Transfer) cards.
 
 
 # Group Stores
 
 Resources related to Stores
 
-## Search Stores [/stores(?limit)]
+## Search Stores [/stores{?limit}]
 
 Allows you to search for stores
+
+### Search [GET]
+
+Search for Stores using the specified query parameters.
+
++ Response 200 (application/json)
+    + Attributes (array[Store])
 
 ## Data Structures
 

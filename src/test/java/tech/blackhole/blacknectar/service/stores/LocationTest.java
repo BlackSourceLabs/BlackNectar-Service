@@ -78,34 +78,7 @@ public class LocationTest
         
         assertThrows(() -> new Location(badLatitude, badLongitude));
     }
-
-    @Test
-    public void testValidLatitude()
-    {
-        AlchemyAssertion<Double> assertion = Location.validLatitude();
-        assertion.check(latitude);
-    }
-    @Test
-    public void testValidLatitudeWithInvalid()
-    {
-        AlchemyAssertion<Double> assertion = Location.validLatitude();
-        assertThrows(() -> assertion.check(badLocation.getLatitude()));
-    }
-
-    @Test
-    public void testValidLongitude()
-    {
-        AlchemyAssertion<Double> assertion = Location.validLongitude();
-        assertion.check(longitude);
-    }
-
-    @Test
-    public void testValidLongitudeWithInvalid()
-    {
-        AlchemyAssertion<Double> assertion = Location.validLongitude();
-        assertThrows(() -> assertion.check(badLocation.getLongitude()));
-    }
-
+    
     @Test
     public void testAsJSON()
     {

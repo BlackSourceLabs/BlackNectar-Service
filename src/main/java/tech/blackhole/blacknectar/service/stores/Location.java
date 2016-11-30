@@ -25,8 +25,8 @@ import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
-import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThanOrEqualTo;
-import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.lessThanOrEqualTo;
+import static tech.sirwellington.alchemy.arguments.assertions.GeolocationAssertions.validLatitude;
+import static tech.sirwellington.alchemy.arguments.assertions.GeolocationAssertions.validLongitude;
 
 /**
  * A {@link Location} represents a Global Geo-Coordinate.
@@ -76,29 +76,6 @@ public final class Location implements JSONRepresentable
         };
     }
     
-    public static AlchemyAssertion<Double> validLatitude()
-    {
-        return lat ->
-        {
-            checkThat(lat)
-                .usingMessage("Latitude must be between -90 and 90, but was " + lat)
-                .is(lessThanOrEqualTo(90.0))
-                .is(greaterThanOrEqualTo(-90.0));
-        };
-        
-    }
-    
-    public static AlchemyAssertion<Double> validLongitude()
-    {
-        return lon ->
-        {
-            checkThat(lon)
-                .usingMessage("Longitude must be between -180 and 180, but was " + lon)
-                .is(greaterThanOrEqualTo(-180.0))
-                .is(lessThanOrEqualTo(180.0));
-        };
-    }
-
     @Override
     public JsonObject asJSON()
     {

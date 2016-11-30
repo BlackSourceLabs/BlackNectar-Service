@@ -18,6 +18,10 @@
 package tech.blackhole.blacknectar.service.yelp;
 
 
+
+/*
+ * TODO: Create a separate library for this, especially if it will be used often.
+ */
 /**
  *
  * @author SirWellington

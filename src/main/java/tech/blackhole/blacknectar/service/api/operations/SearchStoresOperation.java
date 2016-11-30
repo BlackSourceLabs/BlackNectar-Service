@@ -43,11 +43,11 @@ import tech.blackhole.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 
 import static tech.blackhole.blacknectar.service.api.MediaTypes.APPLICATION_JSON;
-import static tech.blackhole.blacknectar.service.stores.Location.validLatitude;
-import static tech.blackhole.blacknectar.service.stores.Location.validLongitude;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.CollectionAssertions.elementInCollection;
+import static tech.sirwellington.alchemy.arguments.assertions.GeolocationAssertions.validLatitude;
+import static tech.sirwellington.alchemy.arguments.assertions.GeolocationAssertions.validLongitude;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThanOrEqualTo;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.decimalString;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.integerString;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>tech.blackhole</groupId>
+    <groupId>tech.blacksource</groupId>
     <artifactId>blacknectar-service</artifactId>
     <name>BlackNectarService</name>
     <version>1.0-SNAPSHOT</version>
@@ -14,27 +14,27 @@
     </properties>
     
     
-    <url>https://github.com/BlackWholeLabs/BlackNectar-Service/</url>
+    <url>https://github.com/BlackSourceLabs/BlackNectar-Service/</url>
     <description>
         The Open Source REST API for BlackNectar, written in Java.
     </description>
 
     <issueManagement>
         <system>GitHub Issues</system>
-        <url>https://github.com/BlackWholeLabs/BlackNectar-Service/issues</url>
+        <url>https://github.com/BlackSourceLabs/BlackNectar-Service/issues</url>
     </issueManagement>
 
     <scm>
-        <connection>scm:git:git@github.com:BlackWholeLabs/BlackNectar-Service.git</connection>
-        <developerConnection>scm:git:git@github.com:BlackWholeLabs/BlackNectar-Service.git</developerConnection>
-        <url>git@github.com:BlackWholeLabs/BlackNectar-Service.git</url>
+        <connection>scm:git:git@github.com:BlackSourceLabs/BlackNectar-Service.git</connection>
+        <developerConnection>scm:git:git@github.com:BlackSourceLabs/BlackNectar-Service.git</developerConnection>
+        <url>git@github.com:BlackSourceLabs/BlackNectar-Service.git</url>
     </scm>
 
     <inceptionYear>2016</inceptionYear>
     
     <organization>
-        <name>BlackWholeLabs</name>
-        <url>http://BlackWholeLabs.com/</url>
+        <name>BlackSourceLabs</name>
+        <url>http://BlackSource.tech/</url>
     </organization>
 
     <developers>
@@ -42,7 +42,7 @@
             <name>Wellington Moreno</name>
             <email>jwellington.moreno@gmail.com</email>
             <id>SirWellington</id>
-            <organizationUrl>https://github.com/BlackWholeLabs</organizationUrl>
+            <organizationUrl>https://github.com/BlackSourceLabs</organizationUrl>
             <roles>
                 <role>owner</role>
                 <role>developer</role>

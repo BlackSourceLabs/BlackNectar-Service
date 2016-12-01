@@ -42,13 +42,7 @@ import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 
-<<<<<<< HEAD:src/main/java/tech/blackhole/blacknectar/service/api/operations/SearchStoresOperation.java
-import static tech.blackhole.blacknectar.service.api.MediaTypes.APPLICATION_JSON;
-=======
 import static tech.blacksource.blacknectar.service.api.MediaTypes.APPLICATION_JSON;
-import static tech.blacksource.blacknectar.service.stores.Location.validLatitude;
-import static tech.blacksource.blacknectar.service.stores.Location.validLongitude;
->>>>>>> develop:src/main/java/tech/blacksource/blacknectar/service/api/operations/SearchStoresOperation.java
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.CollectionAssertions.elementInCollection;

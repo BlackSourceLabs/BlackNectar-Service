@@ -29,6 +29,7 @@ import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.service.api.ModuleBlackNectarService;
 import tech.blacksource.blacknectar.service.api.operations.ModuleOperations;
 import tech.blacksource.blacknectar.service.exceptions.BlackNectarExceptionHandler;
+import tech.redroma.yelp.YelpAPI;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 
 /**
@@ -65,4 +66,16 @@ class ModuleServer extends AbstractModule
         return DriverManager.getConnection("jdbc:sqlite::resource:Stores.db");
     }
 
+    @Provides
+    YelpAPI provideYelpAPI() throws Exception
+    {
+        //TODO: Obtain the client and secret from a local file
+        String cliendId = "client";
+        String secret = "secret";
+        
+        return YelpAPI.Builder.newInstance()
+            .withClientCredentials(cliendId, secret)
+            .withEagerAuthentication()
+            .build();
+    }
 }

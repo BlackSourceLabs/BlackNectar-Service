@@ -72,8 +72,6 @@
         </license>
     </licenses>
     
-    
-
 
     <prerequisites>
         <maven>3.0.3</maven>
@@ -341,7 +339,7 @@
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
                             <useUniqueVersions>false</useUniqueVersions>
-                            <mainClass>tech.blackhole.blacknectar.service.Server</mainClass>
+                            <mainClass>tech.blacksource.blacknectar.service.Server</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

@@ -72,8 +72,6 @@
         </license>
     </licenses>
     
-    
-
 
     <prerequisites>
         <maven>3.0.3</maven>

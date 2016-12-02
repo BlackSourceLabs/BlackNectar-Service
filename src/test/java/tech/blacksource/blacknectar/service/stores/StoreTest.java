@@ -110,4 +110,26 @@ public class StoreTest
         assertThrows(() -> builder.withMainImageURL("")).isInstanceOf(IllegalArgumentException.class);
         assertThrows(() -> builder.withMainImageURL(null)).isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    public void testEquals()
+    {
+        instance = Store.Builder.fromStore(instance)
+            .withMainImageURL(mainImage)
+            .build();
+
+        Store copy = Store.Builder.fromStore(instance).build();
+
+        assertThat(copy, is(instance));
+    }
+
+    @Test
+    public void testEqualsWhenDifferent()
+    {
+        Store other = Store.Builder.fromStore(instance)
+            .withMainImageURL(mainImage)
+            .build();
+
+        assertThat(other, not(instance));
+    }
 }

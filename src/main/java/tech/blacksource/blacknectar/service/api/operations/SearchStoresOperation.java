@@ -27,6 +27,7 @@ import java.util.function.Supplier;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sir.wellington.alchemy.collections.lists.Lists;
 import sir.wellington.alchemy.collections.sets.Sets;
 import spark.QueryParamsMap;
 import spark.Request;
@@ -38,8 +39,14 @@ import tech.blacksource.blacknectar.service.api.BlackNectarSearchRequest;
 import tech.blacksource.blacknectar.service.api.BlackNectarService;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
+import tech.blacksource.blacknectar.service.stores.Address;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
+import tech.redroma.yelp.Coordinate;
+import tech.redroma.yelp.YelpAPI;
+import tech.redroma.yelp.YelpBusiness;
+import tech.redroma.yelp.YelpSearchRequest;
+import tech.redroma.yelp.exceptions.YelpExcetion;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 
 import static tech.blacksource.blacknectar.service.api.MediaTypes.APPLICATION_JSON;
@@ -66,18 +73,23 @@ public class SearchStoresOperation implements Route
     private final static Logger LOG = LoggerFactory.getLogger(SearchStoresOperation.class);
     /** In the event that queries do not include a limit, this one is injected. */
     private final static int DEFAULT_LIMIT = 250;
+    /** The default limit to use when searching for Yelp Stores. */
+    final static int DEFAULT_YELP_LIMIT = 5;
+
     
     private final Aroma aroma;
     private final BlackNectarService service;
-
+    private final YelpAPI yelp;
+    
     @Inject
-    public SearchStoresOperation(Aroma aroma, BlackNectarService service)
+    public SearchStoresOperation(Aroma aroma, BlackNectarService service, YelpAPI yelpAPI)
     {
-        checkThat(aroma, service)
+        checkThat(aroma, service, yelpAPI)
             .are(notNull());
         
         this.aroma = aroma;
         this.service = service;
+        this.yelp = yelpAPI;
     }
 
     @Override
@@ -108,6 +120,7 @@ public class SearchStoresOperation implements Route
         List<Store> stores = findStores(request);
         
         JsonArray json = stores.stream()
+            .map(this::enrichStoreWithYelpData)
             .map(Store::asJSON)
             .collect(supplier, accumulator, combiner);
         
@@ -291,6 +304,89 @@ public class SearchStoresOperation implements Route
                     .is(elementInCollection(QueryKeys.KEYS));
             }
         };
+    }
+    
+    private Store enrichStoreWithYelpData(Store store)
+    {
+        YelpSearchRequest request = buildRequestFor(store);
+        
+        List<YelpBusiness> results = null;
+        
+        try 
+        {
+            results = yelp.searchForBusinesses(request);
+        }
+        catch(YelpExcetion ex)
+        {
+            String message = "Failed to search yelp for business information";
+            
+            LOG.error(message, ex);
+            aroma.begin().titled("Yelp Call Failed")
+                .text(message, ex)
+                .withUrgency(Urgency.HIGH)
+                .send();
+        }
+        
+        if (Lists.isEmpty(results))
+        {
+            return store;
+        }
+        else 
+        {
+            makeNoteOfYelpRequest(request, results, store);
+            
+            YelpBusiness yelpStore = Lists.oneOf(results);
+            
+            Store enrichedStore = copyStoreInfoFromYelp(store, yelpStore);
+            return enrichedStore;
+        }
+    }
+
+    private YelpSearchRequest buildRequestFor(Store store)
+    {
+        tech.redroma.yelp.Address yelpAddress = copyYelpAddressFrom(store.getAddress());
+        Coordinate coordinate = copyCoordinateFrom(store.getLocation());
+        
+        return YelpSearchRequest.newBuilder()
+            .withLocation(yelpAddress)
+            .withCoordinate(coordinate)
+            .withLimit(DEFAULT_YELP_LIMIT)
+            .build();
+    }
+
+    private Store copyStoreInfoFromYelp(Store store, YelpBusiness yelpStore)
+    {
+        return Store.Builder.fromStore(store)
+            .withMainImageURL(yelpStore.imageURL)
+            .build();
+    }
+
+    private tech.redroma.yelp.Address copyYelpAddressFrom(Address address)
+    {
+        tech.redroma.yelp.Address yelpAddress = new tech.redroma.yelp.Address();
+        
+        yelpAddress.address1 = address.getAddressLineOne();
+        yelpAddress.address2 = address.getAddressLineTwo();
+        yelpAddress.city = address.getCity();
+        yelpAddress.state = address.getState();
+        yelpAddress.zipCode = String.valueOf(address.getZip5());
+        
+        return yelpAddress;
+    }
+
+    private Coordinate copyCoordinateFrom(Location location)
+    {
+        return Coordinate.of(location.getLatitude(), location.getLongitude());
+    }
+
+    private void makeNoteOfYelpRequest(YelpSearchRequest request, List<YelpBusiness> results, Store store)
+    {
+        String message = "Yelp request {} resulted in {} results for Store [{}]";
+        LOG.debug(message, request, results.size(), store);
+        aroma.begin().titled("Yelp Request Complete")
+            .text(message, request, results.size(), store)
+            .withUrgency(Urgency.LOW)
+            .send();
     }
 
     static class QueryKeys

@@ -41,6 +41,7 @@ import tech.redroma.yelp.Coordinate;
 import tech.redroma.yelp.YelpAPI;
 import tech.redroma.yelp.YelpBusiness;
 import tech.redroma.yelp.YelpSearchRequest;
+import tech.sirwellington.alchemy.generator.NetworkGenerators;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateInteger;
@@ -125,7 +126,7 @@ public class SearchStoresOperationTest
         setupData();
         setupMocks();
         
-        instance = new SearchStoresOperation(aroma, service);
+        instance = new SearchStoresOperation(aroma, service, yelpAPI);
     }
 
 
@@ -135,8 +136,14 @@ public class SearchStoresOperationTest
         latitude = one(latitudes());
         longitude = one(longitudes());
         
+        correctStores(stores);
+        
         expectedSearchRequest = createExpectedRequest();
         setupYelpData();
+    }
+    
+    private void correctStores(List<Store> stores)
+    {
     }
 
     private void setupYelpData()
@@ -147,7 +154,8 @@ public class SearchStoresOperationTest
         for (Store store : stores)
         {
             YelpBusiness business = one(pojos(YelpBusiness.class));
-
+            business.imageURL = NetworkGenerators.httpUrls().get().toString();
+            
             yelpBusinesses.add(business);
             storeToYelpMap.put(store, business);
             
@@ -168,6 +176,7 @@ public class SearchStoresOperationTest
         return YelpSearchRequest.newBuilder()
             .withLocation(yelpAddress)
             .withCoordinate(coordinate)
+            .withLimit(SearchStoresOperation.DEFAULT_YELP_LIMIT)
             .build();
     }
 
@@ -191,8 +200,9 @@ public class SearchStoresOperationTest
     @Test
     public void testConstructor()
     {
-        assertThrows(() -> new SearchStoresOperation(null, service));
-        assertThrows(() -> new SearchStoresOperation(aroma, null));
+        assertThrows(() -> new SearchStoresOperation(null, service, yelpAPI));
+        assertThrows(() -> new SearchStoresOperation(aroma, null, yelpAPI));
+        assertThrows(() -> new SearchStoresOperation(aroma, service, null));
     }
     
     @Test
@@ -202,6 +212,7 @@ public class SearchStoresOperationTest
         
         JsonArray expected = new JsonArray();
         stores.stream()
+            .map(this::insertCorrespondingYelpData)
             .map(Store::asJSON)
             .forEach(store -> expected.add(store));
 
@@ -274,6 +285,20 @@ public class SearchStoresOperationTest
         double lon = location.getLongitude();
         
         return Coordinate.of(lat, lon);
+    }
+    
+    private Store insertCorrespondingYelpData(Store store)
+    {
+        YelpBusiness yelpBusiness = storeToYelpMap.get(store);
+        
+        if (yelpBusiness == null)
+        {
+            return store;
+        }
+        
+        return Store.Builder.fromStore(store)
+            .withMainImageURL(yelpBusiness.imageURL)
+            .build();
     }
     
 }

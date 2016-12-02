@@ -96,4 +96,18 @@ public class StoreTest
         
         assertThrows(() -> builder.build());
     }
+    
+    @DontRepeat
+    @Test
+    public void testBuilderWithInvalidArguments() throws Exception
+    {
+        Store.Builder builder = Store.Builder.newInstance();
+        
+        assertThrows(() -> builder.withAddress(null)).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(() -> builder.withLocation(null)).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(() -> builder.withName("")).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(() -> builder.withName(null)).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(() -> builder.withMainImageURL("")).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(() -> builder.withMainImageURL(null)).isInstanceOf(IllegalArgumentException.class);
+    }
 }

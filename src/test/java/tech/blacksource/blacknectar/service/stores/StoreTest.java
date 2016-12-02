@@ -27,6 +27,7 @@ import tech.sirwellington.alchemy.test.junit.runners.GenerateURL;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
@@ -68,5 +69,20 @@ public class StoreTest
         assertThat(json.get(Store.Keys.LOCATION), is(instance.getLocation().asJSON()));
         assertThat(json.get(Store.Keys.NAME).getAsString(), is(instance.getName()));
         assertThat(json.get(Store.Keys.MAIN_IMAGE).getAsString(), is(instance.getMainImageURL()));
+    }
+    
+    @Test
+    public void testThatImageCanBeAddedToStore()
+    {
+        Store newStore = Store.Builder.fromStore(instance)
+        .withMainImageURL(mainImage)
+        .build();
+        
+        assertThat(newStore, notNullValue());
+        assertThat(newStore.getMainImageURL(), is(mainImage));
+        assertThat(newStore, not(instance));
+        assertThat(newStore.getName(), is(instance.getName()));
+        assertThat(newStore.getLocation(), is(instance.getLocation()));
+        assertThat(newStore.getAddress(), is(instance.getAddress()));
     }
 }

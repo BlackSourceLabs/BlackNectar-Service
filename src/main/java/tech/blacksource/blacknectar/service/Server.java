@@ -16,12 +16,8 @@
 
 package tech.blacksource.blacknectar.service;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import java.io.File;
-import java.io.IOException;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,7 +147,7 @@ public final class Server
     {
         String keystore = "../Certificates/keystore.jks";
         String keystorePasswordFile = "../Certificates/keystore-password.txt";
-        String keystorePassword = readFile(keystorePasswordFile);
+        String keystorePassword = Files.readFile(keystorePasswordFile);
 
         if (!isNullOrEmpty(keystorePassword))
         {
@@ -175,19 +171,4 @@ public final class Server
     {
         service.exception(Exception.class, exceptionHandler);
     }
-    
-    private String readFile(String filename)
-    {
-        File file = new File(filename);
-        try
-        {
-            return Files.toString(file, Charsets.UTF_8);
-        }
-        catch (IOException ex)
-        {
-            LOG.warn("Failed to read file: {}", ex);
-            return "";
-        }
-    }
-
 }

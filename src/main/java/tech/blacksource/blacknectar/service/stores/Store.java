@@ -95,6 +95,11 @@ public class Store implements JSONRepresentable
         return address;
     }
 
+    public String getMainImageURL()
+    {
+        return mainImageURL;
+    }
+
     @Override
     public JsonObject asJSON()
     {

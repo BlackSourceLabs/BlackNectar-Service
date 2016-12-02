@@ -17,13 +17,16 @@
 package tech.blacksource.blacknectar.service.stores;
 
 import com.google.gson.JsonObject;
+import java.net.URL;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
+import tech.sirwellington.alchemy.test.junit.runners.GenerateURL;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
@@ -39,6 +42,11 @@ public class StoreTest
     @GeneratePojo
     private Store instance;
     
+    @GenerateURL
+    private URL mainImageURL;
+    
+    private String mainImage;
+    
     @Before
     public void setUp() throws Exception
     {
@@ -48,7 +56,7 @@ public class StoreTest
 
     private void setupData() throws Exception
     {
-        
+        mainImage = mainImageURL.toString();
     }
 
     @Test
@@ -56,6 +64,9 @@ public class StoreTest
     {
         JsonObject json = instance.asJSON();
         assertThat(json, notNullValue());
-        
+        assertThat(json.get(Store.Keys.ADDRESS), is(instance.getAddress().asJSON()));
+        assertThat(json.get(Store.Keys.LOCATION), is(instance.getLocation().asJSON()));
+        assertThat(json.get(Store.Keys.NAME).getAsString(), is(instance.getName()));
+        assertThat(json.get(Store.Keys.MAIN_IMAGE).getAsString(), is(instance.getMainImageURL()));
     }
 }

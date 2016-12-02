@@ -33,9 +33,12 @@ import tech.blacksource.blacknectar.service.api.operations.SearchStoresOperation
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
+import tech.redroma.yelp.YelpAPI;
+import tech.redroma.yelp.YelpBusiness;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateInteger;
+import tech.sirwellington.alchemy.test.junit.runners.GenerateList;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
@@ -45,7 +48,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static sir.wellington.alchemy.collections.sets.Sets.toSet;
-import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.generator.GeolocationGenerators.latitudes;
@@ -68,6 +70,12 @@ public class SearchStoresOperationTest
     
     @Mock
     private BlackNectarService service;
+    
+    @Mock
+    private YelpAPI yelpAPI;
+    
+    @GenerateList(YelpBusiness.class)
+    private List<YelpBusiness> yelpBusinesses;
     
     @Mock
     private Request request;
@@ -96,6 +104,7 @@ public class SearchStoresOperationTest
     
     private QueryParamsMap queryParams;
     
+    @GenerateList(Store.class)
     private List<Store> stores;
     
     private BlackNectarSearchRequest expectedSearchRequest;
@@ -117,7 +126,6 @@ public class SearchStoresOperationTest
         latitude = one(latitudes());
         longitude = one(longitudes());
         
-        stores = listOf(stores());
         expectedSearchRequest = createExpectedRequest();
     }
 

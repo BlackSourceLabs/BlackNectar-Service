@@ -33,6 +33,11 @@ class Files
 
     private final static Logger LOG = LoggerFactory.getLogger(Files.class);
 
+    /**
+     * Reads the specified file into a String
+     * @param filename The path of the file to read.
+     * @return 
+     */
     static String readFile(String filename)
     {
         File file = new File(filename);

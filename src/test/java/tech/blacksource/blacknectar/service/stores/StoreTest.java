@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
+import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateURL;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
@@ -30,6 +31,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
  *
@@ -84,5 +86,14 @@ public class StoreTest
         assertThat(newStore.getName(), is(instance.getName()));
         assertThat(newStore.getLocation(), is(instance.getLocation()));
         assertThat(newStore.getAddress(), is(instance.getAddress()));
+    }
+    
+    @DontRepeat
+    @Test
+    public void testBuilderWithNothingSet() throws Exception
+    {
+        Store.Builder builder = Store.Builder.newInstance();
+        
+        assertThrows(() -> builder.build());
     }
 }

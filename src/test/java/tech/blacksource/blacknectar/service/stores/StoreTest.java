@@ -70,7 +70,11 @@ public class StoreTest
         assertThat(json.get(Store.Keys.ADDRESS), is(instance.getAddress().asJSON()));
         assertThat(json.get(Store.Keys.LOCATION), is(instance.getLocation().asJSON()));
         assertThat(json.get(Store.Keys.NAME).getAsString(), is(instance.getName()));
-        assertThat(json.get(Store.Keys.MAIN_IMAGE).getAsString(), is(instance.getMainImageURL()));
+        
+        if (instance.hasMainImage())
+        {
+            assertThat(json.get(Store.Keys.MAIN_IMAGE).getAsString(), is(instance.getMainImageURL()));
+        }
     }
     
     @Test

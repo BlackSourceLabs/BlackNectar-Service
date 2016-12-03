@@ -405,6 +405,13 @@ public class SearchStoresOperation implements Route
         {
             if (areSimilar(business, store))
             {
+                aroma.begin().titled("Store Picked")
+                    .text("For Store: \n\n", store)
+                    .withUrgency(Urgency.LOW)
+                    .send();
+                
+                LOG.debug("Picked Business [{}] for Store [{}]", business, store);
+                
                 return business;
             }
         }

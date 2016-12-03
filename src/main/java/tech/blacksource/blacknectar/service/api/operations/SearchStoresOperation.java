@@ -118,7 +118,7 @@ public class SearchStoresOperation implements Route
 
         List<Store> stores = findStores(request);
         
-        JsonArray json = stores.stream()
+        JsonArray json = stores.parallelStream()
             .map(this::enrichStoreWithYelpData)
             .map(Store::asJSON)
             .collect(supplier, accumulator, combiner);

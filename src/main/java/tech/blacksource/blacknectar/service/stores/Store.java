@@ -25,11 +25,14 @@ import tech.sirwellington.alchemy.annotations.concurrency.ThreadSafe;
 import tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern;
 import tech.sirwellington.alchemy.annotations.objects.Pojo;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static tech.blacksource.blacknectar.service.stores.Address.validAddress;
 import static tech.blacksource.blacknectar.service.stores.Location.validLocation;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern.Role.BUILDER;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern.Role.PRODUCT;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+import static tech.sirwellington.alchemy.arguments.assertions.NetworkAssertions.validURL;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
@@ -46,22 +49,35 @@ public class Store implements JSONRepresentable
     private String name;
     private Location location;
     private Address address;
+    private String mainImageURL;
+
     private JsonObject json;
 
     Store()
     {
     }
-    
-    public Store(String name, Location location, Address address)
+
+    public Store(String name, Location location, Address address, String mainImageURL)
     {
         checkThat(address).is(validAddress());
         checkThat(name).usingMessage("name is missing").is(nonEmptyString());
         checkThat(location).is(validLocation());
+        
+        if (!isNullOrEmpty(mainImageURL))
+        {
+            checkThat(mainImageURL).is(validURL());
+        }
 
         this.name = name;
         this.location = location;
         this.address = address;
+        this.mainImageURL = mainImageURL;
         this.json = createJSON();
+    }
+    
+    public boolean hasMainImage()
+    {
+        return !isNullOrEmpty(mainImageURL);
     }
 
     public String getName()
@@ -79,6 +95,11 @@ public class Store implements JSONRepresentable
         return address;
     }
 
+    public String getMainImageURL()
+    {
+        return mainImageURL;
+    }
+
     @Override
     public JsonObject asJSON()
     {
@@ -89,9 +110,10 @@ public class Store implements JSONRepresentable
     public int hashCode()
     {
         int hash = 7;
-        hash = 23 * hash + Objects.hashCode(this.name);
-        hash = 23 * hash + Objects.hashCode(this.location);
-        hash = 23 * hash + Objects.hashCode(this.address);
+        hash = 83 * hash + Objects.hashCode(this.name);
+        hash = 83 * hash + Objects.hashCode(this.location);
+        hash = 83 * hash + Objects.hashCode(this.address);
+        hash = 83 * hash + Objects.hashCode(this.mainImageURL);
         return hash;
     }
 
@@ -115,6 +137,10 @@ public class Store implements JSONRepresentable
         {
             return false;
         }
+        if (!Objects.equals(this.mainImageURL, other.mainImageURL))
+        {
+            return false;
+        }
         if (!Objects.equals(this.location, other.location))
         {
             return false;
@@ -129,7 +155,7 @@ public class Store implements JSONRepresentable
     @Override
     public String toString()
     {
-        return "Store{" + "name=" + name + ", location=" + location + ", address=" + address + '}';
+        return "Store{" + "name=" + name + ", location=" + location + ", address=" + address + ", mainImageURL=" + mainImageURL + '}';
     }
 
     private JsonObject createJSON()
@@ -140,6 +166,11 @@ public class Store implements JSONRepresentable
         jsonObject.add(Keys.LOCATION, location.asJSON());
         jsonObject.add(Keys.ADDRESS, this.address.asJSON());
         
+        if (hasMainImage())
+        {
+            jsonObject.addProperty(Keys.MAIN_IMAGE, this.mainImageURL);
+        }
+
         return jsonObject;
     }
 
@@ -151,6 +182,7 @@ public class Store implements JSONRepresentable
         static final String NAME = "store_name";
         static final String LOCATION = "location";
         static final String ADDRESS = "address";
+        static final String MAIN_IMAGE = "main_image_url";
     }
     
     public static final Store SAMPLE_STORE = createSampleStore();
@@ -166,8 +198,9 @@ public class Store implements JSONRepresentable
                                       "CARVER",
                                       55318,
                                       2079);
+        String sampleImage = "https://s3-media3.fl.yelpcdn.com/bphoto/hzF7KhWb1B6cdGJ1y9E05A/o.jpg";
         
-        return new Store(name, location, address);
+        return new Store(name, location, address, sampleImage);
     }
     
     /**
@@ -181,17 +214,31 @@ public class Store implements JSONRepresentable
         {
             return new Builder();
         }
+        
+        public static Builder fromStore(@Required Store store) throws IllegalArgumentException
+        {
+            checkThat(store).is(notNull());
+            
+            Builder builder = new Builder();
+            builder.name = store.name;
+            builder.location = store.location;
+            builder.address = store.address;
+            builder.mainImageURL = store.mainImageURL;
+            
+            return builder;
+        }
 
         private String name;
         private Location location;
         private Address address;
+        private String mainImageURL;
 
         Builder()
         {
 
         }
-
-        public Builder withName(@NonEmpty String name)
+        
+        public Builder withName(@NonEmpty String name) throws IllegalArgumentException
         {
             checkThat(name)
                 .usingMessage("name cannot be empty")
@@ -201,7 +248,7 @@ public class Store implements JSONRepresentable
             return this;
         }
 
-        public Builder withAddress(@Required Address address)
+        public Builder withAddress(@Required Address address) throws IllegalArgumentException
         {
             checkThat(address)
                 .is(validAddress());
@@ -210,12 +257,22 @@ public class Store implements JSONRepresentable
             return this;
         }
 
-        public Builder withLocation(@Required Location location)
+        public Builder withLocation(@Required Location location) throws IllegalArgumentException
         {
             checkThat(location)
                 .is(validLocation());
 
             this.location = location;
+            return this;
+        }
+        
+        public Builder withMainImageURL(@Required String imageURL) throws IllegalArgumentException
+        {
+            checkThat(imageURL)
+                .is(nonEmptyString())
+                .is(validURL());
+            
+            this.mainImageURL = imageURL;
             return this;
         }
 
@@ -232,8 +289,8 @@ public class Store implements JSONRepresentable
             checkThat(address)
                 .usingMessage("Address is missing or invalid")
                 .is(validAddress());
-
-            return new Store(this.name, this.location, this.address);
+            
+            return new Store(this.name, this.location, this.address, this.mainImageURL);
         }
     }
 }

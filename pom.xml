@@ -162,6 +162,13 @@
         </dependency>
         
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.21</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.1.7</version>
@@ -196,7 +203,17 @@
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.15.1</version>
         </dependency>
-
+        
+        
+        <!--=======================-->
+        <!--YELP-->
+        <!--=======================-->
+        <dependency>
+            <groupId>tech.redroma.yelp</groupId>
+            <artifactId>yelp-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        
     </dependencies>
 
 

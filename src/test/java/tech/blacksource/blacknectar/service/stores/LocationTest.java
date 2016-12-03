@@ -48,7 +48,6 @@ public class LocationTest
     private Double longitude;
     
     private Location location;
-    private Location badLocation;
     
     @Before
     public void setUp() throws Exception
@@ -76,36 +75,9 @@ public class LocationTest
         double badLatitude = one(doubles(91, Double.MAX_VALUE));
         double badLongitude = one(doubles(-Double.MAX_VALUE, -91.0));
         
-        assertThrows(() -> new Location(badLatitude, badLongitude));
+        assertThrows(() -> new Location(badLatitude, badLongitude)).isInstanceOf(IllegalArgumentException.class);
     }
-
-    @Test
-    public void testValidLatitude()
-    {
-        AlchemyAssertion<Double> assertion = Location.validLatitude();
-        assertion.check(latitude);
-    }
-    @Test
-    public void testValidLatitudeWithInvalid()
-    {
-        AlchemyAssertion<Double> assertion = Location.validLatitude();
-        assertThrows(() -> assertion.check(badLocation.getLatitude()));
-    }
-
-    @Test
-    public void testValidLongitude()
-    {
-        AlchemyAssertion<Double> assertion = Location.validLongitude();
-        assertion.check(longitude);
-    }
-
-    @Test
-    public void testValidLongitudeWithInvalid()
-    {
-        AlchemyAssertion<Double> assertion = Location.validLongitude();
-        assertThrows(() -> assertion.check(badLocation.getLongitude()));
-    }
-
+    
     @Test
     public void testAsJSON()
     {

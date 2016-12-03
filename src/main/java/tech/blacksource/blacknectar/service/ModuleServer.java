@@ -26,9 +26,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.ExceptionHandler;
 import tech.aroma.client.Aroma;
+import tech.aroma.client.Urgency;
 import tech.blacksource.blacknectar.service.api.ModuleBlackNectarService;
 import tech.blacksource.blacknectar.service.api.operations.ModuleOperations;
 import tech.blacksource.blacknectar.service.exceptions.BlackNectarExceptionHandler;
+import tech.redroma.yelp.YelpAPI;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 
 /**
@@ -65,4 +67,27 @@ class ModuleServer extends AbstractModule
         return DriverManager.getConnection("jdbc:sqlite::resource:Stores.db");
     }
 
+    @Provides
+    YelpAPI provideYelpAPI(Aroma aroma) throws Exception
+    {
+        try
+        {
+            String cliendId = Files.readFile("../api-keys/yelp-client.txt");
+            String secret = Files.readFile("../api-keys/yelp-secret.txt");
+
+            return YelpAPI.Builder.newInstance()
+                .withClientCredentials(cliendId, secret)
+                .withEagerAuthentication()
+                .build();
+        }
+        catch (Exception ex)
+        {
+            aroma.begin().titled("Yelp Setup Failed")
+                .text("Failed to setup the Yelp API Client", ex)
+                .withUrgency(Urgency.HIGH)
+                .send();
+            
+            return YelpAPI.NO_OP;
+        }
+    }
 }

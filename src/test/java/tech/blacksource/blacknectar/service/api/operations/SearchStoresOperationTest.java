@@ -18,11 +18,14 @@ package tech.blacksource.blacknectar.service.api.operations;
 
 import com.google.gson.JsonArray;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import sir.wellington.alchemy.collections.lists.Lists;
+import sir.wellington.alchemy.collections.maps.Maps;
 import spark.QueryParamsMap;
 import spark.Request;
 import spark.Response;
@@ -33,9 +36,16 @@ import tech.blacksource.blacknectar.service.api.operations.SearchStoresOperation
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
+import tech.redroma.yelp.Address;
+import tech.redroma.yelp.Coordinate;
+import tech.redroma.yelp.YelpAPI;
+import tech.redroma.yelp.YelpBusiness;
+import tech.redroma.yelp.YelpSearchRequest;
+import tech.sirwellington.alchemy.generator.NetworkGenerators;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateInteger;
+import tech.sirwellington.alchemy.test.junit.runners.GenerateList;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
@@ -45,12 +55,12 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static sir.wellington.alchemy.collections.sets.Sets.toSet;
-import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.generator.GeolocationGenerators.latitudes;
 import static tech.sirwellington.alchemy.generator.GeolocationGenerators.longitudes;
 import static tech.sirwellington.alchemy.generator.NetworkGenerators.ip4Addresses;
+import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateInteger.Type.POSITIVE;
@@ -68,6 +78,16 @@ public class SearchStoresOperationTest
     
     @Mock
     private BlackNectarService service;
+    
+    @Mock
+    private YelpAPI yelpAPI;
+    
+    private List<YelpBusiness> yelpBusinesses;
+    
+    @GenerateList(Store.class)
+    private List<Store> stores;
+    
+    private Map<Store, YelpBusiness> storeToYelpMap;
     
     @Mock
     private Request request;
@@ -95,8 +115,7 @@ public class SearchStoresOperationTest
     private Integer limit;
     
     private QueryParamsMap queryParams;
-    
-    private List<Store> stores;
+
     
     private BlackNectarSearchRequest expectedSearchRequest;
 
@@ -107,7 +126,7 @@ public class SearchStoresOperationTest
         setupData();
         setupMocks();
         
-        instance = new SearchStoresOperation(aroma, service);
+        instance = new SearchStoresOperation(aroma, service, yelpAPI);
     }
 
 
@@ -117,8 +136,49 @@ public class SearchStoresOperationTest
         latitude = one(latitudes());
         longitude = one(longitudes());
         
-        stores = listOf(stores());
+        correctStores(stores);
+        
         expectedSearchRequest = createExpectedRequest();
+        setupYelpData();
+    }
+    
+    private void correctStores(List<Store> stores)
+    {
+    }
+
+    private void setupYelpData()
+    {
+        yelpBusinesses = Lists.create();
+        storeToYelpMap = Maps.create();
+        
+        for (Store store : stores)
+        {
+            YelpBusiness business = one(pojos(YelpBusiness.class));
+            business.imageURL = NetworkGenerators.httpUrls().get().toString();
+            
+            yelpBusinesses.add(business);
+            storeToYelpMap.put(store, business);
+            
+            List<YelpBusiness> yelpResults = Lists.createFrom(business);
+            
+            YelpSearchRequest expectedRequest = createExpectedYelpRequestFor(store);
+            
+            when(yelpAPI.searchForBusinesses(expectedRequest))
+                .thenReturn(yelpResults);
+        }
+    }
+    
+    private YelpSearchRequest createExpectedYelpRequestFor(Store store)
+    {
+        Address yelpAddress = copyAddressFrom(store.getAddress());
+        Coordinate coordinate = copyCoordinateFrom(store.getLocation());
+        
+        return YelpSearchRequest.newBuilder()
+            .withLocation(yelpAddress)
+            .withCoordinate(coordinate)
+            .withLimit(SearchStoresOperation.DEFAULT_YELP_LIMIT)
+            .withSearchTerm(store.getName())
+            .build();
     }
 
     private void setupMocks() throws Exception
@@ -134,14 +194,16 @@ public class SearchStoresOperationTest
         
         when(service.searchForStores(expectedSearchRequest))
             .thenReturn(stores);
+        
     }
 
     @DontRepeat
     @Test
     public void testConstructor()
     {
-        assertThrows(() -> new SearchStoresOperation(null, service));
-        assertThrows(() -> new SearchStoresOperation(aroma, null));
+        assertThrows(() -> new SearchStoresOperation(null, service, yelpAPI));
+        assertThrows(() -> new SearchStoresOperation(aroma, null, yelpAPI));
+        assertThrows(() -> new SearchStoresOperation(aroma, service, null));
     }
     
     @Test
@@ -151,6 +213,7 @@ public class SearchStoresOperationTest
         
         JsonArray expected = new JsonArray();
         stores.stream()
+            .map(this::insertCorrespondingYelpData)
             .map(Store::asJSON)
             .forEach(store -> expected.add(store));
 
@@ -202,6 +265,41 @@ public class SearchStoresOperationTest
         when(params.value(QueryKeys.SEARCH_TERM)).thenReturn(searchTerm);
         
         return params;
+    }
+
+    private Address copyAddressFrom(tech.blacksource.blacknectar.service.stores.Address address)
+    {
+        Address yelpAddress = new Address();
+        
+        yelpAddress.address1 = address.getAddressLineOne();
+        yelpAddress.address2 = address.getAddressLineTwo();
+        yelpAddress.city = address.getCity();
+        yelpAddress.state = address.getState();
+        yelpAddress.zipCode = String.valueOf(address.getZip5());
+        
+        return yelpAddress;
+    }
+
+    private Coordinate copyCoordinateFrom(Location location)
+    {
+        double lat = location.getLatitude();
+        double lon = location.getLongitude();
+        
+        return Coordinate.of(lat, lon);
+    }
+    
+    private Store insertCorrespondingYelpData(Store store)
+    {
+        YelpBusiness yelpBusiness = storeToYelpMap.get(store);
+        
+        if (yelpBusiness == null)
+        {
+            return store;
+        }
+        
+        return Store.Builder.fromStore(store)
+            .withMainImageURL(yelpBusiness.imageURL)
+            .build();
     }
     
 }

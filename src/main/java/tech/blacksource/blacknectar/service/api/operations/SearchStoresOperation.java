@@ -50,6 +50,7 @@ import tech.redroma.yelp.YelpSearchRequest;
 import tech.redroma.yelp.exceptions.YelpExcetion;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static tech.blacksource.blacknectar.service.api.MediaTypes.APPLICATION_JSON;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
@@ -357,9 +358,16 @@ public class SearchStoresOperation implements Route
 
     private Store copyStoreInfoFromYelp(Store store, YelpBusiness yelpStore)
     {
-        return Store.Builder.fromStore(store)
-            .withMainImageURL(yelpStore.imageURL)
-            .build();
+        if (!isNullOrEmpty(yelpStore.imageURL))
+        {
+            return Store.Builder.fromStore(store)
+                .withMainImageURL(yelpStore.imageURL)
+                .build();
+        }
+        else
+        {
+            return store;
+        }
     }
 
     private tech.redroma.yelp.Address copyYelpAddressFrom(Address address)

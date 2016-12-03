@@ -75,7 +75,6 @@ public class SearchStoresOperation implements Route
     private final static int DEFAULT_LIMIT = 250;
     /** The default limit to use when searching for Yelp Stores. */
     final static int DEFAULT_YELP_LIMIT = 5;
-
     
     private final Aroma aroma;
     private final BlackNectarService service;

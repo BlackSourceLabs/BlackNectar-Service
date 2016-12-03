@@ -334,7 +334,7 @@ public class SearchStoresOperation implements Route
         {
             makeNoteOfYelpRequest(request, results, store);
             
-            YelpBusiness yelpStore = Lists.oneOf(results);
+            YelpBusiness yelpStore = pickResultClosestToStore(results, store);
             
             Store enrichedStore = copyStoreInfoFromYelp(store, yelpStore);
             return enrichedStore;
@@ -387,6 +387,11 @@ public class SearchStoresOperation implements Route
             .text(message, request, results.size(), store)
             .withUrgency(Urgency.LOW)
             .send();
+    }
+
+    private YelpBusiness pickResultClosestToStore(List<YelpBusiness> results, Store store)
+    {
+        return Lists.oneOf(results);
     }
 
     static class QueryKeys

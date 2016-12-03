@@ -21,6 +21,7 @@ package tech.blacksource.blacknectar.service.api.operations;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
@@ -391,7 +392,36 @@ public class SearchStoresOperation implements Route
 
     private YelpBusiness pickResultClosestToStore(List<YelpBusiness> results, Store store)
     {
+        
+        for (YelpBusiness business : results)
+        {
+            if (addressesAreSimilar(business, store))
+            {
+                return business;
+            }
+        }
+        
         return Lists.oneOf(results);
+    }
+
+    private boolean addressesAreSimilar(YelpBusiness business, Store store)
+    {
+        if (business.location == null || store.getAddress() == null)
+        {
+            return false;
+        }
+        
+        if (!Objects.equals(business.location.address1, store.getAddress().getAddressLineOne()))
+        {
+            return false;
+        }
+        
+        if (!Objects.equals(business.location.city, store.getAddress().getState()))
+        {
+            return false;
+        }
+        
+        return true;
     }
 
     static class QueryKeys

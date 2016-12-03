@@ -403,7 +403,7 @@ public class SearchStoresOperation implements Route
         
         for (YelpBusiness business : results)
         {
-            if (addressesAreSimilar(business, store))
+            if (areSimilar(business, store))
             {
                 return business;
             }
@@ -412,8 +412,16 @@ public class SearchStoresOperation implements Route
         return Lists.oneOf(results);
     }
 
-    private boolean addressesAreSimilar(YelpBusiness business, Store store)
+    private boolean areSimilar(YelpBusiness business, Store store)
     {
+        if (!Objects.isNull(business.name) && !Objects.isNull(store.getName()))
+        {
+            if (business.name.contains(store.getName()) || store.getName().contains(business.name))
+            {
+                return true;
+            }
+        }
+        
         if (business.location == null || store.getAddress() == null)
         {
             return false;

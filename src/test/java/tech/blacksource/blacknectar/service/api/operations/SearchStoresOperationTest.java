@@ -177,6 +177,7 @@ public class SearchStoresOperationTest
             .withLocation(yelpAddress)
             .withCoordinate(coordinate)
             .withLimit(SearchStoresOperation.DEFAULT_YELP_LIMIT)
+            .withSearchTerm(store.getName())
             .build();
     }
 

@@ -350,6 +350,7 @@ public class SearchStoresOperation implements Route
             .withLocation(yelpAddress)
             .withCoordinate(coordinate)
             .withLimit(DEFAULT_YELP_LIMIT)
+            .withSearchTerm(store.getName())
             .build();
     }
 

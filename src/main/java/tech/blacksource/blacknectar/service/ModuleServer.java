@@ -72,8 +72,8 @@ class ModuleServer extends AbstractModule
     {
         try
         {
-            String cliendId = Files.readFile("../api-keys/yelp-client.txt");
-            String secret = Files.readFile("../api-keys/yelp-secret.txt");
+            String cliendId = Files.readFile("../api-keys/yelp-client.txt").trim();
+            String secret = Files.readFile("../api-keys/yelp-secret.txt").trim();
 
             return YelpAPI.Builder.newInstance()
                 .withClientCredentials(cliendId, secret)

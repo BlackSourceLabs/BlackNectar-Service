@@ -418,6 +418,8 @@ public class SearchStoresOperation implements Route
             }
         }
         
+        makeNotThatYelpMatchFailedFor(store);
+        
         return Lists.oneOf(results);
     }
 
@@ -494,6 +496,16 @@ public class SearchStoresOperation implements Route
         String blackNectarZipCode = Strings.nullToEmpty(store.getAddress().getZip5() + "");
         
         return Objects.equals(yelpZipCode, blackNectarZipCode);
+    }
+
+    private void makeNotThatYelpMatchFailedFor(Store store)
+    {
+        String message = "Could not find a Yelp Store close to: \n\n{}";
+        LOG.debug(message, store);
+        aroma.begin().titled("Yelp Match Failed")
+            .text(message, store)
+            .withUrgency(Urgency.LOW)
+            .send();
     }
 
     static class QueryKeys

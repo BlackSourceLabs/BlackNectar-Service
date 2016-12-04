@@ -354,7 +354,7 @@ public class SearchStoresOperation implements Route
             .withCoordinate(coordinate)
             .withLimit(DEFAULT_YELP_LIMIT)
             .withSearchTerm(store.getName())
-            .withSortBy(YelpSearchRequest.SortType.BEST_MATCH)
+            .withSortBy(YelpSearchRequest.SortType.DISTANCE)
             .build();
     }
 

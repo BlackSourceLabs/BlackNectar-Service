@@ -423,7 +423,10 @@ public class SearchStoresOperation implements Route
     {
         if (!Objects.isNull(business.name) && !Objects.isNull(store.getName()))
         {
-            if (business.name.contains(store.getName()) || store.getName().contains(business.name))
+            String yelpName = business.name.toLowerCase();
+            String blackNectarName = store.getName().toLowerCase();
+            
+            if (yelpName.contains(blackNectarName) || blackNectarName.contains(yelpName))
             {
                 return true;
             }

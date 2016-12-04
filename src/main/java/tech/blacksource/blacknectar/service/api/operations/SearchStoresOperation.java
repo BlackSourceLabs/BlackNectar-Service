@@ -433,11 +433,6 @@ public class SearchStoresOperation implements Route
             return true;
         }
         
-        if (haveDifferentCities(business, store) || haveDifferentZipCodes(business, store))
-        {
-            return false;
-        }
-        
         if (haveTheSameAddressLine(business, store))
         {
             aroma.begin().titled("Yelp Match")
@@ -447,7 +442,12 @@ public class SearchStoresOperation implements Route
             
             return true;
         }
-        
+
+        if (haveDifferentCities(business, store) || haveDifferentZipCodes(business, store))
+        {
+            return false;
+        }
+
         return false;
     }
 

@@ -427,6 +427,11 @@ public class SearchStoresOperation implements Route
     {
         if (haveTheSameName(business, store))
         {
+            aroma.begin().titled("Yelp Match")
+                .text("Businessess have the same name. \n\nYelp:\n{}\n\nBlackNectar:\n{}", business, store)
+                .withUrgency(Urgency.LOW)
+                .send();
+            
             return true;
         }
         
@@ -437,10 +442,15 @@ public class SearchStoresOperation implements Route
         
         if (haveTheSameAddressLine(business, store))
         {
+            aroma.begin().titled("Yelp Match")
+                .text("Businessess have the same address. \n\nYelp:\n{}\n\nBlackNectar:\n{}", business, store)
+                .withUrgency(Urgency.LOW)
+                .send();
+            
             return true;
         }
         
-        return true;
+        return false;
     }
 
     private boolean haveTheSameName(YelpBusiness business, Store store)

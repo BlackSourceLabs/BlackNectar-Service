@@ -18,6 +18,7 @@
 package tech.blacksource.blacknectar.service.api.operations;
 
 
+import com.google.common.base.Strings;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.util.List;
@@ -421,33 +422,77 @@ public class SearchStoresOperation implements Route
 
     private boolean areSimilar(YelpBusiness business, Store store)
     {
+        if (haveTheSameName(business, store))
+        {
+            return true;
+        }
+        
+        if (haveDifferentCities(business, store) || haveDifferentZipCodes(business, store))
+        {
+            return false;
+        }
+        
+        if (haveTheSameAddressLine(business, store))
+        {
+            return true;
+        }
+        
+        return true;
+    }
+
+    private boolean haveTheSameName(YelpBusiness business, Store store)
+    {
         if (!Objects.isNull(business.name) && !Objects.isNull(store.getName()))
         {
             String yelpName = business.name.toLowerCase();
             String blackNectarName = store.getName().toLowerCase();
-            
+
             if (yelpName.contains(blackNectarName) || blackNectarName.contains(yelpName))
             {
                 return true;
             }
         }
-        
-        if (business.location == null || store.getAddress() == null)
+
+        return false;
+    }
+
+    private boolean haveTheSameAddressLine(YelpBusiness business, Store store)
+    {
+        if (Objects.isNull(business.location) || Objects.isNull(store.getAddress()))
         {
             return false;
         }
         
-        if (!Objects.equals(business.location.address1, store.getAddress().getAddressLineOne()))
+        String yelpAddress = Strings.nullToEmpty(business.location.address1).toUpperCase();
+        String blackNectarAddress = Strings.nullToEmpty(store.getAddress().getAddressLineOne()).toUpperCase();
+        
+        return Objects.equals(yelpAddress, blackNectarAddress);
+    }
+
+    private boolean haveDifferentCities(YelpBusiness business, Store store)
+    {
+        if (Objects.isNull(business.location) || Objects.isNull(store.getAddress()))
         {
-            return false;
+            return true;
         }
         
-        if (!Objects.equals(business.location.city, store.getAddress().getState()))
+        String yelpCity = Strings.nullToEmpty(business.location.city).toUpperCase();
+        String blackNectarCity = Strings.nullToEmpty(store.getAddress().getCity()).toUpperCase();
+        
+        return Objects.equals(yelpCity, blackNectarCity);
+    }
+
+    private boolean haveDifferentZipCodes(YelpBusiness business, Store store)
+    {
+        if (Objects.isNull(business.location) || Objects.isNull(store.getAddress()))
         {
-            return false;
+            return true;
         }
         
-        return true;
+        String yelpZipCode = Strings.nullToEmpty(business.location.zipCode);
+        String blackNectarZipCode = Strings.nullToEmpty(store.getAddress().getZip5() + "");
+        
+        return Objects.equals(yelpZipCode, blackNectarZipCode);
     }
 
     static class QueryKeys

@@ -174,7 +174,6 @@ public class SearchStoresOperationTest
         Coordinate coordinate = copyCoordinateFrom(store.getLocation());
         
         return YelpSearchRequest.newBuilder()
-            .withLocation(yelpAddress)
             .withCoordinate(coordinate)
             .withLimit(SearchStoresOperation.DEFAULT_YELP_LIMIT)
             .withSearchTerm(store.getName())

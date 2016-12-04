@@ -407,7 +407,7 @@ public class SearchStoresOperation implements Route
             if (areSimilar(business, store))
             {
                 aroma.begin().titled("Store Picked")
-                    .text("Business: {}\n\n For Store: {}", business, store)
+                    .text("Business: {}\n\n For Store: \n\n{}", business, store)
                     .withUrgency(Urgency.LOW)
                     .send();
                 

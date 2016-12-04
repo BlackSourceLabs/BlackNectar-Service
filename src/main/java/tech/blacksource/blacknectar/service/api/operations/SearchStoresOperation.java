@@ -122,7 +122,7 @@ public class SearchStoresOperation implements Route
         List<Store> stores = findStores(request);
         
         JsonArray json = stores.parallelStream()
-            .map(this::enrichStoreWithYelpData)
+            .map(this::tryToEnrichStoreWithYelpData)
             .map(Store::asJSON)
             .collect(supplier, accumulator, combiner);
         
@@ -308,7 +308,7 @@ public class SearchStoresOperation implements Route
         };
     }
     
-    private Store enrichStoreWithYelpData(Store store)
+    private Store tryToEnrichStoreWithYelpData(Store store)
     {
         YelpSearchRequest request = buildRequestFor(store);
         
@@ -329,19 +329,20 @@ public class SearchStoresOperation implements Route
                 .send();
         }
         
-        if (Lists.isEmpty(results))
-        {
-            return store;
-        }
-        else 
+        if (!Lists.isEmpty(results))
         {
             makeNoteOfYelpRequest(request, results, store);
             
-            YelpBusiness yelpStore = pickResultClosestToStore(results, store);
+            YelpBusiness yelpStore = tryToFindMatchingBusiness(results, store);
             
-            Store enrichedStore = copyStoreInfoFromYelp(store, yelpStore);
-            return enrichedStore;
+            if (Objects.nonNull(yelpStore))
+            {
+                Store enrichedStore = copyStoreInfoFromYelp(store, yelpStore);
+                return enrichedStore;
+            }
         }
+        
+        return store;
     }
 
     private YelpSearchRequest buildRequestFor(Store store)
@@ -398,7 +399,7 @@ public class SearchStoresOperation implements Route
             .send();
     }
 
-    private YelpBusiness pickResultClosestToStore(List<YelpBusiness> results, Store store)
+    private YelpBusiness tryToFindMatchingBusiness(List<YelpBusiness> results, Store store)
     {
         
         for (YelpBusiness business : results)

@@ -178,6 +178,7 @@ public class SearchStoresOperationTest
             .withCoordinate(coordinate)
             .withLimit(SearchStoresOperation.DEFAULT_YELP_LIMIT)
             .withSearchTerm(store.getName())
+            .withSortBy(YelpSearchRequest.SortType.BEST_MATCH)
             .build();
     }
 

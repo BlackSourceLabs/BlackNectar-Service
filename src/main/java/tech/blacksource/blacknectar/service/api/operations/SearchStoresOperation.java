@@ -77,7 +77,7 @@ public class SearchStoresOperation implements Route
     /** In the event that queries do not include a limit, this one is injected. */
     private final static int DEFAULT_LIMIT = 250;
     /** The default limit to use when searching for Yelp Stores. */
-    final static int DEFAULT_YELP_LIMIT = 5;
+    final static int DEFAULT_YELP_LIMIT = 10;
     
     private final Aroma aroma;
     private final BlackNectarService service;
@@ -354,6 +354,7 @@ public class SearchStoresOperation implements Route
             .withCoordinate(coordinate)
             .withLimit(DEFAULT_YELP_LIMIT)
             .withSearchTerm(store.getName())
+            .withSortBy(YelpSearchRequest.SortType.BEST_MATCH)
             .build();
     }
 

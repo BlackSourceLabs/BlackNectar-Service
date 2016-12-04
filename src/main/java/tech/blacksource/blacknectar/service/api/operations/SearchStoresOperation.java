@@ -419,7 +419,7 @@ public class SearchStoresOperation implements Route
         
         makeNotThatYelpMatchFailedFor(store);
         
-        return Lists.oneOf(results);
+        return null;
     }
 
     private boolean areSimilar(YelpBusiness business, Store store)

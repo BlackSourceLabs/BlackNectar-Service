@@ -390,10 +390,10 @@ public class SearchStoresOperation implements Route
 
     private void makeNoteOfYelpRequest(YelpSearchRequest request, List<YelpBusiness> results, Store store)
     {
-        String message = "Yelp request {} \n\nResulted in {} results \n\nFor Store [{}]";
+        String message = "Yelp request {} \n\nResulted in {} results \n\nFor Store [{}]:\n\n{}";
         LOG.debug(message, request, results.size(), store);
         aroma.begin().titled("Yelp Request Complete")
-            .text(message, request, results.size(), store)
+            .text(message, request, results.size(), store, results)
             .withUrgency(Urgency.LOW)
             .send();
     }

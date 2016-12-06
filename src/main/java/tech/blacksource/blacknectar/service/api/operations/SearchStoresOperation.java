@@ -48,7 +48,7 @@ import tech.redroma.yelp.Coordinate;
 import tech.redroma.yelp.YelpAPI;
 import tech.redroma.yelp.YelpBusiness;
 import tech.redroma.yelp.YelpSearchRequest;
-import tech.redroma.yelp.exceptions.YelpExcetion;
+import tech.redroma.yelp.exceptions.YelpException;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -318,7 +318,7 @@ public class SearchStoresOperation implements Route
         {
             results = yelp.searchForBusinesses(request);
         }
-        catch(YelpExcetion ex)
+        catch(YelpException ex)
         {
             String message = "Failed to search yelp for business information";
             

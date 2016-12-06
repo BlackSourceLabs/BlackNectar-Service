@@ -27,6 +27,7 @@ import spark.Request;
 import spark.Response;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
+import tech.redroma.yelp.exceptions.YelpException;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 import tech.sirwellington.alchemy.arguments.FailedAssertionException;
 
@@ -84,6 +85,16 @@ public final class BlackNectarExceptionHandler implements ExceptionHandler
                 .send();
             
             response.status(((BlackNectarAPIException) ex).getStatusCode());
+        }
+        else if (ex instanceof YelpException)
+        {
+            LOG.error("Failed to make Yelp API Call", ex);
+            
+            aroma.begin()
+                .titled("Yelp API Call Failed")
+                .text("Failed to make Yelp API Call from request: {}", request, ex)
+                .withUrgency(Urgency.HIGH)
+                .send();
         }
         else
         {

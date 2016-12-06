@@ -154,7 +154,10 @@ public class SearchStoresOperationTest
         for (Store store : stores)
         {
             YelpBusiness business = one(pojos(YelpBusiness.class));
+            //Make sure the business has a valid URL
             business.imageURL = NetworkGenerators.httpUrls().get().toString();
+            //Ensure the store and the name match up, otherwise the algorithm will ignore it
+            business.name = store.getName();
             
             yelpBusinesses.add(business);
             storeToYelpMap.put(store, business);

@@ -42,6 +42,8 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
 public final class BlackNectarExceptionHandler implements ExceptionHandler
 {
     private final static Logger LOG = LoggerFactory.getLogger(BlackNectarExceptionHandler.class);
+    private static final int BAD_ARGUMENT = 400;
+    private static final int INTERNAL_ERROR = 500;
     
     private final Aroma aroma;
 
@@ -73,7 +75,7 @@ public final class BlackNectarExceptionHandler implements ExceptionHandler
                 .withUrgency(Urgency.MEDIUM)
                 .send();
             
-            response.status(400);
+            response.status(BAD_ARGUMENT);
         }
         else if (ex instanceof BlackNectarAPIException)
         {
@@ -95,6 +97,8 @@ public final class BlackNectarExceptionHandler implements ExceptionHandler
                 .text("Failed to make Yelp API Call from request: {}", request, ex)
                 .withUrgency(Urgency.HIGH)
                 .send();
+            
+            response.status(INTERNAL_ERROR);
         }
         else
         {
@@ -105,7 +109,7 @@ public final class BlackNectarExceptionHandler implements ExceptionHandler
                 .withUrgency(Urgency.HIGH)
                 .send();
             
-            response.status(500);
+            response.status(INTERNAL_ERROR);
         }
         
         response.type("text/plain");

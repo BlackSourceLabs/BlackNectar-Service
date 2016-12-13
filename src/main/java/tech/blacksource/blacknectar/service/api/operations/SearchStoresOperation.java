@@ -334,7 +334,7 @@ public class SearchStoresOperation implements Route
             
             LOG.error(message, ex);
             aroma.begin().titled("Yelp Call Failed")
-                .text(message, ex)
+                .text("{}\n\nFor Request:\n{}", message, request)
                 .withUrgency(Urgency.HIGH)
                 .send();
         }

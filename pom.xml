@@ -128,7 +128,7 @@
         <dependency>
             <groupId>tech.sirwellington.alchemy</groupId>
             <artifactId>alchemy-arguments</artifactId>
-            <version>1.5-SNAPSHOT</version>
+            <version>1.5</version>
         </dependency>
         
         <dependency>

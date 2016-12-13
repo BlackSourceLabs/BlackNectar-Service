@@ -51,7 +51,6 @@ import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static sir.wellington.alchemy.collections.sets.Sets.toSet;
@@ -193,7 +192,7 @@ public class SearchStoresOperationTest
         when(request.ip()).thenReturn(ip);
         when(request.queryString()).thenReturn(queryString);
         when(request.queryMap()).thenReturn(queryParams);
-
+        when(request.queryParams()).thenReturn(QueryKeys.KEYS);
         
         when(service.searchForStores(expectedSearchRequest))
             .thenReturn(stores);
@@ -245,21 +244,25 @@ public class SearchStoresOperationTest
 
     private BlackNectarSearchRequest createExpectedRequest()
     {
-        BlackNectarSearchRequest request = new BlackNectarSearchRequest();
+        BlackNectarSearchRequest expectedRequest = new BlackNectarSearchRequest();
         
-        request.withCenter(Location.with(latitude, longitude))
+        expectedRequest.withCenter(Location.with(latitude, longitude))
             .withLimit(limit)
             .withRadius(radius)
             .withSearchTerm(searchTerm);
         
-        return request;
+        return expectedRequest;
     }
 
     private QueryParamsMap createQueryParams()
     {
         QueryParamsMap params = mock(QueryParamsMap.class);
         
-        when(params.hasKey(anyString())).thenReturn(true);
+        when(params.hasKey(QueryKeys.LATITUDE)).thenReturn(true);
+        when(params.hasKey(QueryKeys.LONGITUDE)).thenReturn(true);
+        when(params.hasKey(QueryKeys.RADIUS)).thenReturn(true);
+        when(params.hasKey(QueryKeys.LIMIT)).thenReturn(true);
+        when(params.hasKey(QueryKeys.SEARCH_TERM)).thenReturn(true);
         
         when(params.value(QueryKeys.LATITUDE)).thenReturn(String.valueOf(latitude));
         when(params.value(QueryKeys.LONGITUDE)).thenReturn(String.valueOf(longitude));
@@ -304,5 +307,5 @@ public class SearchStoresOperationTest
             .withMainImageURL(yelpBusiness.imageURL)
             .build();
     }
-    
+
 }

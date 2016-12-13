@@ -211,7 +211,7 @@
         <dependency>
             <groupId>tech.redroma.yelp</groupId>
             <artifactId>yelp-api</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
         
     </dependencies>

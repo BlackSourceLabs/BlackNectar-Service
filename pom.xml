@@ -214,6 +214,15 @@
             <version>1.0</version>
         </dependency>
         
+        <!--=======================-->
+        <!--GOOGLE PLACES-->
+        <!--=======================-->
+        <dependency>
+            <groupId>tech.redroma.google</groupId>
+            <artifactId>google-places-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        
     </dependencies>
 
 

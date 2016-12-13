@@ -55,6 +55,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static tech.blacksource.blacknectar.service.api.MediaTypes.APPLICATION_JSON;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+import static tech.sirwellington.alchemy.arguments.assertions.CollectionAssertions.collectionContaining;
 import static tech.sirwellington.alchemy.arguments.assertions.CollectionAssertions.elementInCollection;
 import static tech.sirwellington.alchemy.arguments.assertions.GeolocationAssertions.validLatitude;
 import static tech.sirwellington.alchemy.arguments.assertions.GeolocationAssertions.validLongitude;
@@ -304,6 +305,15 @@ public class SearchStoresOperation implements Route
                     .is(nonEmptyString())
                     .usingMessage("Unrecognized Query Parameter: " + key)
                     .is(elementInCollection(QueryKeys.KEYS));
+            }
+            
+            if (!queryParams.contains(QueryKeys.SEARCH_TERM))
+            {
+                checkThat(queryParams)
+                    .usingMessage("latitude parameter is missing")
+                    .is(collectionContaining(QueryKeys.LATITUDE))
+                    .usingMessage("longitude parameter is missing")
+                    .is(collectionContaining(QueryKeys.LONGITUDE));
             }
         };
     }

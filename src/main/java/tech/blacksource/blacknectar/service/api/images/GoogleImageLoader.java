@@ -201,6 +201,7 @@ final class GoogleImageLoader implements ImageLoader
     {
         first = first.toLowerCase();
         second = second.toLowerCase();
+        
         return first.contains(second) || second.contains(first);
     }
 
@@ -212,6 +213,11 @@ final class GoogleImageLoader implements ImageLoader
         }
 
         Address address = store.getAddress();
+        
+        if (namesMatch(place.vicinity, address.getAddressLineOne()))
+        {
+            return true;
+        }
 
         return namesMatch(place.formattedAddress, address.getAddressLineOne()) &&
                namesMatch(place.formattedAddress, address.getCity()) &&

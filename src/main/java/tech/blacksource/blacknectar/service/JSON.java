@@ -1,18 +1,18 @@
-/*
- * Copyright 2016 BlackSourceLabs.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+ /*
+  * Copyright 2016 BlackSourceLabs.
+  *
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+  *      http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
 
 package tech.blacksource.blacknectar.service;
 
@@ -33,23 +33,23 @@ import tech.sirwellington.alchemy.annotations.access.NonInstantiable;
 @NonInstantiable
 public final class JSON
 {
-
+    
     private final static Logger LOG = LoggerFactory.getLogger(JSON.class);
-
+    
     public static Collector<JsonElement, JsonArray, JsonArray> collectArray()
     {
         Supplier<JsonArray> supplier = () -> new JsonArray();
         BiConsumer<JsonArray, JsonElement> accumulator = (array, object) -> array.add(object);
         BinaryOperator<JsonArray> combiner = (first, second) ->
-            {
-                JsonArray result = new JsonArray();
-                result.addAll(first);
-                result.addAll(second);
-                return result;
-            };
-
+        {
+            JsonArray result = new JsonArray();
+            result.addAll(first);
+            result.addAll(second);
+            return result;
+        };
+        
         Collector<JsonElement, JsonArray, JsonArray> collector = Collector.of(supplier, accumulator, combiner,
-                                                                              Collector.Characteristics.CONCURRENT);
+                                                                                                     Collector.Characteristics.CONCURRENT);
         return collector;
     }
 }

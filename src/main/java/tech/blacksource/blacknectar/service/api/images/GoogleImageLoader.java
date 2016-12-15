@@ -19,6 +19,7 @@ package tech.blacksource.blacknectar.service.api.images;
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
@@ -36,6 +37,9 @@ import tech.redroma.google.places.requests.GetPhotoRequest;
 import tech.redroma.google.places.requests.NearbySearchRequest;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+
 /**
  *
  * @author SirWellington
@@ -43,20 +47,29 @@ import tech.sirwellington.alchemy.annotations.access.Internal;
 @Internal
 final class GoogleImageLoader implements ImageLoader
 {
-
+    
     private final static Logger LOG = LoggerFactory.getLogger(GoogleImageLoader.class);
     static final int DEFAULT_RADIUS = 5_000;
-
-    private Aroma aroma;
-    private GooglePlacesAPI google;
-
+    
+    private final Aroma aroma;
+    private final GooglePlacesAPI google;
+    
+    @Inject
+    GoogleImageLoader(Aroma aroma, GooglePlacesAPI google)
+    {
+        checkThat(aroma, google).are(notNull());
+        
+        this.aroma = aroma;
+        this.google = google;
+    }
+    
     @Override
     public URL getImageFor(Store store)
     {
         NearbySearchRequest request = createRequestToSearchFor(store);
-
+        
         List<Place> places;
-
+        
         try
         {
             places = google.simpleSearchNearbyPlaces(request);
@@ -66,24 +79,24 @@ final class GoogleImageLoader implements ImageLoader
             makeNoteThatGoogleSearchFailed(ex, request, store);
             throw new OperationFailedException("Could not make Google API Request", ex);
         }
-
+        
         Place matchingPlace = tryToFindMatchingPlaceFor(store, places);
-
+        
         if (Objects.isNull(matchingPlace))
         {
             makeNoteThatNoMatchesFoundFor(store, places);
             return null;
         }
-
+        
         if (!matchingPlace.hasPhotos())
         {
             makeNoteThatPlaceHasNoPhotos(store, matchingPlace);
             return null;
         }
-
+        
         Photo photo = Lists.oneOf(matchingPlace.photos);
         GetPhotoRequest photoRequest = createRequestToGetPhoto(photo);
-
+        
         try
         {
             return google.getPhoto(photoRequest);
@@ -94,19 +107,19 @@ final class GoogleImageLoader implements ImageLoader
             throw new OperationFailedException(ex);
         }
     }
-
+    
     private NearbySearchRequest createRequestToSearchFor(Store store)
     {
         Location location = Location.of(store.getLocation().getLatitude(), store.getLocation().getLongitude());
-
+        
         return NearbySearchRequest.newBuilder()
             .withKeyword(store.getName())
             .withLocation(location)
             .withRadiusInMeters(DEFAULT_RADIUS)
             .build();
-
+        
     }
-
+    
     private GetPhotoRequest createRequestToGetPhoto(Photo photo)
     {
         return GetPhotoRequest.newBuilder()
@@ -114,7 +127,7 @@ final class GoogleImageLoader implements ImageLoader
             .withMaxHeight(GetPhotoRequest.Builder.MAX_HEIGHT)
             .build();
     }
-
+    
     private Place tryToFindMatchingPlaceFor(Store store, List<Place> places)
     {
         if (Lists.isEmpty(places))
@@ -137,7 +150,7 @@ final class GoogleImageLoader implements ImageLoader
         
         return null;
     }
-
+    
     private void makeNoteThatGoogleSearchFailed(GooglePlacesException ex, NearbySearchRequest request, Store store)
     {
         LOG.error("Failed to execute Google Place Search for store: [{}]", store, ex);
@@ -147,7 +160,7 @@ final class GoogleImageLoader implements ImageLoader
             .withUrgency(Urgency.HIGH)
             .send();
     }
-
+    
     private void makeNoteThatNoMatchesFoundFor(Store store, List<Place> places)
     {
         LOG.warn("No matches found for store: [{}]", store);
@@ -157,7 +170,7 @@ final class GoogleImageLoader implements ImageLoader
             .withUrgency(Urgency.MEDIUM)
             .send();
     }
-
+    
     private void makeNoteThatPlaceHasNoPhotos(Store store, Place place)
     {
         LOG.info("Matching store has no photos: {}", place);
@@ -166,7 +179,7 @@ final class GoogleImageLoader implements ImageLoader
             .text("Google Place has no image.\n\nStore:\n{}\n\nPlace:\n{}", store, place)
             .withUrgency(Urgency.LOW);
     }
-
+    
     private void makeNoteThatGooglePhotoCallFailed(Photo photo, Place place, GooglePlacesException ex)
     {
         LOG.error("API call to Google Places failed", ex);
@@ -175,12 +188,12 @@ final class GoogleImageLoader implements ImageLoader
             .text("API Call to Google failed.\nPhoto: {}\n\nPlace:\n{}\n\n{}", photo, place, ex)
             .withUrgency(Urgency.HIGH);
     }
-
+    
     private boolean namesMatch(String first, String second)
     {
         return first.contains(second) || second.contains(first);
     }
-
+    
     private boolean addressesMatch(Place place, Store store)
     {
         if (!place.hasFormattedAddress())
@@ -189,11 +202,11 @@ final class GoogleImageLoader implements ImageLoader
         }
         
         Address address = store.getAddress();
-
+        
         return namesMatch(place.formattedAddress, address.getAddressLineOne()) &&
                namesMatch(place.formattedAddress, address.getCity()) &&
                namesMatch(place.formattedAddress, address.getState()) &&
                namesMatch(place.formattedAddress, "" + address.getZip5());
     }
-
+    
 }

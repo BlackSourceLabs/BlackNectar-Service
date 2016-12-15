@@ -104,7 +104,7 @@ public class SearchStoresOperation implements Route
         List<Store> stores = findStores(request);
 
         JsonArray json = stores.parallelStream()
-            .map(this::tryToEnrichStoreWithYelpData)
+            .map(this::tryToEnrichStoreWithImage)
             .map(Store::asJSON)
             .collect(JSON.collectArray());
 
@@ -290,7 +290,7 @@ public class SearchStoresOperation implements Route
         };
     }
 
-    private Store tryToEnrichStoreWithYelpData(Store store)
+    private Store tryToEnrichStoreWithImage(Store store)
     {
         URL url = imageLoader.getImageFor(store);
 

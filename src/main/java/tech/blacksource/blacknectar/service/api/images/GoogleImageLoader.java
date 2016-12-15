@@ -207,7 +207,7 @@ final class GoogleImageLoader implements ImageLoader
 
     private boolean addressesMatch(Place place, Store store)
     {
-        if (!place.hasFormattedAddress())
+        if (!place.hasFormattedAddress() && !place.hasVicinity())
         {
             return false;
         }

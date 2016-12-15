@@ -145,11 +145,13 @@ final class GoogleImageLoader implements ImageLoader
         {
             if (namesMatch(place.name, store.getName()))
             {
+                makeNoteThatNamesMatch(place, store);
                 return place;
             }
 
             if (addressesMatch(place, store))
             {
+                makeNoteThatAddressesMatch(place, store);
                 return place;
             }
         }
@@ -197,6 +199,8 @@ final class GoogleImageLoader implements ImageLoader
 
     private boolean namesMatch(String first, String second)
     {
+        first = first.toLowerCase();
+        second = second.toLowerCase();
         return first.contains(second) || second.contains(first);
     }
 
@@ -222,6 +226,26 @@ final class GoogleImageLoader implements ImageLoader
         aroma.begin().titled("No Places Found")
             .text("No Google Places found for Store:\n\n{}\n\nFor Request:\n{}", store, request)
             .withUrgency(Urgency.MEDIUM)
+            .send();
+    }
+
+    private void makeNoteThatNamesMatch(Place place, Store store)
+    {
+        LOG.debug("Place matches store by name: {}", place);
+
+        aroma.begin().titled("Matched By Name")
+            .text("Google Place matches store by name.\n\nStore:\n{}\n\nPlace:\n{}", store, place)
+            .withUrgency(Urgency.LOW)
+            .send();
+    }
+
+    private void makeNoteThatAddressesMatch(Place place, Store store)
+    {
+        LOG.debug("Place matches store by address: {}", place);
+
+        aroma.begin().titled("Matched By Address")
+            .text("Google Place matches store by address.\n\nStore:\n{}\n\nPlace:\n{}", store, place)
+            .withUrgency(Urgency.LOW)
             .send();
     }
 

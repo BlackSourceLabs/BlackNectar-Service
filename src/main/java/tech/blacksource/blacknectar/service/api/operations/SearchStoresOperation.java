@@ -34,8 +34,8 @@ import tech.aroma.client.Urgency;
 import tech.blacksource.blacknectar.service.JSON;
 import tech.blacksource.blacknectar.service.api.BlackNectarSearchRequest;
 import tech.blacksource.blacknectar.service.api.BlackNectarService;
-import tech.blacksource.blacknectar.service.api.images.Google;
 import tech.blacksource.blacknectar.service.api.images.ImageLoader;
+import tech.blacksource.blacknectar.service.api.images.Yelp;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
 import tech.blacksource.blacknectar.service.stores.Location;
@@ -75,7 +75,7 @@ public class SearchStoresOperation implements Route
     private final ImageLoader imageLoader;
 
     @Inject
-    public SearchStoresOperation(Aroma aroma, BlackNectarService service, @Google ImageLoader imageLoader)
+    public SearchStoresOperation(Aroma aroma, BlackNectarService service, @Yelp ImageLoader imageLoader)
     {
         checkThat(aroma, service, imageLoader)
             .are(notNull());

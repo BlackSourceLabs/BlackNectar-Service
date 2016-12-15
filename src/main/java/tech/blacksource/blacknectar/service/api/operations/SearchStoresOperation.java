@@ -72,17 +72,17 @@ public class SearchStoresOperation implements Route
 
     private final Aroma aroma;
     private final BlackNectarService service;
-    private final ImageLoader yelpLoader;
+    private final ImageLoader imageLoader;
 
     @Inject
-    public SearchStoresOperation(Aroma aroma, BlackNectarService service, @Yelp ImageLoader yelpLoader)
+    public SearchStoresOperation(Aroma aroma, BlackNectarService service, @Yelp ImageLoader imageLoader)
     {
-        checkThat(aroma, service, yelpLoader)
+        checkThat(aroma, service, imageLoader)
             .are(notNull());
 
         this.aroma = aroma;
         this.service = service;
-        this.yelpLoader = yelpLoader;
+        this.imageLoader = imageLoader;
     }
 
     @Override
@@ -292,7 +292,7 @@ public class SearchStoresOperation implements Route
 
     private Store tryToEnrichStoreWithYelpData(Store store)
     {
-        URL url = yelpLoader.getImageFor(store);
+        URL url = imageLoader.getImageFor(store);
 
         if (Objects.nonNull(url))
         {

@@ -111,7 +111,7 @@ final class ModuleServer extends AbstractModule
                 .withUrgency(Urgency.HIGH)
                 .send();
             
-            throw ex;
+            return GooglePlacesAPI.NO_OP;
         }
     }
 }

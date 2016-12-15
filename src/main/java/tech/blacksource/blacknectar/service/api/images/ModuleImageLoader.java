@@ -34,6 +34,7 @@ public final class ModuleImageLoader extends AbstractModule
     protected void configure()
     {
         bind(ImageLoader.class).annotatedWith(Yelp.class).to(YelpImageLoader.class);
+        bind(ImageLoader.class).annotatedWith(Google.class).to(GoogleImageLoader.class);
     }
     
 }

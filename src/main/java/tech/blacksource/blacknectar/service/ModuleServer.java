@@ -30,6 +30,7 @@ import tech.aroma.client.Urgency;
 import tech.blacksource.blacknectar.service.api.ModuleBlackNectarService;
 import tech.blacksource.blacknectar.service.api.operations.ModuleOperations;
 import tech.blacksource.blacknectar.service.exceptions.BlackNectarExceptionHandler;
+import tech.redroma.google.places.GooglePlacesAPI;
 import tech.redroma.yelp.YelpAPI;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 
@@ -38,7 +39,7 @@ import tech.sirwellington.alchemy.annotations.access.Internal;
  * @author SirWellington
  */
 @Internal
-class ModuleServer extends AbstractModule
+final class ModuleServer extends AbstractModule
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(ModuleServer.class);
@@ -88,6 +89,29 @@ class ModuleServer extends AbstractModule
                 .send();
             
             return YelpAPI.NO_OP;
+        }
+    }
+    
+    @Provides
+    @Singleton
+    GooglePlacesAPI provideGooglePlacesAPI(Aroma aroma) throws Exception
+    {
+        try
+        {
+            String apiKey = Files.readFile("../api-keys/google-places.txt").trim();
+            
+            return GooglePlacesAPI.create(apiKey);
+        }
+        catch(Exception ex)
+        {
+            LOG.error("Failed to initialized Google Places API", ex);
+            
+            aroma.begin().titled("Initialization Failed")
+                .text("Failed to initialized Google Places API", ex)
+                .withUrgency(Urgency.HIGH)
+                .send();
+            
+            return GooglePlacesAPI.NO_OP;
         }
     }
 }

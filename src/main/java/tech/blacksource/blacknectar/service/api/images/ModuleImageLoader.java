@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 BlackWholeLabs.
+ * Copyright 2016 BlackSourceLabs.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,30 +15,26 @@
  */
 
  
-package tech.blacksource.blacknectar.service.api.operations;
+package tech.blacksource.blacknectar.service.api.images;
 
 
 import com.google.inject.AbstractModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.blacksource.blacknectar.service.api.images.ModuleImageLoader;
 
 /**
  *
  * @author SirWellington
  */
-public final class ModuleOperations extends AbstractModule
+public final class ModuleImageLoader extends AbstractModule
 {
-    private final static Logger LOG = LoggerFactory.getLogger(ModuleOperations.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ModuleImageLoader.class);
 
     @Override
     protected void configure()
     {
-        install(new ModuleImageLoader());
-        
-        bind(GetSampleStoreOperation.class);
-        bind(SayHelloOperation.class);
-        bind(SearchStoresOperation.class);
+        bind(ImageLoader.class).annotatedWith(Yelp.class).to(YelpImageLoader.class);
+        bind(ImageLoader.class).annotatedWith(Google.class).to(GoogleImageLoader.class);
     }
-
+    
 }

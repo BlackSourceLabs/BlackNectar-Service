@@ -21,6 +21,7 @@ package tech.blacksource.blacknectar.service.api.operations;
 import com.google.inject.AbstractModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.blacksource.blacknectar.service.api.images.ModuleImageLoader;
 
 /**
  *
@@ -33,6 +34,8 @@ public final class ModuleOperations extends AbstractModule
     @Override
     protected void configure()
     {
+        install(new ModuleImageLoader());
+        
         bind(GetSampleStoreOperation.class);
         bind(SayHelloOperation.class);
         bind(SearchStoresOperation.class);

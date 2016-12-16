@@ -50,7 +50,7 @@ final class GoogleImageLoader implements ImageLoader
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(GoogleImageLoader.class);
-    static final int DEFAULT_RADIUS = 5_000;
+    static final int DEFAULT_RADIUS = 1_000;
 
     private final Aroma aroma;
     private final GooglePlacesAPI google;

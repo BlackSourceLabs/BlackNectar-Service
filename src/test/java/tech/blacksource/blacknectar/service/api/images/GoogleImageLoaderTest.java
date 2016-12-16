@@ -131,7 +131,7 @@ public class GoogleImageLoaderTest
         Location location = Location.of(store.getLocation().getLatitude(), store.getLocation().getLongitude());
 
         return NearbySearchRequest.newBuilder()
-            .withKeyword(store.getName())
+            .withKeyword(store.getName().toLowerCase())
             .withLocation(location)
             .withRadiusInMeters(DEFAULT_RADIUS)
             .build();

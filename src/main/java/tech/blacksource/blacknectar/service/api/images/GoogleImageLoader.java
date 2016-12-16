@@ -36,6 +36,7 @@ import tech.redroma.google.places.exceptions.GooglePlacesException;
 import tech.redroma.google.places.requests.GetPhotoRequest;
 import tech.redroma.google.places.requests.NearbySearchRequest;
 import tech.sirwellington.alchemy.annotations.access.Internal;
+import tech.sirwellington.alchemy.arguments.Checks;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
@@ -199,6 +200,11 @@ final class GoogleImageLoader implements ImageLoader
 
     private boolean namesMatch(String first, String second)
     {
+        if (Checks.anyAreNullOrEmpty(first, second))
+        {
+            return false;
+        }
+        
         first = first.toLowerCase();
         second = second.toLowerCase();
         

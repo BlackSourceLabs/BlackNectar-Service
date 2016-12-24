@@ -74,93 +74,93 @@ public class SearchStoresOperationTest
 {
 
     private Aroma aroma;
-    
+
     @Mock
     private BlackNectarService service;
-    
+
     @Mock
     private ImageLoader secondaryImageLoader;
-    
+
     @Mock
     private ImageLoader primaryImageLoader;
-    
+
     @GenerateList(Store.class)
     private List<Store> stores;
-    
+
     private Map<Store, URL> images;
-    
+
     @Mock
     private Request request;
-    
+
     @Mock
     private Response response;
-    
+
     @GenerateString(ALPHANUMERIC)
     private String queryString;
-    
+
     private String ip;
-    
+
     private SearchStoresOperation instance;
-    
+
     private double latitude;
     private double longitude;
-    
+
     @GenerateString
     private String searchTerm;
-    
+
     @GenerateInteger(POSITIVE)
     private Integer radius;
-    
+
     @GenerateInteger
     private Integer limit;
-    
+
     private QueryParamsMap queryParams;
-    
+
     private BlackNectarSearchRequest expectedSearchRequest;
-    
+
     @Before
     public void setUp() throws Exception
     {
-        
+
         setupData();
         setupMocks();
-        
+
         instance = new SearchStoresOperation(aroma, service, primaryImageLoader, secondaryImageLoader);
     }
-    
+
     private void setupData() throws Exception
     {
         ip = one(ip4Addresses());
         latitude = one(latitudes());
         longitude = one(longitudes());
-        
+
         expectedSearchRequest = createExpectedRequest();
         images = Maps.create();
     }
-    
+
     private void setupMocks() throws Exception
     {
         aroma = Aroma.create();
-        
+
         queryParams = createQueryParams();
-        
+
         when(request.ip()).thenReturn(ip);
         when(request.queryString()).thenReturn(queryString);
         when(request.queryMap()).thenReturn(queryParams);
         when(request.queryParams()).thenReturn(QueryKeys.KEYS);
-        
+
         when(service.searchForStores(expectedSearchRequest)).thenReturn(stores);
-        
-        for (Store store : stores)
+
+        stores.stream().forEach((store) ->
         {
             URL url = one(httpsUrls());
             images.put(store, url);
-            
+
             when(primaryImageLoader.getImageFor(store)).thenReturn(url);
-        }
-        
+        });
+
     }
-    
+
     @DontRepeat
     @Test
     public void testConstructor()
@@ -170,19 +170,61 @@ public class SearchStoresOperationTest
         assertThrows(() -> new SearchStoresOperation(aroma, service, null, secondaryImageLoader));
         assertThrows(() -> new SearchStoresOperation(aroma, service, primaryImageLoader, null));
     }
-    
+
     @Test
     public void testHandle() throws Exception
     {
         JsonArray array = instance.handle(request, response);
-        
+
         JsonArray expected = stores.stream()
             .map(this::storeWithImage)
             .map(Store::asJSON)
             .collect(JSON.collectArray());
-        
+
         assertThat(array, is(expected));
+
+    }
+
+    @Test
+    public void testWhenPrimaryAndSecondaryHaveNoImage() throws Exception
+    {
+        when(primaryImageLoader.getImageFor(any())).thenReturn(null);
+        when(secondaryImageLoader.getImageFor(any())).thenReturn(null);
+
+        JsonArray expectedResponse = stores.stream()
+            .map(Store::asJSON)
+            .collect(collectArray());
+
+        JsonArray jsonResponse = instance.handle(request, response);
+
+        assertThat(jsonResponse, is(expectedResponse));
+
+        stores.forEach(s -> verify(primaryImageLoader).getImageFor(s));
+        stores.forEach(s -> verify(secondaryImageLoader).getImageFor(s));
+
+    }
+    
+    @Test
+    public void testWhenPrimaryImageLoaderHasNoImage() throws Exception
+    {
+        //Expect that the secondary will be asked for an image
+        when(primaryImageLoader.getImageFor(any())).thenReturn(null);
+        images.forEach((store, url) ->
+        {
+            when(secondaryImageLoader.getImageFor(store)).thenReturn(url);
+        });
         
+        JsonArray expectedResponse = stores.stream()
+            .map(this::storeWithImage)
+            .map(Store::asJSON)
+            .collect(collectArray());
+        
+        JsonArray result = instance.handle(request, response);
+        
+        assertThat(result, is(expectedResponse));
+        
+        stores.forEach(s -> verify(primaryImageLoader).getImageFor(s));
+        stores.forEach(s -> verify(secondaryImageLoader).getImageFor(s));
     }
     
     @DontRepeat
@@ -192,75 +234,56 @@ public class SearchStoresOperationTest
         assertThrows(() -> instance.handle(request, null)).isInstanceOf(BadArgumentException.class);
         assertThrows(() -> instance.handle(null, response)).isInstanceOf(BadArgumentException.class);
     }
-    
+
     @DontRepeat
     @Test
     public void testHandleWithUnrecognizedQueryKeys() throws Exception
     {
         Set<String> params = toSet(listOf(alphabeticString()));
         when(request.queryParams()).thenReturn(params);
-        
+
         assertThrows(() -> instance.handle(request, response))
             .isInstanceOf(BadArgumentException.class);
     }
-    
-    @Test
-    public void testWhenPrimaryAndSecondaryHaveNoImage() throws Exception
-    {
-        when(primaryImageLoader.getImageFor(any())).thenReturn(null);
-        when(secondaryImageLoader.getImageFor(any())).thenReturn(null);
-        
-        JsonArray expectedResponse = stores.stream()
-            .map(Store::asJSON)
-            .collect(collectArray());
-        
-        JsonArray jsonResponse = instance.handle(request, response);
-        
-        assertThat(jsonResponse, is(expectedResponse));
-        
-        stores.forEach(s -> verify(primaryImageLoader).getImageFor(s));
-        stores.forEach(s -> verify(secondaryImageLoader).getImageFor(s));
-        
-    }
-    
+
     private BlackNectarSearchRequest createExpectedRequest()
     {
         BlackNectarSearchRequest expectedRequest = new BlackNectarSearchRequest();
-        
+
         expectedRequest.withCenter(Location.with(latitude, longitude))
             .withLimit(limit)
             .withRadius(radius)
             .withSearchTerm(searchTerm);
-        
+
         return expectedRequest;
     }
-    
+
     private QueryParamsMap createQueryParams()
     {
         QueryParamsMap params = mock(QueryParamsMap.class);
-        
+
         when(params.hasKey(QueryKeys.LATITUDE)).thenReturn(true);
         when(params.hasKey(QueryKeys.LONGITUDE)).thenReturn(true);
         when(params.hasKey(QueryKeys.RADIUS)).thenReturn(true);
         when(params.hasKey(QueryKeys.LIMIT)).thenReturn(true);
         when(params.hasKey(QueryKeys.SEARCH_TERM)).thenReturn(true);
-        
+
         when(params.value(QueryKeys.LATITUDE)).thenReturn(String.valueOf(latitude));
         when(params.value(QueryKeys.LONGITUDE)).thenReturn(String.valueOf(longitude));
         when(params.value(QueryKeys.RADIUS)).thenReturn(radius.toString());
         when(params.value(QueryKeys.LIMIT)).thenReturn(limit.toString());
         when(params.value(QueryKeys.SEARCH_TERM)).thenReturn(searchTerm);
-        
+
         return params;
     }
-    
+
     private Store storeWithImage(Store store)
     {
         URL url = images.get(store);
-        
+
         return Store.Builder.fromStore(store)
             .withMainImageURL(url.toString())
             .build();
     }
-    
+
 }

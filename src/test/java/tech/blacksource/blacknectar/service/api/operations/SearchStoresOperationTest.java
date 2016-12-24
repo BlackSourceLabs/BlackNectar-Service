@@ -75,10 +75,10 @@ public class SearchStoresOperationTest
     private BlackNectarService service;
     
     @Mock
-    private ImageLoader googleLoader;
+    private ImageLoader secondaryImageLoader;
     
     @Mock
-    private ImageLoader yelpLoader;
+    private ImageLoader primaryImageLoader;
     
     @GenerateList(Store.class)
     private List<Store> stores;
@@ -122,7 +122,7 @@ public class SearchStoresOperationTest
         setupData();
         setupMocks();
         
-        instance = new SearchStoresOperation(aroma, service, yelpLoader);
+        instance = new SearchStoresOperation(aroma, service, primaryImageLoader, secondaryImageLoader);
     }
 
 
@@ -155,7 +155,7 @@ public class SearchStoresOperationTest
             URL url = one(httpsUrls());
             images.put(store, url);
             
-            when(yelpLoader.getImageFor(store)).thenReturn(url);
+            when(primaryImageLoader.getImageFor(store)).thenReturn(url);
         }
         
     }
@@ -164,9 +164,10 @@ public class SearchStoresOperationTest
     @Test
     public void testConstructor()
     {
-        assertThrows(() -> new SearchStoresOperation(null, service, yelpLoader));
-        assertThrows(() -> new SearchStoresOperation(aroma, null, yelpLoader));
-        assertThrows(() -> new SearchStoresOperation(aroma, service, null));
+        assertThrows(() -> new SearchStoresOperation(null, service, primaryImageLoader, secondaryImageLoader));
+        assertThrows(() -> new SearchStoresOperation(aroma, null, primaryImageLoader, secondaryImageLoader));
+        assertThrows(() -> new SearchStoresOperation(aroma, service, null, secondaryImageLoader));
+        assertThrows(() -> new SearchStoresOperation(aroma, service, primaryImageLoader, null));
     }
     
     @Test

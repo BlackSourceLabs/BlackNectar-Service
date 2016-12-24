@@ -36,6 +36,7 @@ import tech.blacksource.blacknectar.service.api.BlackNectarSearchRequest;
 import tech.blacksource.blacknectar.service.api.BlackNectarService;
 import tech.blacksource.blacknectar.service.api.images.Google;
 import tech.blacksource.blacknectar.service.api.images.ImageLoader;
+import tech.blacksource.blacknectar.service.api.images.Yelp;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
 import tech.blacksource.blacknectar.service.stores.Location;
@@ -72,17 +73,22 @@ public class SearchStoresOperation implements Route
 
     private final Aroma aroma;
     private final BlackNectarService service;
-    private final ImageLoader imageLoader;
+    private final ImageLoader primaryImageLoader;
+    private final ImageLoader secondaryImageLoader;
 
     @Inject
-    public SearchStoresOperation(Aroma aroma, BlackNectarService service, @Google ImageLoader imageLoader)
+    public SearchStoresOperation(Aroma aroma,
+                                 BlackNectarService service,
+                                 @Google ImageLoader primaryImageLoader,
+                                 @Yelp ImageLoader secondaryImageLoader)
     {
-        checkThat(aroma, service, imageLoader)
+        checkThat(aroma, service, primaryImageLoader, secondaryImageLoader)
             .are(notNull());
 
         this.aroma = aroma;
         this.service = service;
-        this.imageLoader = imageLoader;
+        this.primaryImageLoader = primaryImageLoader;
+        this.secondaryImageLoader = secondaryImageLoader;
     }
 
     @Override
@@ -292,7 +298,12 @@ public class SearchStoresOperation implements Route
 
     private Store tryToEnrichStoreWithImage(Store store)
     {
-        URL url = imageLoader.getImageFor(store);
+        URL url = primaryImageLoader.getImageFor(store);
+        
+        if (Objects.isNull(url))
+        {
+            url = secondaryImageLoader.getImageFor(store);
+        }
 
         if (Objects.nonNull(url))
         {

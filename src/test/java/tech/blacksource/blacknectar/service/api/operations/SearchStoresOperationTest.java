@@ -47,9 +47,12 @@ import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static sir.wellington.alchemy.collections.sets.Sets.toSet;
+import static tech.blacksource.blacknectar.service.JSON.collectArray;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.generator.GeolocationGenerators.latitudes;
@@ -67,8 +70,9 @@ import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.
  */
 @Repeat(50)
 @RunWith(AlchemyTestRunner.class)
-public class SearchStoresOperationTest 
+public class SearchStoresOperationTest
 {
+
     private Aroma aroma;
     
     @Mock
@@ -100,21 +104,20 @@ public class SearchStoresOperationTest
     
     private double latitude;
     private double longitude;
-   
+    
     @GenerateString
     private String searchTerm;
-   
+    
     @GenerateInteger(POSITIVE)
     private Integer radius;
-   
+    
     @GenerateInteger
     private Integer limit;
     
     private QueryParamsMap queryParams;
-
     
     private BlackNectarSearchRequest expectedSearchRequest;
-
+    
     @Before
     public void setUp() throws Exception
     {
@@ -124,14 +127,12 @@ public class SearchStoresOperationTest
         
         instance = new SearchStoresOperation(aroma, service, primaryImageLoader, secondaryImageLoader);
     }
-
-
+    
     private void setupData() throws Exception
     {
         ip = one(ip4Addresses());
         latitude = one(latitudes());
         longitude = one(longitudes());
-        
         
         expectedSearchRequest = createExpectedRequest();
         images = Maps.create();
@@ -140,7 +141,7 @@ public class SearchStoresOperationTest
     private void setupMocks() throws Exception
     {
         aroma = Aroma.create();
-
+        
         queryParams = createQueryParams();
         
         when(request.ip()).thenReturn(ip);
@@ -159,7 +160,7 @@ public class SearchStoresOperationTest
         }
         
     }
-
+    
     @DontRepeat
     @Test
     public void testConstructor()
@@ -179,11 +180,11 @@ public class SearchStoresOperationTest
             .map(this::storeWithImage)
             .map(Store::asJSON)
             .collect(JSON.collectArray());
-
+        
         assertThat(array, is(expected));
-            
+        
     }
-
+    
     @DontRepeat
     @Test
     public void testHandleWithBadArguments() throws Exception
@@ -202,7 +203,26 @@ public class SearchStoresOperationTest
         assertThrows(() -> instance.handle(request, response))
             .isInstanceOf(BadArgumentException.class);
     }
-
+    
+    @Test
+    public void testWhenPrimaryAndSecondaryHaveNoImage() throws Exception
+    {
+        when(primaryImageLoader.getImageFor(any())).thenReturn(null);
+        when(secondaryImageLoader.getImageFor(any())).thenReturn(null);
+        
+        JsonArray expectedResponse = stores.stream()
+            .map(Store::asJSON)
+            .collect(collectArray());
+        
+        JsonArray jsonResponse = instance.handle(request, response);
+        
+        assertThat(jsonResponse, is(expectedResponse));
+        
+        stores.forEach(s -> verify(primaryImageLoader).getImageFor(s));
+        stores.forEach(s -> verify(secondaryImageLoader).getImageFor(s));
+        
+    }
+    
     private BlackNectarSearchRequest createExpectedRequest()
     {
         BlackNectarSearchRequest expectedRequest = new BlackNectarSearchRequest();
@@ -214,7 +234,7 @@ public class SearchStoresOperationTest
         
         return expectedRequest;
     }
-
+    
     private QueryParamsMap createQueryParams()
     {
         QueryParamsMap params = mock(QueryParamsMap.class);
@@ -233,7 +253,6 @@ public class SearchStoresOperationTest
         
         return params;
     }
-
     
     private Store storeWithImage(Store store)
     {
@@ -243,5 +262,5 @@ public class SearchStoresOperationTest
             .withMainImageURL(url.toString())
             .build();
     }
-
+    
 }

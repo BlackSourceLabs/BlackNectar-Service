@@ -49,6 +49,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static sir.wellington.alchemy.collections.sets.Sets.toSet;
@@ -172,7 +173,7 @@ public class SearchStoresOperationTest
     }
 
     @Test
-    public void testHandle() throws Exception
+    public void testHandleWhenPrimaryHasImage() throws Exception
     {
         JsonArray array = instance.handle(request, response);
 
@@ -183,6 +184,7 @@ public class SearchStoresOperationTest
 
         assertThat(array, is(expected));
 
+        stores.forEach(s -> verify(secondaryImageLoader, never()).getImageFor(s));
     }
 
     @Test

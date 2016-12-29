@@ -204,6 +204,12 @@
             <version>3.15.1</version>
         </dependency>
         
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.4.1212</version>
+        </dependency>
+        
         
         <!--=======================-->
         <!--YELP-->
@@ -222,7 +228,7 @@
             <artifactId>google-places-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-        
+
     </dependencies>
 
 

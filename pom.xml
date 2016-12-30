@@ -220,6 +220,7 @@
             <version>1.0</version>
         </dependency>
         
+        
         <!--=======================-->
         <!--GOOGLE PLACES-->
         <!--=======================-->
@@ -320,6 +321,7 @@
                 </executions>
             </plugin>
             
+            
             <!--DEPENDENCY PLUGIN-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -344,6 +346,8 @@
                 </executions>
             </plugin>
                 
+                
+            <!--JAR PLUGIN-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -360,6 +364,8 @@
                 </configuration>
             </plugin>
 
+
+            <!--ASSEMBLY PLUGIN-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>

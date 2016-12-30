@@ -23,6 +23,7 @@ package tech.blacksource.blacknectar.service.api;
  */
 class SQLColumns 
 {
+    static final String STORE_ID = "store_id";
     static final String STORE_NAME = "store_name";
     static final String LATITUDE = "latitude";
     static final String LONGITUDE = "longitude";

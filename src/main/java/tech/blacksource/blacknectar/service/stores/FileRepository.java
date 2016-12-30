@@ -49,18 +49,21 @@ final class FileRepository implements StoreRepository
     private final static Logger LOG = LoggerFactory.getLogger(FileRepository.class);
     private static final String FILENAME = "Stores.csv";
 
-    private final List<Store> stores = loadAllStores();
-    private final int MAXIMUM_STORES = 30_000;
+    private final List<Store> stores;
+    final static int MAXIMUM_STORES = 30_000;
 
     private final Aroma aroma;
+    private final IDGenerator idGenerator;
 
     @Inject
-    FileRepository(Aroma aroma)
+    FileRepository(Aroma aroma, IDGenerator idGenerator)
     {
-        checkThat(aroma)
+        checkThat(aroma, idGenerator)
             .is(notNull());
 
         this.aroma = aroma;
+        this.idGenerator = idGenerator;
+        this.stores = loadAllStores();
     }
 
     @Override
@@ -227,8 +230,12 @@ final class FileRepository implements StoreRepository
         {
             addressBuilder = addressBuilder.withCounty(county);
         }
+        
+        //Finally, generate an ID for the Store
+        String storeId = idGenerator.generateKey();
 
         return Store.Builder.newInstance()
+            .withStoreID(storeId)
             .withAddress(addressBuilder.build())
             .withLocation(location)
             .withName(storeName)

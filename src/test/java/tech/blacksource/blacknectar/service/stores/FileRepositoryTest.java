@@ -20,18 +20,22 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import tech.aroma.client.Aroma;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
-import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Answers.RETURNS_MOCKS;
+import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.doubles;
@@ -48,8 +52,12 @@ import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticSt
 public class FileRepositoryTest 
 {
     
-    @GeneratePojo
     private Store store;
+    
+    
+    @Mock(answer = RETURNS_MOCKS)
+    private Aroma aroma;
+    private IDGenerator idGenerator;
     
     private FileRepository instance;
 
@@ -58,22 +66,24 @@ public class FileRepositoryTest
     {
         
         setupData();
-        instance = new FileRepository(Aroma.create());
+        instance = new FileRepository(aroma, idGenerator);
     }
 
 
     private void setupData() throws Exception
     {
-        
+        store = one(stores());
     }
 
     @DontRepeat
     @Test
     public void testGetAllStores()
     {
-        List<Store> stores = instance.getAllStores();
-        assertThat(stores, notNullValue());
-        assertThat(stores.size(), greaterThanOrEqualTo(30_000));
+        List<Store> result = instance.getAllStores();
+        assertThat(result, notNullValue());
+        assertThat(result, not(empty()));
+        assertThat(result.size(), greaterThanOrEqualTo(3000));
+        assertThat(result.size(), lessThanOrEqualTo(FileRepository.MAXIMUM_STORES));
     }
 
     @DontRepeat

@@ -73,6 +73,7 @@ interface SQLStoreMapper
                 longitude = null;
             }
 
+            String storeId = results.getString(SQLColumns.STORE_ID);
             String address = results.getString(SQLColumns.ADDRESS);
             String addressTwo = results.getString(SQLColumns.ADDRESS_LINE_TWO);
             String city = results.getString(SQLColumns.CITY);
@@ -109,6 +110,7 @@ interface SQLStoreMapper
             }
 
             Store.Builder storeBuilder = Store.Builder.newInstance()
+                .withStoreID(storeId)
                 .withAddress(addressBuilder.build())
                 .withName(name);
 

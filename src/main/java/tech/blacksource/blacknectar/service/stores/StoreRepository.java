@@ -35,5 +35,5 @@ public interface StoreRepository
      */
     List<Store> getAllStores();
     
-    static StoreRepository FILE = new FileRepository(Aroma.create());
+    static StoreRepository FILE = new FileRepository(Aroma.create(), IDGenerator.uuids());
 }

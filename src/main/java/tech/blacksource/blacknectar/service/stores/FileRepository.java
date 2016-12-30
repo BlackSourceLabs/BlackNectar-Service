@@ -94,6 +94,7 @@ final class FileRepository implements StoreRepository
     String readCSVFile()
     {
         URL url;
+        
         try
         {
             url = Resources.getResource(FILENAME);
@@ -110,6 +111,7 @@ final class FileRepository implements StoreRepository
 
             return "";
         }
+        
         try
         {
             return Resources.toString(url, Charsets.UTF_8);
@@ -131,6 +133,7 @@ final class FileRepository implements StoreRepository
     List<String> splitFileIntoLines(String file)
     {
         String[] lines = file.split("\n");
+        
         if (lines == null || lines.length == 0)
         {
             return Lists.emptyList();
@@ -142,7 +145,9 @@ final class FileRepository implements StoreRepository
     Store toStore(String line)
     {
         String[] components = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+        
         if (components == null || components.length == 0)
+            
         {
             LOG.debug("Received empty components");
             return null;

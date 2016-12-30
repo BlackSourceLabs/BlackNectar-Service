@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS Stores
 (
-	store_id uuid PRIMARY KEY,
+	store_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     store_name VARCHAR(100),
     latitude NUMERIC,
     longitude NUMERIC,

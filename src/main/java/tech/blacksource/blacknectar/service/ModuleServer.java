@@ -65,7 +65,12 @@ final class ModuleServer extends AbstractModule
     @Singleton
     Connection provideSQLConnection() throws SQLException
     {
-        return DriverManager.getConnection("jdbc:sqlite::resource:Stores.db");
+        String user = "blacknectar";
+        String password = "";
+        String schema = "blacknectar";
+        
+        String url = String.format("jdbc:postgresql://localhost:5432/postgres?user=%s&password=%s&currentSchema=%s", user, password, schema);
+        return DriverManager.getConnection(url);
     }
 
     @Provides

@@ -35,7 +35,6 @@ import tech.sirwellington.alchemy.generator.NetworkGenerators;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateList;
-import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.is;
@@ -61,7 +60,6 @@ public class YelpImageLoaderTest
 
     private YelpBusiness matchingBusiness;
 
-    @GeneratePojo
     private Store store;
 
     @Mock(answer = RETURNS_MOCKS)

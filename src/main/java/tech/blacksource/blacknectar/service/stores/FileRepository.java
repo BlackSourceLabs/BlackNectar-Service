@@ -22,10 +22,8 @@ import com.google.common.io.Resources;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.slf4j.Logger;
@@ -260,13 +258,6 @@ final class FileRepository implements StoreRepository
     private void removeFirstLine(List<String> lines)
     {
         lines.remove(0);
-    }
-
-    private void removeDuplicates(List<String> lines)
-    {
-        Set<String> set = new LinkedHashSet<>(lines);
-        lines.clear();
-        lines.addAll(set);
     }
 
 }

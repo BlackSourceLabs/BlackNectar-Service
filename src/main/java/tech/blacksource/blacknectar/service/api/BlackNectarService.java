@@ -21,12 +21,16 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import tech.aroma.client.Aroma;
+import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.blacksource.blacknectar.service.stores.StoreRepository;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 
+/*
+ * TODO: Rename this interface to StoreRepository.
+ */
 /**
  * The BlackNectarService serves as the Backbone for the REST API.
  * 
@@ -42,6 +46,14 @@ public interface BlackNectarService
      * 5 Kilometers.
      */
     public double DEFAULT_RADIUS = 5_000;
+    
+    /**
+     * Adds a Store to the repository.
+     * 
+     * @param store The store to add.
+     * @throws BadArgumentException If the argument is null or invalid.
+     */
+    public void addStore(@Required Store store) throws BadArgumentException;
 
     /**
      * Get all of the EBT stores in the country.

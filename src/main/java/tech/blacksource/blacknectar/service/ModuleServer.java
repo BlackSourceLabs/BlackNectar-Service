@@ -65,8 +65,8 @@ final class ModuleServer extends AbstractModule
     @Singleton
     Connection provideSQLConnection() throws SQLException
     {
-        String user = Files.readFile("../secrets/postgres-user.txt");
-        String password = Files.readFile("../secrets/postgres-password.txt");
+        String user = Files.readFile("../secrets/postgres-user.txt").trim();
+        String password = Files.readFile("../secrets/postgres-password.txt").trim();
         
         String url = String.format("jdbc:postgresql://localhost:5432/postgres?user=%s&password=%s", user, password);
         return DriverManager.getConnection(url);

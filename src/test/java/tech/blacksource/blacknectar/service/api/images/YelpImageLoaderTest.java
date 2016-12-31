@@ -152,7 +152,7 @@ public class YelpImageLoaderTest
         yelpAddress.address2 = address.getAddressLineTwo();
         yelpAddress.city = address.getCity();
         yelpAddress.state = address.getState();
-        yelpAddress.zipCode = String.valueOf(address.getZip5());
+        yelpAddress.zipCode = String.valueOf(address.getZipCode());
 
         return yelpAddress;
     }

@@ -39,6 +39,7 @@ import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static tech.blacksource.blacknectar.service.stores.Store.validStore;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.BooleanAssertions.falseStatement;
@@ -77,6 +78,52 @@ final class SQLBlackNectarService implements BlackNectarService
         this.connection = connection;
         this.geoCalculator = geoCalculator;
         this.storeMapper = storeMapper;
+    }
+
+    @Override
+    public void addStore(@Required Store store) throws OperationFailedException
+    {
+        checkThat(store)
+            .throwing(BadArgumentException.class)
+            .is(notNull())
+            .is(validStore());
+
+        String insertStatement = createSQLToInsertStore();
+        PreparedStatement statement = tryToPrepareStatement(insertStatement, "could not save Store to Database: " + store);
+
+        try
+        {
+            prepareStatementForStore(statement, store);
+        }
+        catch (SQLException ex)
+        {
+            LOG.error("Failed to prepare statement to insert Store [{}]", store, ex);
+
+            aroma.begin().titled("SQL Failed")
+                .text("Could not prepare statement to insert Store: [{}]", store, ex)
+                .withUrgency(Urgency.HIGH)
+                .send();
+
+            throw new OperationFailedException(ex);
+        }
+
+        try
+        {
+            int count = statement.executeUpdate();
+            LOG.info("Successfully executed statement to insert Store. Received count {} for store [{}]", count, store);
+        }
+        catch (SQLException ex)
+        {
+            LOG.error("Failed to execute statement to insert Store: [{}]", store, ex);
+
+            aroma.begin().titled("SQL Failed")
+                .text("Could not execute SQL to insert Store [{}]", store, ex)
+                .withUrgency(Urgency.HIGH)
+                .send();
+
+            throw new OperationFailedException(ex);
+        }
+
     }
 
     @Override
@@ -136,49 +183,6 @@ final class SQLBlackNectarService implements BlackNectarService
         }
     }
 
-    void addStore(@Required Store store) throws OperationFailedException
-    {
-        checkThat(store)
-            .throwing(BadArgumentException.class)
-            .is(notNull());
-
-        String insertStatement = createSQLToInsertStore();
-        PreparedStatement statement = tryToPrepareStatement(insertStatement, "could not save Store to Database: " + store);
-
-        try
-        {
-            prepareStatementForStore(statement, store);
-        }
-        catch (SQLException ex)
-        {
-            LOG.error("Failed to prepare statement to insert Store [{}]", store, ex);
-
-            aroma.begin().titled("SQL Failed")
-                .text("Could not prepare statement to insert Store: [{}]", store, ex)
-                .withUrgency(Urgency.HIGH)
-                .send();
-
-            throw new OperationFailedException(ex);
-        }
-
-        try
-        {
-            int count = statement.executeUpdate();
-            LOG.info("Successfully executed statement to insert Store. Received count {} for store [{}]", count, store);
-        }
-        catch (SQLException ex)
-        {
-            LOG.error("Failed to execute statement to insert Store: [{}]", store, ex);
-
-            aroma.begin().titled("SQL Failed")
-                .text("Could not execute SQL to insert Store [{}]", store, ex)
-                .withUrgency(Urgency.HIGH)
-                .send();
-
-            throw new OperationFailedException(ex);
-        }
-
-    }
 
     private PreparedStatement createStatementToGetAllStores(int limit) throws OperationFailedException
     {
@@ -213,8 +217,9 @@ final class SQLBlackNectarService implements BlackNectarService
 
     private String createSQLToInsertStore()
     {
-        return "INSERT INTO Stores(store_name, latitude, longitude, address, address_line_two, city, state, county, zip_code, local_zip_code)\n" +
-               "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        return "INSERT INTO blacknectar.stores(\n" +
+               "	store_name, latitude, longitude, address_line_one, address_line_two, city, state, county, zip_code, local_zip_code)\n" +
+               "	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
     }
 
     private PreparedStatement tryToPrepareStatement(String insertStatement, String message)
@@ -252,21 +257,23 @@ final class SQLBlackNectarService implements BlackNectarService
 
     String getStatementToCreateTable()
     {
-        return "CREATE TABLE IF NOT EXISTS Stores\n" +
+        return "CREATE TABLE IF NOT EXISTS BlackNectar.Stores\n" +
                "(\n" +
-               "    store_name text,\n" +
-               "    latitude numeric,\n" +
-               "    longitude numeric,\n" +
-               "    address text,\n" +
-               "    address_line_two text,\n" +
-               "    city text,\n" +
-               "    state text,\n" +
-               "    county text,\n" +
-               "    zip_code text,\n" +
-               "    local_zip_code text,\n" +
+               "	store_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),\n" +
+               "    store_name VARCHAR(100),\n" +
+               "    latitude NUMERIC NOT NULL,\n" +
+               "    longitude NUMERIC NOT NULL,\n" +
+               "    location GEOGRAPHY,\n" +
+               "    address_line_one VARCHAR(100),\n" +
+               "    address_line_two VARCHAR(100),\n" +
+               "    city VARCHAR(100),\n" +
+               "    state VARCHAR(5),\n" +
+               "    county VARCHAR(100),\n" +
+               "    zip_code INTEGER,\n" +
+               "    local_zip_code INTEGER,\n" +
                "\n" +
-               "    PRIMARY KEY(store_name, latitude, longitude)\n" +
-               ")";
+               "    CONSTRAINT Unique_Stores UNIQUE(store_name, latitude, longitude)\n" +
+               ");";
     }
 
     private ResultSet tryToGetResults(PreparedStatement statement, String errorMessage)

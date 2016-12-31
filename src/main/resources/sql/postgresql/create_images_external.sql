@@ -8,5 +8,5 @@ CREATE TABLE IF NOT EXISTS BlackNectar.Images_External
 		height INT,
 		width INT,
 		size_in_bytes INT,
-		file_type VARCHAR(5)
+		file_type TEXT
 );

@@ -3,7 +3,7 @@
 
 CREATE TABLE IF NOT EXISTS BlackNectar.Stores
 (
-	store_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+		store_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     store_name VARCHAR(100),
     latitude NUMERIC NOT NULL,
     longitude NUMERIC NOT NULL,

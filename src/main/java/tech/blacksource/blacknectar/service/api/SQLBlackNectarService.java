@@ -24,6 +24,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Predicate;
 import javax.inject.Inject;
 import org.slf4j.Logger;
@@ -243,7 +244,9 @@ final class SQLBlackNectarService implements BlackNectarService
 
     void prepareStatementToInsertStore(PreparedStatement statement, Store store) throws SQLException
     {
-        statement.setString(1, store.getStoreId());
+        UUID storeUuid = UUID.fromString(store.getStoreId());
+        
+        statement.setObject(1, storeUuid);
         statement.setString(2, store.getName());
         statement.setDouble(3, store.getLocation().getLatitude());
         statement.setDouble(4, store.getLocation().getLongitude());
@@ -252,8 +255,8 @@ final class SQLBlackNectarService implements BlackNectarService
         statement.setString(7, store.getAddress().getCity());
         statement.setString(8, store.getAddress().getState());
         statement.setString(9, store.getAddress().getCounty());
-        statement.setString(10, "" + store.getAddress().getZip5());
-        statement.setString(11, "" + store.getAddress().getZip4());
+        statement.setString(10,  store.getAddress().getZipCode());
+        statement.setString(11, store.getAddress().getLocalZipCode());
     }
 
     String getStatementToCreateTable()

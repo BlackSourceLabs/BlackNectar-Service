@@ -43,7 +43,6 @@ import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.doubles;
-import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.UUID;
 
@@ -56,8 +55,6 @@ import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.
 @RunWith(AlchemyTestRunner.class)
 public class FileRepositoryTest 
 {
-    
-    
     
     @Mock(answer = RETURNS_MOCKS)
     private Aroma aroma;
@@ -138,15 +135,6 @@ public class FileRepositoryTest
         Location result = instance.extractLocationFrom(latitudeString, longitudeString);
         assertThat(result.getLatitude(), is(latitude));
         assertThat(result.getLongitude(), is(longitude));
-    }
-
-    @Test
-    public void testExtractZipCode()
-    {
-        int zipCode = one(integers(0, 99_999));
-        
-        int result = instance.extractZipCode(String.valueOf(zipCode));
-        assertThat(result, is(zipCode));
     }
 
 }

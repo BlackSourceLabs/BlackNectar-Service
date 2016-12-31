@@ -199,13 +199,11 @@ final class FileRepository implements StoreRepository
         String addressLineTwo = components[4].replaceAll("\"", "");
         String city = components[5].replaceAll("\"", "");
         String state = components[6].replaceAll("\"", "");
-        String zip5 = components[7].replaceAll("\"", "");
-        String zip4 = components[8].replaceAll("\"", "").replaceAll(" ", "");
+        String zipCode = components[7].replaceAll("\"", "");
+        String localZipCode = components[8].replaceAll("\"", "").replaceAll(" ", "");
         String county = components[9].replaceAll("\"", "").replaceAll("\r", "");
 
         Location location = extractLocationFrom(latitudeString, longitudeString);
-
-        int zipCode = extractZipCode(zip5);
 
         Address.Builder addressBuilder = Address.Builder.newBuilder()
             .withAddressLineOne(addressLineOne)
@@ -213,11 +211,10 @@ final class FileRepository implements StoreRepository
             .withState(state)
             .withZipCode(zipCode);
 
-        if (!Strings.isNullOrEmpty(zip4))
+        if (!Strings.isNullOrEmpty(localZipCode))
         {
             try
             {
-                int localZipCode = extractZipCode(zip4);
                 addressBuilder = addressBuilder.withLocalZipCode(localZipCode);
             }
             catch (RuntimeException ex)
@@ -244,26 +241,6 @@ final class FileRepository implements StoreRepository
             .withLocation(location)
             .withName(storeName)
             .build();
-    }
-
-    int extractZipCode(String zipCode)
-    {
-        try
-        {
-            return Integer.valueOf(zipCode);
-        }
-        catch (NumberFormatException ex)
-        {
-            LOG.error("Failed to parse Zip codes: {}", zipCode, ex);
-
-            aroma.begin()
-                .titled("Conversion Failed")
-                .text("Could not parse Zip Code: {}", zipCode, ex)
-                .withUrgency(Urgency.MEDIUM)
-                .send();
-
-            throw new OperationFailedException(ex);
-        }
     }
 
     private void removeFirstLine(List<String> lines)

@@ -64,14 +64,19 @@ public class SQLBlackNectarServiceTest
 {
     @Mock
     private Connection connection;
+    
     @Mock
     private PreparedStatement preparedStatement;
+   
     @Mock
     private Statement statement;
+    
     @Mock
     private ResultSet resultSet;
+    
     @Mock
     private GeoCalculator geoCalculator;
+    
     @Mock
     private SQLStoreMapper storeMapper;
     

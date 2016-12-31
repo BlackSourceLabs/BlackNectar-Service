@@ -254,13 +254,13 @@ public class SQLBlackNectarServiceTest
         verify(preparedStatement).setDouble(4, store.getLocation().getLongitude());
         verify(preparedStatement).setDouble(5, store.getLocation().getLongitude());
         verify(preparedStatement).setDouble(6, store.getLocation().getLatitude());
-        verify(preparedStatement).setString(6, store.getAddress().getAddressLineOne());
-        verify(preparedStatement).setString(7, store.getAddress().getAddressLineTwo());
-        verify(preparedStatement).setString(8, store.getAddress().getCity());
-        verify(preparedStatement).setString(9, store.getAddress().getState());
-        verify(preparedStatement).setString(10, store.getAddress().getCounty());
-        verify(preparedStatement).setString(11, store.getAddress().getZipCode());
-        verify(preparedStatement).setString(12, store.getAddress().getLocalZipCode());
+        verify(preparedStatement).setString(7, store.getAddress().getAddressLineOne());
+        verify(preparedStatement).setString(8, store.getAddress().getAddressLineTwo());
+        verify(preparedStatement).setString(9, store.getAddress().getCity());
+        verify(preparedStatement).setString(10, store.getAddress().getState());
+        verify(preparedStatement).setString(11, store.getAddress().getCounty());
+        verify(preparedStatement).setString(12, store.getAddress().getZipCode());
+        verify(preparedStatement).setString(13, store.getAddress().getLocalZipCode());
     }
 
 }

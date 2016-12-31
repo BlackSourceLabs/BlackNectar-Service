@@ -30,6 +30,7 @@ import static tech.sirwellington.alchemy.generator.NumberGenerators.doubles;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphanumericString;
+import static tech.sirwellington.alchemy.generator.StringGenerators.uuids;
 
 /**
  *
@@ -71,6 +72,7 @@ public class BlackNectarGenerators
         return () ->
         {
             return Store.Builder.newInstance()
+                .withStoreID(one(uuids))
                 .withAddress(addresses().get())
                 .withLocation(locations().get())
                 .withName(one(alphabeticString()))

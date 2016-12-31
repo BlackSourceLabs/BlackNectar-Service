@@ -147,7 +147,6 @@ final class FileRepository implements StoreRepository
         String[] components = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
         
         if (components == null || components.length == 0)
-            
         {
             LOG.debug("Received empty components");
             return null;

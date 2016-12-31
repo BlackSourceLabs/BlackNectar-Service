@@ -23,7 +23,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -206,39 +205,52 @@ public class SQLBlackNectarServiceTest
         assertThat(first, is(store));
     }
 
-    @Ignore
     @Test
-    public void testAddStore()
+    public void testAddStore() throws Exception
     {
+        when(connection.prepareStatement(anyString()))
+            .thenReturn(preparedStatement);
+        
+        instance.addStore(store);
+        
+        verify(preparedStatement).executeUpdate();
+        
+        assertThatStatementWasPreparedAgainstStore(preparedStatement, store);
     }
 
     @Test
     public void testPrepareStatementForStore() throws Exception
     {
-        instance.prepareStatementForStore(preparedStatement, store);
+        instance.prepareStatementToInsertStore(preparedStatement, store);
         
-        verify(preparedStatement).setString(1, store.getName());
-        verify(preparedStatement).setDouble(2, store.getLocation().getLatitude());
-        verify(preparedStatement).setDouble(3, store.getLocation().getLongitude());;
-        verify(preparedStatement).setString(4, store.getAddress().getAddressLineOne());
-        verify(preparedStatement).setString(5, store.getAddress().getAddressLineTwo());
-        verify(preparedStatement).setString(6, store.getAddress().getCity());
-        verify(preparedStatement).setString(7, store.getAddress().getState());
-        verify(preparedStatement).setString(8, store.getAddress().getCounty());
-        verify(preparedStatement).setString(9, "" + store.getAddress().getZip5());
-        verify(preparedStatement).setString(10, "" + store.getAddress().getZip4());
+        assertThatStatementWasPreparedAgainstStore(preparedStatement, store);
     }
 
     @Test
     public void testGetStatementToCreateTable()
     {
-        String statement = instance.getStatementToCreateTable();
-        assertThat(statement.isEmpty(), is(false));
+        String sqlStatement = instance.getStatementToCreateTable();
+        assertThat(sqlStatement.isEmpty(), is(false));
     }
 
     private void setupResultsWithStore(ResultSet resultSet, Store store) throws SQLException
     {
         when(storeMapper.mapToStore(resultSet)).thenReturn(store);
+    }
+
+    private void assertThatStatementWasPreparedAgainstStore(PreparedStatement preparedStatement, Store store) throws Exception
+    {
+        verify(preparedStatement).setString(1, store.getStoreId());
+        verify(preparedStatement).setString(2, store.getName());
+        verify(preparedStatement).setDouble(3, store.getLocation().getLatitude());
+        verify(preparedStatement).setDouble(4, store.getLocation().getLongitude());;
+        verify(preparedStatement).setString(5, store.getAddress().getAddressLineOne());
+        verify(preparedStatement).setString(6, store.getAddress().getAddressLineTwo());
+        verify(preparedStatement).setString(7, store.getAddress().getCity());
+        verify(preparedStatement).setString(8, store.getAddress().getState());
+        verify(preparedStatement).setString(9, store.getAddress().getCounty());
+        verify(preparedStatement).setString(10, "" + store.getAddress().getZip5());
+        verify(preparedStatement).setString(11, "" + store.getAddress().getZip4());
     }
 
 }

@@ -93,7 +93,7 @@ final class SQLBlackNectarService implements BlackNectarService
 
         try
         {
-            prepareStatementForStore(statement, store);
+            prepareStatementToInsertStore(statement, store);
         }
         catch (SQLException ex)
         {
@@ -218,8 +218,8 @@ final class SQLBlackNectarService implements BlackNectarService
     private String createSQLToInsertStore()
     {
         return "INSERT INTO blacknectar.stores(\n" +
-               "	store_name, latitude, longitude, address_line_one, address_line_two, city, state, county, zip_code, local_zip_code)\n" +
-               "	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+               "	store_id, store_name, latitude, longitude, address_line_one, address_line_two, city, state, county, zip_code, local_zip_code)\n" +
+               "	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
     }
 
     private PreparedStatement tryToPrepareStatement(String insertStatement, String message)
@@ -241,18 +241,19 @@ final class SQLBlackNectarService implements BlackNectarService
         }
     }
 
-    void prepareStatementForStore(PreparedStatement statement, Store store) throws SQLException
+    void prepareStatementToInsertStore(PreparedStatement statement, Store store) throws SQLException
     {
-        statement.setString(1, store.getName());
-        statement.setDouble(2, store.getLocation().getLatitude());
-        statement.setDouble(3, store.getLocation().getLongitude());
-        statement.setString(4, store.getAddress().getAddressLineOne());
-        statement.setString(5, store.getAddress().getAddressLineTwo());
-        statement.setString(6, store.getAddress().getCity());
-        statement.setString(7, store.getAddress().getState());
-        statement.setString(8, store.getAddress().getCounty());
-        statement.setString(9, "" + store.getAddress().getZip5());
-        statement.setString(10, "" + store.getAddress().getZip4());
+        statement.setString(1, store.getStoreId());
+        statement.setString(2, store.getName());
+        statement.setDouble(3, store.getLocation().getLatitude());
+        statement.setDouble(4, store.getLocation().getLongitude());
+        statement.setString(5, store.getAddress().getAddressLineOne());
+        statement.setString(6, store.getAddress().getAddressLineTwo());
+        statement.setString(7, store.getAddress().getCity());
+        statement.setString(8, store.getAddress().getState());
+        statement.setString(9, store.getAddress().getCounty());
+        statement.setString(10, "" + store.getAddress().getZip5());
+        statement.setString(11, "" + store.getAddress().getZip4());
     }
 
     String getStatementToCreateTable()

@@ -264,8 +264,8 @@ public class Store implements JSONRepresentable
                                       "Chaska",
                                       "MN",
                                       "CARVER",
-                                      55318,
-                                      2079);
+                                      "55318",
+                                      "2079");
         
         String sampleImage = "https://s3-media3.fl.yelpcdn.com/bphoto/hzF7KhWb1B6cdGJ1y9E05A/o.jpg";
 

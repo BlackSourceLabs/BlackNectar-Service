@@ -67,9 +67,8 @@ final class ModuleServer extends AbstractModule
     {
         String user = "blacknectar";
         String password = "";
-        String schema = "blacknectar";
         
-        String url = String.format("jdbc:postgresql://localhost:5432/postgres?user=%s&password=%s&currentSchema=%s", user, password, schema);
+        String url = String.format("jdbc:postgresql://localhost:5432/postgres?user=%s&password=%s", user, password);
         return DriverManager.getConnection(url);
     }
 

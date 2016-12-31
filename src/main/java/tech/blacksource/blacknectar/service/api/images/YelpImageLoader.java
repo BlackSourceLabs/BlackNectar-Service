@@ -266,7 +266,7 @@ final class YelpImageLoader implements ImageLoader
         }
 
         String yelpZipCode = Strings.nullToEmpty(business.location.zipCode);
-        String blackNectarZipCode = Strings.nullToEmpty(store.getAddress().getZip5() + "");
+        String blackNectarZipCode = Strings.nullToEmpty(store.getAddress().getZipCode());
 
         return Objects.equals(yelpZipCode, blackNectarZipCode);
     }

@@ -218,9 +218,9 @@ final class SQLBlackNectarService implements BlackNectarService
 
     private String createSQLToInsertStore()
     {
-        return "INSERT INTO blacknectar.stores(\n" +
-               "	store_id, store_name, latitude, longitude, address_line_one, address_line_two, city, state, county, zip_code, local_zip_code)\n" +
-               "	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        return "INSERT INTO BlackNectar.Stores(\n" +
+               "	store_id, store_name, latitude, longitude, location, address_line_one, address_line_two, city, state, county, zip_code, local_zip_code)\n" +
+               "	VALUES (?, ?, ?, ?, ST_SetSRID(ST_Point(?, ?), 4326)::geography, ?, ?, ?, ?, ?, ?, ?);";
     }
 
     private PreparedStatement tryToPrepareStatement(String insertStatement, String message)
@@ -250,13 +250,16 @@ final class SQLBlackNectarService implements BlackNectarService
         statement.setString(2, store.getName());
         statement.setDouble(3, store.getLocation().getLatitude());
         statement.setDouble(4, store.getLocation().getLongitude());
-        statement.setString(5, store.getAddress().getAddressLineOne());
-        statement.setString(6, store.getAddress().getAddressLineTwo());
-        statement.setString(7, store.getAddress().getCity());
-        statement.setString(8, store.getAddress().getState());
-        statement.setString(9, store.getAddress().getCounty());
-        statement.setString(10,  store.getAddress().getZipCode());
-        statement.setString(11, store.getAddress().getLocalZipCode());
+        //Remember for the ST_Point function, that it is longitude(x),latitude(y)
+        statement.setDouble(5, store.getLocation().getLongitude());
+        statement.setDouble(6, store.getLocation().getLatitude());
+        statement.setString(7, store.getAddress().getAddressLineOne());
+        statement.setString(8, store.getAddress().getAddressLineTwo());
+        statement.setString(9, store.getAddress().getCity());
+        statement.setString(10, store.getAddress().getState());
+        statement.setString(11, store.getAddress().getCounty());
+        statement.setString(12,  store.getAddress().getZipCode());
+        statement.setString(13, store.getAddress().getLocalZipCode());
     }
 
     String getStatementToCreateTable()
@@ -449,6 +452,5 @@ final class SQLBlackNectarService implements BlackNectarService
             return distance <= radiusInMeters;
         };
     }
-
 
 }

@@ -65,8 +65,8 @@ final class ModuleServer extends AbstractModule
     @Singleton
     Connection provideSQLConnection() throws SQLException
     {
-        String user = Files.readFile("../secrets/postgres-user.txt").trim();
-        String password = Files.readFile("../secrets/postgres-password.txt").trim();
+        String user = Files.readFile("./secrets/postgres-user.txt").trim();
+        String password = Files.readFile("./secrets/postgres-password.txt").trim();
         
         String url = String.format("jdbc:postgresql://localhost:5432/postgres?user=%s&password=%s", user, password);
         return DriverManager.getConnection(url);
@@ -77,15 +77,15 @@ final class ModuleServer extends AbstractModule
     {
         try
         {
-            String cliendId = Files.readFile("../secrets/yelp-client.txt").trim();
-            String secret = Files.readFile("../secrets/yelp-secret.txt").trim();
+            String cliendId = Files.readFile("./secrets/yelp-client.txt").trim();
+            String secret = Files.readFile("./secrets/yelp-secret.txt").trim();
 
             return YelpAPI.Builder.newInstance()
                 .withClientCredentials(cliendId, secret)
                 .withEagerAuthentication()
                 .build();
         }
-        catch (Exception ex)
+        catch (RuntimeException ex)
         {
             aroma.begin().titled("Yelp Setup Failed")
                 .text("Failed to setup the Yelp API Client", ex)
@@ -102,11 +102,11 @@ final class ModuleServer extends AbstractModule
     {
         try
         {
-            String apiKey = Files.readFile("../secrets/google-places.txt").trim();
+            String apiKey = Files.readFile("./secrets/google-places.txt").trim();
             
             return GooglePlacesAPI.create(apiKey);
         }
-        catch(Exception ex)
+        catch(RuntimeException ex)
         {
             LOG.error("Failed to initialized Google Places API", ex);
             

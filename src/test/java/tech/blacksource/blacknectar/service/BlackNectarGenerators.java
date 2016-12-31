@@ -60,6 +60,7 @@ public class BlackNectarGenerators
         {
             return Address.Builder.newBuilder()
                 .withAddressLineOne(one(alphanumericString()))
+                .withAddressLineTwo(one(alphanumericString()))
                 .withZipCode(zipCodes.get())
                 .withLocalZipCode(one(localZipCodes))
                 .withCity(one(alphabeticString(5)))

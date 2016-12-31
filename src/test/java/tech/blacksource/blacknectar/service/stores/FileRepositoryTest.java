@@ -24,6 +24,7 @@ import org.mockito.Mock;
 import tech.aroma.client.Aroma;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
+import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.empty;
@@ -35,12 +36,16 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_MOCKS;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.doubles;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
+import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.UUID;
 
 
 /**
@@ -52,20 +57,28 @@ import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticSt
 public class FileRepositoryTest 
 {
     
-    private Store store;
     
     
     @Mock(answer = RETURNS_MOCKS)
     private Aroma aroma;
+    
+    @Mock
     private IDGenerator idGenerator;
     
     private FileRepository instance;
+    
+    private Store store;
+    
+    @GenerateString(UUID)
+    private String generatedStoreId;
 
     @Before
     public void setUp() throws Exception
     {
         
         setupData();
+        setupMocks();
+        
         instance = new FileRepository(aroma, idGenerator);
     }
 
@@ -74,16 +87,24 @@ public class FileRepositoryTest
     {
         store = one(stores());
     }
+    
+    private void setupMocks() throws Exception
+    {
+        when(idGenerator.generateKey()).thenReturn(generatedStoreId);
+    }
 
     @DontRepeat
     @Test
     public void testGetAllStores()
     {
-        List<Store> result = instance.getAllStores();
-        assertThat(result, notNullValue());
-        assertThat(result, not(empty()));
-        assertThat(result.size(), greaterThanOrEqualTo(3000));
-        assertThat(result.size(), lessThanOrEqualTo(FileRepository.MAXIMUM_STORES));
+        List<Store> results = instance.getAllStores();
+        assertThat(results, notNullValue());
+        assertThat(results, not(empty()));
+        assertThat(results.size(), greaterThanOrEqualTo(3000));
+        assertThat(results.size(), lessThanOrEqualTo(FileRepository.MAXIMUM_STORES));
+        
+        results.forEach(s -> assertThat(s.getStoreId(), is(generatedStoreId)));
+        verify(idGenerator, atLeastOnce()).generateKey();
     }
 
     @DontRepeat

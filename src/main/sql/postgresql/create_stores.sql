@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS BlackNectar.Stores
     city VARCHAR(100),
     state VARCHAR(5),
     county VARCHAR(100),
-    zip_code INTEGER,
-    local_zip_code INTEGER,
+    zip_code VARCHAR(20),
+    local_zip_code VARCHAR(20),
 
     CONSTRAINT Unique_Stores UNIQUE(store_name, latitude, longitude)
 );

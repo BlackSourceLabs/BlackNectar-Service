@@ -83,10 +83,10 @@ public class AddressTest
         assertThat(county, is(instance.getCounty()));
         
         String zipCode = json.get(Keys.ZIP).getAsString();
-        assertThat(zipCode, is(instance.getZip5()));
+        assertThat(zipCode, is(instance.getZipCode()));
         
         String localZip = json.get(Keys.LOCAL_ZIP).getAsString();
-        assertThat(localZip, is(instance.getZip4()));
+        assertThat(localZip, is(instance.getLocalZipCode()));
     }
 
 }

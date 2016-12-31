@@ -52,8 +52,8 @@ public final class Address implements JSONRepresentable
     private String city;
     private String state;
     private String county;
-    private String zip5;
-    private String zip4;
+    private String zipCode;
+    private String localZipCode;
 
     private JsonObject json;
 
@@ -81,7 +81,7 @@ public final class Address implements JSONRepresentable
                 .usingMessage("Country is missing")
                 .is(nonEmptyString());
 
-            checkThat(a.zip5)
+            checkThat(a.zipCode)
                 .is(validZipCode());
         };
     }
@@ -95,16 +95,16 @@ public final class Address implements JSONRepresentable
             String city,
             String state,
             String county,
-            String zip5,
-            String zip4)
+            String zipCode,
+            String localZipCode)
     {
         this.addressLineOne = addressLineOne;
         this.addressLineTwo = addressLineTwo;
         this.city = city;
         this.state = state;
         this.county = county;
-        this.zip5 = zip5;
-        this.zip4 = zip4;
+        this.zipCode = zipCode;
+        this.localZipCode = localZipCode;
 
         this.json = createJSON();
     }
@@ -134,14 +134,14 @@ public final class Address implements JSONRepresentable
         return county;
     }
 
-    public String getZip5()
+    public String getZipCode()
     {
-        return zip5;
+        return zipCode;
     }
 
-    public String getZip4()
+    public String getLocalZipCode()
     {
-        return zip4;
+        return localZipCode;
     }
 
     @Override
@@ -159,8 +159,8 @@ public final class Address implements JSONRepresentable
         hash = 79 * hash + Objects.hashCode(this.city);
         hash = 79 * hash + Objects.hashCode(this.state);
         hash = 79 * hash + Objects.hashCode(this.county);
-        hash = 79 * hash + Objects.hashCode(this.zip5);
-        hash = 79 * hash + Objects.hashCode(this.zip4);
+        hash = 79 * hash + Objects.hashCode(this.zipCode);
+        hash = 79 * hash + Objects.hashCode(this.localZipCode);
         return hash;
     }
 
@@ -200,11 +200,11 @@ public final class Address implements JSONRepresentable
         {
             return false;
         }
-        if (!Objects.equals(this.zip5, other.zip5))
+        if (!Objects.equals(this.zipCode, other.zipCode))
         {
             return false;
         }
-        if (!Objects.equals(this.zip4, other.zip4))
+        if (!Objects.equals(this.localZipCode, other.localZipCode))
         {
             return false;
         }
@@ -214,9 +214,10 @@ public final class Address implements JSONRepresentable
     @Override
     public String toString()
     {
-        return "Address{" + "addressLineOne=" + addressLineOne + ", addressLineTwo=" + addressLineTwo + ", city=" + city + ", state=" + state + ", county=" + county + ", zip5=" + zip5 + ", zip4=" + zip4 + '}';
+        return "Address{" + "addressLineOne=" + addressLineOne + ", addressLineTwo=" + addressLineTwo + ", city=" + city + ", state=" + state + ", county=" + county + ", zipCode=" + zipCode + ", localZipCode=" + localZipCode + '}';
     }
 
+ 
     @Internal
     private JsonObject createJSON()
     {
@@ -232,8 +233,8 @@ public final class Address implements JSONRepresentable
         jsonObject.addProperty(Keys.CITY, city);
         jsonObject.addProperty(Keys.STATE, state);
         jsonObject.addProperty(Keys.COUNTY, county);
-        jsonObject.addProperty(Keys.ZIP, zip5);
-        jsonObject.addProperty(Keys.LOCAL_ZIP, zip4);
+        jsonObject.addProperty(Keys.ZIP, zipCode);
+        jsonObject.addProperty(Keys.LOCAL_ZIP, localZipCode);
 
         return jsonObject;
     }

@@ -1,3 +1,7 @@
+-- It is good practice to normalize data, but for the purposes of BlackNectar,
+-- we do not really need a separate normalized address table.
+-- ===========================================================================
+
 CREATE TABLE IF NOT EXISTS Store_Addresses
 (
 	address_id uuid PRIMARY KEY,

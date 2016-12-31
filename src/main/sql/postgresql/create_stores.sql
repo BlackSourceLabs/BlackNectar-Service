@@ -1,3 +1,6 @@
+-- Used to store Stores that support EBT
+-- ===========================================================================
+
 CREATE TABLE IF NOT EXISTS BlackNectar.Stores
 (
 	store_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

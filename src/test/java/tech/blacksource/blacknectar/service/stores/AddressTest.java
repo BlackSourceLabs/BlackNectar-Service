@@ -33,7 +33,7 @@ import static org.junit.Assert.assertThat;
  *
  * @author SirWellington
  */
-@Repeat(10)
+@Repeat(50)
 @RunWith(AlchemyTestRunner.class)
 public class AddressTest 
 {
@@ -81,6 +81,12 @@ public class AddressTest
         
         String county = json.get(Keys.COUNTY).getAsString();
         assertThat(county, is(instance.getCounty()));
+        
+        String zipCode = json.get(Keys.ZIP).getAsString();
+        assertThat(zipCode, is(instance.getZip5()));
+        
+        String localZip = json.get(Keys.LOCAL_ZIP).getAsString();
+        assertThat(localZip, is(instance.getZip4()));
     }
 
 }

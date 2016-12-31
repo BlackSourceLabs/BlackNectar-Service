@@ -30,7 +30,8 @@ import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
- *
+ * Loads SQL queries into memory.
+ * 
  * @author SirWellington
  */
 @Internal

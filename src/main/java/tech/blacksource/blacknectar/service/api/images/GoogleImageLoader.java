@@ -228,7 +228,7 @@ final class GoogleImageLoader implements ImageLoader
         return namesMatch(place.formattedAddress, address.getAddressLineOne()) &&
                namesMatch(place.formattedAddress, address.getCity()) &&
                namesMatch(place.formattedAddress, address.getState()) &&
-               namesMatch(place.formattedAddress, "" + address.getZip5());
+               namesMatch(place.formattedAddress, address.getZipCode());
     }
 
     private void makeNoteThatNoPlacesFoundFor(Store store, NearbySearchRequest request)

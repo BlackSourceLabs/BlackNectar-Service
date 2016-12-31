@@ -1,5 +1,6 @@
 -- Find Stores around a Geolocation
 -- Returns resulting stores and the distance from the specified GeoLocation
+-- ===========================================================================
 
 SELECT
 	*,

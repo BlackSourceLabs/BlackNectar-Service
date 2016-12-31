@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -245,7 +246,9 @@ public class SQLBlackNectarServiceTest
 
     private void assertThatStatementWasPreparedAgainstStore(PreparedStatement preparedStatement, Store store) throws Exception
     {
-        verify(preparedStatement).setString(1, store.getStoreId());
+        UUID storeUuid = UUID.fromString(store.getStoreId());
+        
+        verify(preparedStatement).setObject(1, storeUuid);
         verify(preparedStatement).setString(2, store.getName());
         verify(preparedStatement).setDouble(3, store.getLocation().getLatitude());
         verify(preparedStatement).setDouble(4, store.getLocation().getLongitude());;
@@ -254,8 +257,8 @@ public class SQLBlackNectarServiceTest
         verify(preparedStatement).setString(7, store.getAddress().getCity());
         verify(preparedStatement).setString(8, store.getAddress().getState());
         verify(preparedStatement).setString(9, store.getAddress().getCounty());
-        verify(preparedStatement).setString(10, "" + store.getAddress().getZip5());
-        verify(preparedStatement).setString(11, "" + store.getAddress().getZip4());
+        verify(preparedStatement).setString(10, store.getAddress().getZipCode());
+        verify(preparedStatement).setString(11, store.getAddress().getLocalZipCode());
     }
 
 }

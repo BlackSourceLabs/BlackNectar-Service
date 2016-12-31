@@ -21,13 +21,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.blacksource.blacknectar.service.stores.Address.Keys;
+import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
-import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static tech.blacksource.blacknectar.service.BlackNectarGenerators.addresses;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 
 /**
  *
@@ -38,7 +40,6 @@ import static org.junit.Assert.assertThat;
 public class AddressTest 
 {
 
-    @GeneratePojo
     private Address instance;
     
     @Before
@@ -51,7 +52,7 @@ public class AddressTest
 
     private void setupData() throws Exception
     {
-        
+        instance = one(addresses());
     }
 
     private void setupMocks() throws Exception
@@ -62,6 +63,10 @@ public class AddressTest
     @Test
     public void testValidAddress()
     {
+        AlchemyAssertion<Address> assertion = Address.validAddress();
+        assertThat(assertion, notNullValue());
+        
+        assertion.check(instance);
     }
 
     @Test

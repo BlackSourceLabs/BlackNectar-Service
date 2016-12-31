@@ -47,15 +47,35 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.s
 public final class Address implements JSONRepresentable
 {
 
-    private String addressLineOne;
-    private String addressLineTwo;
-    private String city;
-    private String state;
-    private String county;
-    private String zipCode;
-    private String localZipCode;
+    private final String addressLineOne;
+    private final String addressLineTwo;
+    private final String city;
+    private final String state;
+    private final String county;
+    private final String zipCode;
+    private final String localZipCode;
 
-    private JsonObject json;
+    private final JsonObject json;
+
+    
+    Address(String addressLineOne,
+            String addressLineTwo,
+            String city,
+            String state,
+            String county,
+            String zipCode,
+            String localZipCode)
+    {
+        this.addressLineOne = addressLineOne;
+        this.addressLineTwo = addressLineTwo;
+        this.city = city;
+        this.state = state;
+        this.county = county;
+        this.zipCode = zipCode;
+        this.localZipCode = localZipCode;
+
+        this.json = createJSON();
+    }
 
     static AlchemyAssertion<Address> validAddress()
     {
@@ -84,29 +104,6 @@ public final class Address implements JSONRepresentable
             checkThat(a.zipCode)
                 .is(validZipCode());
         };
-    }
-
-    Address()
-    {
-    }
-
-    Address(String addressLineOne,
-            String addressLineTwo,
-            String city,
-            String state,
-            String county,
-            String zipCode,
-            String localZipCode)
-    {
-        this.addressLineOne = addressLineOne;
-        this.addressLineTwo = addressLineTwo;
-        this.city = city;
-        this.state = state;
-        this.county = county;
-        this.zipCode = zipCode;
-        this.localZipCode = localZipCode;
-
-        this.json = createJSON();
     }
 
     public String getAddressLineOne()
@@ -147,7 +144,7 @@ public final class Address implements JSONRepresentable
     @Override
     public JsonObject asJSON()
     {
-        return createJSON();
+        return json;
     }
 
     @Override
@@ -217,7 +214,6 @@ public final class Address implements JSONRepresentable
         return "Address{" + "addressLineOne=" + addressLineOne + ", addressLineTwo=" + addressLineTwo + ", city=" + city + ", state=" + state + ", county=" + county + ", zipCode=" + zipCode + ", localZipCode=" + localZipCode + '}';
     }
 
- 
     @Internal
     private JsonObject createJSON()
     {
@@ -238,7 +234,7 @@ public final class Address implements JSONRepresentable
 
         return jsonObject;
     }
-    
+
     @BuilderPattern(role = BUILDER)
     public final static class Builder
     {

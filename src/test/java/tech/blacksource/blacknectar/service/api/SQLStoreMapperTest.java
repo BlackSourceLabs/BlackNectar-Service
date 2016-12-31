@@ -108,8 +108,8 @@ public class SQLStoreMapperTest
         when(results.getString(SQLColumns.CITY)).thenReturn(store.getAddress().getCity());
         when(results.getString(SQLColumns.STATE)).thenReturn(store.getAddress().getState());
         when(results.getString(SQLColumns.COUNTY)).thenReturn(store.getAddress().getCounty());
-        when(results.getInt(SQLColumns.ZIP_CODE)).thenReturn(store.getAddress().getZip5());
-        when(results.getInt(SQLColumns.LOCAL_ZIP_CODE)).thenReturn(store.getAddress().getZip4());
+        when(results.getString(SQLColumns.ZIP_CODE)).thenReturn(store.getAddress().getZipCode());
+        when(results.getString(SQLColumns.LOCAL_ZIP_CODE)).thenReturn(store.getAddress().getLocalZipCode());
         when(results.getDouble(SQLColumns.LATITUDE)).thenReturn(store.getLocation().getLatitude());
         when(results.getDouble(SQLColumns.LONGITUDE)).thenReturn(store.getLocation().getLongitude());
     }

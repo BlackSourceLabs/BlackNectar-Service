@@ -79,13 +79,8 @@ interface SQLStoreMapper
             String city = results.getString(SQLColumns.CITY);
             String state = results.getString(SQLColumns.STATE);
             String county = results.getString(SQLColumns.COUNTY);
-            Integer zipCode = results.getInt(SQLColumns.ZIP_CODE);
-            Integer localZip = results.getInt(SQLColumns.LOCAL_ZIP_CODE);
-
-            if (results.wasNull())
-            {
-                localZip = null;
-            }
+            String zipCode = results.getString(SQLColumns.ZIP_CODE);
+            String localZip = results.getString(SQLColumns.LOCAL_ZIP_CODE);
 
             //Use the data to start creating a Store object, piece by piece
             Address.Builder addressBuilder = Address.Builder.newBuilder()
@@ -104,7 +99,7 @@ interface SQLStoreMapper
                 addressBuilder.withAddressLineTwo(addressTwo);
             }
 
-            if (localZip != null && localZip > 0)
+            if (!isNullOrEmpty(localZip))
             {
                 addressBuilder.withLocalZipCode(localZip);
             }

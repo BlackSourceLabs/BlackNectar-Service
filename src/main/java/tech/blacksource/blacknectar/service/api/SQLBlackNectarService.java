@@ -89,7 +89,7 @@ final class SQLBlackNectarService implements BlackNectarService
             .is(notNull())
             .is(validStore());
 
-        String insertStatement = createSQLToInsertStore();
+        String insertStatement = SQLQueries.INSERT_STORE;
         PreparedStatement statement = tryToPrepareStatement(insertStatement, "could not save Store to Database: " + store);
 
         try
@@ -214,13 +214,6 @@ final class SQLBlackNectarService implements BlackNectarService
             return "SELECT * FROM Stores " +
                    "LIMIT " + limit;
         }
-    }
-
-    private String createSQLToInsertStore()
-    {
-        return "INSERT INTO BlackNectar.Stores(\n" +
-               "	store_id, store_name, latitude, longitude, location, address_line_one, address_line_two, city, state, county, zip_code, local_zip_code)\n" +
-               "	VALUES (?, ?, ?, ?, ST_SetSRID(ST_Point(?, ?), 4326)::geography, ?, ?, ?, ?, ?, ?, ?);";
     }
 
     private PreparedStatement tryToPrepareStatement(String insertStatement, String message)

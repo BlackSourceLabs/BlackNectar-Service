@@ -24,10 +24,10 @@ import tech.blacksource.blacknectar.service.stores.Address;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.generator.AlchemyGenerator;
+import tech.sirwellington.alchemy.generator.StringGenerators;
 
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.doubles;
-import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphanumericString;
 import static tech.sirwellington.alchemy.generator.StringGenerators.uuids;
@@ -53,13 +53,15 @@ public class BlackNectarGenerators
     
     public static AlchemyGenerator<Address> addresses()
     {
-        AlchemyGenerator<Integer> zipCodes = integers(1, 99_999);
+        AlchemyGenerator<String> zipCodes = StringGenerators.numericString(5);
+        AlchemyGenerator<String> localZipCodes = StringGenerators.numericString(4);
         
         return () ->
         {
             return Address.Builder.newBuilder()
-                .withZipCode(zipCodes.get())
                 .withAddressLineOne(one(alphanumericString()))
+                .withZipCode(zipCodes.get())
+                .withLocalZipCode(one(localZipCodes))
                 .withCity(one(alphabeticString(5)))
                 .withState(one(alphabeticString(2)).toUpperCase())
                 .withCounty(one(alphabeticString()))

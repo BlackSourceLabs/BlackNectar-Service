@@ -17,26 +17,35 @@
 package tech.blacksource.blacknectar.service.stores;
 
 import java.util.List;
+import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import tech.aroma.client.Aroma;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
-import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
+import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Answers.RETURNS_MOCKS;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.doubles;
-import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
+import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.UUID;
 
 
 /**
@@ -48,32 +57,56 @@ import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticSt
 public class FileRepositoryTest 
 {
     
-    @GeneratePojo
-    private Store store;
+    @Mock(answer = RETURNS_MOCKS)
+    private Aroma aroma;
+    
+    @Mock
+    private IDGenerator idGenerator;
     
     private FileRepository instance;
+    
+    private Store store;
+    
+    @GenerateString(UUID)
+    private String storeIdString;
+    
+    private UUID storeId;
 
     @Before
     public void setUp() throws Exception
     {
         
         setupData();
-        instance = new FileRepository(Aroma.create());
+        setupMocks();
+        
+        instance = new FileRepository(aroma, idGenerator);
     }
 
 
     private void setupData() throws Exception
     {
-        
+        store = one(stores());
+        storeId = java.util.UUID.fromString(storeIdString);
+    }
+    
+    private void setupMocks() throws Exception
+    {
+        when(idGenerator.generateKey()).thenReturn(storeId);
+        when(idGenerator.generateKeyAsString()).thenReturn(storeIdString);
     }
 
     @DontRepeat
     @Test
     public void testGetAllStores()
     {
-        List<Store> stores = instance.getAllStores();
-        assertThat(stores, notNullValue());
-        assertThat(stores.size(), greaterThanOrEqualTo(30_000));
+        List<Store> results = instance.getAllStores();
+        assertThat(results, notNullValue());
+        assertThat(results, not(empty()));
+        assertThat(results.size(), greaterThanOrEqualTo(3000));
+        assertThat(results.size(), lessThanOrEqualTo(FileRepository.MAXIMUM_STORES));
+        
+        results.forEach(s -> assertThat(s.getStoreId(), is(storeIdString)));
+        verify(idGenerator, atLeastOnce()).generateKey();
     }
 
     @DontRepeat
@@ -107,15 +140,6 @@ public class FileRepositoryTest
         Location result = instance.extractLocationFrom(latitudeString, longitudeString);
         assertThat(result.getLatitude(), is(latitude));
         assertThat(result.getLongitude(), is(longitude));
-    }
-
-    @Test
-    public void testExtractZipCode()
-    {
-        int zipCode = one(integers(0, 99_999));
-        
-        int result = instance.extractZipCode(String.valueOf(zipCode));
-        assertThat(result, is(zipCode));
     }
 
 }

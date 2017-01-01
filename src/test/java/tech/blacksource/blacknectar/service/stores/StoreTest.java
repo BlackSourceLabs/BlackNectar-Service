@@ -21,9 +21,9 @@ import java.net.URL;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
-import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateURL;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
@@ -31,6 +31,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
@@ -42,8 +44,11 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
 public class StoreTest 
 {
 
-    @GeneratePojo
     private Store instance;
+    
+    private Store other;
+    
+    private Store copy;
     
     @GenerateURL
     private URL mainImageURL;
@@ -59,6 +64,10 @@ public class StoreTest
 
     private void setupData() throws Exception
     {
+        instance = one(stores());
+        other = one(stores());
+        copy = Store.Builder.fromStore(instance).build();
+        
         mainImage = mainImageURL.toString();
     }
 
@@ -70,6 +79,7 @@ public class StoreTest
         assertThat(json.get(Store.Keys.ADDRESS), is(instance.getAddress().asJSON()));
         assertThat(json.get(Store.Keys.LOCATION), is(instance.getLocation().asJSON()));
         assertThat(json.get(Store.Keys.NAME).getAsString(), is(instance.getName()));
+        assertThat(json.get(Store.Keys.STORE_ID).getAsString(), is(instance.getStoreId()));
         
         if (instance.hasMainImage())
         {
@@ -81,12 +91,13 @@ public class StoreTest
     public void testThatImageCanBeAddedToStore()
     {
         Store newStore = Store.Builder.fromStore(instance)
-        .withMainImageURL(mainImage)
-        .build();
+            .withMainImageURL(mainImage)
+            .build();
         
         assertThat(newStore, notNullValue());
         assertThat(newStore.getMainImageURL(), is(mainImage));
         assertThat(newStore, not(instance));
+        assertThat(newStore.getStoreId(), is(instance.getStoreId()));
         assertThat(newStore.getName(), is(instance.getName()));
         assertThat(newStore.getLocation(), is(instance.getLocation()));
         assertThat(newStore.getAddress(), is(instance.getAddress()));
@@ -113,27 +124,48 @@ public class StoreTest
         assertThrows(() -> builder.withName(null)).isInstanceOf(IllegalArgumentException.class);
         assertThrows(() -> builder.withMainImageURL("")).isInstanceOf(IllegalArgumentException.class);
         assertThrows(() -> builder.withMainImageURL(null)).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(() -> builder.withStoreID(null)).isInstanceOf(IllegalArgumentException.class);
     }
-
+    
     @Test
     public void testEquals()
     {
-        instance = Store.Builder.fromStore(instance)
-            .withMainImageURL(mainImage)
-            .build();
-
-        Store copy = Store.Builder.fromStore(instance).build();
-
-        assertThat(copy, is(instance));
+        assertThat(instance, is(copy));
+        assertThat(instance, not(other));
     }
 
     @Test
     public void testEqualsWhenDifferent()
     {
-        Store other = Store.Builder.fromStore(instance)
+        other = Store.Builder.fromStore(instance)
             .withMainImageURL(mainImage)
             .build();
 
         assertThat(other, not(instance));
+    }
+
+    @Test
+    public void testValidStore()
+    {
+        AlchemyAssertion<Store> assertion = Store.validStore();
+        assertThat(assertion, notNullValue());
+        
+        assertion.check(instance);
+        assertion.check(copy);
+        assertion.check(other);
+    }
+
+    @Test
+    public void testHashCode()
+    {
+        assertThat(instance.hashCode(), is(copy.hashCode()));
+        assertThat(instance.hashCode(), not(other.hashCode()));
+    }
+
+    @Test
+    public void testToString()
+    {
+        assertThat(instance.toString(), is(copy.toString()));
+        assertThat(instance.toString(), not(other.toString()));
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 BlackWholeLabs.
+ * Copyright 2016 BlackSourceLabs.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
+ 
 package tech.blacksource.blacknectar.service.stores;
 
-import com.google.inject.ImplementedBy;
-import java.util.List;
-import tech.aroma.client.Aroma;
+
+import com.google.inject.AbstractModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author SirWellington
  */
-@ImplementedBy(FileRepository.class)
-public interface StoreRepository
+public final class ModuleStores extends AbstractModule 
 {
+    private final static Logger LOG = LoggerFactory.getLogger(ModuleStores.class);
 
-    /**
-     * Returns all of the {@linkplain Store Stores} saved in the Repository;
-     *
-     * @return
-     */
-    List<Store> getAllStores();
-    
-    static StoreRepository FILE = new FileRepository(Aroma.create(), IDGenerator.INSTANCE);
+    @Override
+    protected void configure()
+    {
+        bind(IDGenerator.class).toInstance(IDGenerator.INSTANCE);
+    }
+
 }

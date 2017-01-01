@@ -33,14 +33,11 @@ import static tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPat
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.AddressAssertions.validZipCode;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
-import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThan;
-import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.lessThan;
-import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.lessThanOrEqualTo;
-import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.positiveInteger;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.stringWithLength;
 
 /**
- * 
+ *
  * @author SirWellington
  */
 @Pojo
@@ -50,15 +47,38 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
 public final class Address implements JSONRepresentable
 {
 
-    private String addressLineOne;
-    private String addressLineTwo;
-    private String city;
-    private String state;
-    private String county;
-    private int zip5;
-    private int zip4;
-    private JsonObject json;
+    private final String addressLineOne;
+    private final String addressLineTwo;
+    private final String city;
+    private final String state;
+    private final String county;
+    /** This is the 5-part zip code. For example, 93013. */
+    private final String zipCode;
+    /** This is the local 4-part zip code. For example 0351. */
+    private final String localZipCode;
+
+    private final JsonObject json;
+
     
+    Address(String addressLineOne,
+            String addressLineTwo,
+            String city,
+            String state,
+            String county,
+            String zipCode,
+            String localZipCode)
+    {
+        this.addressLineOne = addressLineOne;
+        this.addressLineTwo = addressLineTwo;
+        this.city = city;
+        this.state = state;
+        this.county = county;
+        this.zipCode = zipCode;
+        this.localZipCode = localZipCode;
+
+        this.json = createJSON();
+    }
+
     static AlchemyAssertion<Address> validAddress()
     {
         return a ->
@@ -66,52 +86,26 @@ public final class Address implements JSONRepresentable
             checkThat(a)
                 .usingMessage("Address was null")
                 .is(notNull());
-            
+
             checkThat(a.addressLineOne)
                 .usingMessage("Address Line 1 cannot be empty")
                 .is(nonEmptyString());
-            
+
             checkThat(a.city)
                 .usingMessage("City is missing")
                 .is(nonEmptyString());
-            
+
             checkThat(a.state)
                 .usingMessage("State is missing")
                 .is(nonEmptyString());
-            
+
             checkThat(a.county)
                 .usingMessage("Country is missing")
                 .is(nonEmptyString());
-            
-            checkThat(a.zip5)
-                .usingMessage("Zip Code 5 is missing")
-                .is(greaterThan(0))
-                .usingMessage("Zip Code 5 must be < 100,000")
-                .is(lessThan(100_000));
-        };
-    }
 
-    Address()
-    {
-    }
-    
-    Address(String addressLineOne, 
-            String addressLineTwo,
-            String city,
-            String state,
-            String county,
-            int zip5,
-            int zip4)
-    {
-        this.addressLineOne = addressLineOne;
-        this.addressLineTwo = addressLineTwo;
-        this.city = city;
-        this.state = state;
-        this.county = county;
-        this.zip5 = zip5;
-        this.zip4 = zip4;
-        
-        this.json = createJSON();
+            checkThat(a.zipCode)
+                .is(validZipCode());
+        };
     }
 
     public String getAddressLineOne()
@@ -139,33 +133,33 @@ public final class Address implements JSONRepresentable
         return county;
     }
 
-    public int getZip5()
+    public String getZipCode()
     {
-        return zip5;
+        return zipCode;
     }
 
-    public int getZip4()
+    public String getLocalZipCode()
     {
-        return zip4;
+        return localZipCode;
     }
 
     @Override
     public JsonObject asJSON()
     {
-        return createJSON();
+        return json;
     }
 
     @Override
     public int hashCode()
     {
-        int hash = 3;
-        hash = 41 * hash + Objects.hashCode(this.addressLineOne);
-        hash = 41 * hash + Objects.hashCode(this.addressLineTwo);
-        hash = 41 * hash + Objects.hashCode(this.city);
-        hash = 41 * hash + Objects.hashCode(this.state);
-        hash = 41 * hash + Objects.hashCode(this.county);
-        hash = 41 * hash + this.zip5;
-        hash = 41 * hash + this.zip4;
+        int hash = 7;
+        hash = 79 * hash + Objects.hashCode(this.addressLineOne);
+        hash = 79 * hash + Objects.hashCode(this.addressLineTwo);
+        hash = 79 * hash + Objects.hashCode(this.city);
+        hash = 79 * hash + Objects.hashCode(this.state);
+        hash = 79 * hash + Objects.hashCode(this.county);
+        hash = 79 * hash + Objects.hashCode(this.zipCode);
+        hash = 79 * hash + Objects.hashCode(this.localZipCode);
         return hash;
     }
 
@@ -185,14 +179,6 @@ public final class Address implements JSONRepresentable
             return false;
         }
         final Address other = (Address) obj;
-        if (this.zip5 != other.zip5)
-        {
-            return false;
-        }
-        if (this.zip4 != other.zip4)
-        {
-            return false;
-        }
         if (!Objects.equals(this.addressLineOne, other.addressLineOne))
         {
             return false;
@@ -213,44 +199,42 @@ public final class Address implements JSONRepresentable
         {
             return false;
         }
+        if (!Objects.equals(this.zipCode, other.zipCode))
+        {
+            return false;
+        }
+        if (!Objects.equals(this.localZipCode, other.localZipCode))
+        {
+            return false;
+        }
         return true;
     }
 
     @Override
     public String toString()
     {
-        return "Address{" + "addressLineOne=" + addressLineOne + ", addressLineTwo=" + addressLineTwo + ", city=" + city + ", state=" + state + ", county=" + county + ", zip5=" + zip5 + ", zip4=" + zip4 + '}';
+        return "Address{" + "addressLineOne=" + addressLineOne + ", addressLineTwo=" + addressLineTwo + ", city=" + city + ", state=" + state + ", county=" + county + ", zipCode=" + zipCode + ", localZipCode=" + localZipCode + '}';
     }
 
     @Internal
     private JsonObject createJSON()
     {
         JsonObject jsonObject = new JsonObject();
-        
+
         jsonObject.addProperty(Keys.ADDRESS_LINE_ONE, addressLineOne);
-        
+
         if (!isNullOrEmpty(addressLineTwo))
         {
             jsonObject.addProperty(Keys.ADDRESS_LINE_TWO, addressLineTwo);
         }
-        
+
         jsonObject.addProperty(Keys.CITY, city);
         jsonObject.addProperty(Keys.STATE, state);
         jsonObject.addProperty(Keys.COUNTY, county);
-        jsonObject.addProperty(Keys.ZIP, zipToString(zip5));
-        jsonObject.addProperty(Keys.LOCAL_ZIP, localZipToString(zip4));
-        
+        jsonObject.addProperty(Keys.ZIP, zipCode);
+        jsonObject.addProperty(Keys.LOCAL_ZIP, localZipCode);
+
         return jsonObject;
-    }
-    
-    private String zipToString(int zip)
-    {
-        return String.format("%05d", zip);
-    }
-    
-    private String localZipToString(int localZip)
-    {
-        return String.format("%04d", localZip);
     }
 
     @BuilderPattern(role = BUILDER)
@@ -263,9 +247,9 @@ public final class Address implements JSONRepresentable
         private String city;
         private String state;
         private String county;
-        private int zipCode;
+        private String zipCode;
         @Optional
-        private int localZip;
+        private String localZip;
 
         public static Builder newBuilder()
         {
@@ -327,24 +311,26 @@ public final class Address implements JSONRepresentable
             this.county = county;
             return this;
         }
-        
-        public Builder withZipCode(int zipCode) throws IllegalArgumentException
+
+        public Builder withZipCode(@NonEmpty String zipCode) throws IllegalArgumentException
         {
-            checkThat(zipCode).is(validZipCode());
-            
+            checkThat(zipCode)
+                .is(validZipCode())
+                .usingMessage("zipCode must have length 5")
+                .is(stringWithLength(5));
+
             this.zipCode = zipCode;
             return this;
         }
-        
+
         @Optional
-        public Builder withLocalZipCode(int localZipCode) throws IllegalArgumentException
+        public Builder withLocalZipCode(@NonEmpty String localZipCode) throws IllegalArgumentException
         {
             checkThat(localZipCode)
-                .usingMessage("Local Zip Code cannot be negative")
-                .is(positiveInteger())
-                .usingMessage("Local Zip Code cannot exceed 4 digits")
-                .is(lessThanOrEqualTo(9_999));
-            
+                .is(validZipCode())
+                .usingMessage("localZipCode must have length 4")
+                .is(stringWithLength(4));
+
             this.localZip = localZipCode;
             return this;
         }
@@ -362,12 +348,12 @@ public final class Address implements JSONRepresentable
                 .is(validZipCode());
 
             Address address = new Address(this.addressLineOne,
-                               this.addressLineTwo,
-                               this.city,
-                               this.state,
-                               this.county,
-                               this.zipCode,
-                               this.localZip);
+                                          this.addressLineTwo,
+                                          this.city,
+                                          this.state,
+                                          this.county,
+                                          this.zipCode,
+                                          this.localZip);
 
             checkThat(address).is(validAddress());
 
@@ -390,4 +376,5 @@ public final class Address implements JSONRepresentable
         final static String ZIP = "zip_code";
         final static String LOCAL_ZIP = "local_zip_code";
     }
+
 }

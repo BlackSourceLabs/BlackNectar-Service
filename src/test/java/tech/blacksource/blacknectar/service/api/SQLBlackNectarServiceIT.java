@@ -17,8 +17,6 @@
 package tech.blacksource.blacknectar.service.api;
 
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -178,14 +176,6 @@ public class SQLBlackNectarServiceIT
             }
         }
 
-    }
-
-    @Test
-    public void testGetStatementToCreateTable() throws SQLException
-    {
-        String sql = instance.getStatementToCreateTable();
-        Statement statement = connection.createStatement();
-        statement.execute(sql);
     }
 
 }

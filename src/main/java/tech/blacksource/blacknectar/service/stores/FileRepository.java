@@ -22,10 +22,9 @@ import com.google.common.io.Resources;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.slf4j.Logger;
@@ -51,18 +50,21 @@ final class FileRepository implements StoreRepository
     private final static Logger LOG = LoggerFactory.getLogger(FileRepository.class);
     private static final String FILENAME = "Stores.csv";
 
-    private final List<Store> stores = loadAllStores();
-    private final int MAXIMUM_STORES = 30_000;
+    private final List<Store> stores;
+    final static int MAXIMUM_STORES = 30_000;
 
     private final Aroma aroma;
+    private final IDGenerator idGenerator;
 
     @Inject
-    FileRepository(Aroma aroma)
+    FileRepository(Aroma aroma, IDGenerator idGenerator)
     {
-        checkThat(aroma)
+        checkThat(aroma, idGenerator)
             .is(notNull());
 
         this.aroma = aroma;
+        this.idGenerator = idGenerator;
+        this.stores = loadAllStores();
     }
 
     @Override
@@ -93,6 +95,7 @@ final class FileRepository implements StoreRepository
     String readCSVFile()
     {
         URL url;
+        
         try
         {
             url = Resources.getResource(FILENAME);
@@ -109,6 +112,7 @@ final class FileRepository implements StoreRepository
 
             return "";
         }
+        
         try
         {
             return Resources.toString(url, Charsets.UTF_8);
@@ -130,6 +134,7 @@ final class FileRepository implements StoreRepository
     List<String> splitFileIntoLines(String file)
     {
         String[] lines = file.split("\n");
+        
         if (lines == null || lines.length == 0)
         {
             return Lists.emptyList();
@@ -141,6 +146,7 @@ final class FileRepository implements StoreRepository
     Store toStore(String line)
     {
         String[] components = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+        
         if (components == null || components.length == 0)
         {
             LOG.debug("Received empty components");
@@ -194,13 +200,11 @@ final class FileRepository implements StoreRepository
         String addressLineTwo = components[4].replaceAll("\"", "");
         String city = components[5].replaceAll("\"", "");
         String state = components[6].replaceAll("\"", "");
-        String zip5 = components[7].replaceAll("\"", "");
-        String zip4 = components[8].replaceAll("\"", "").replaceAll(" ", "");
+        String zipCode = components[7].replaceAll("\"", "");
+        String localZipCode = components[8].replaceAll("\"", "").replaceAll(" ", "");
         String county = components[9].replaceAll("\"", "").replaceAll("\r", "");
 
         Location location = extractLocationFrom(latitudeString, longitudeString);
-
-        int zipCode = extractZipCode(zip5);
 
         Address.Builder addressBuilder = Address.Builder.newBuilder()
             .withAddressLineOne(addressLineOne)
@@ -208,11 +212,10 @@ final class FileRepository implements StoreRepository
             .withState(state)
             .withZipCode(zipCode);
 
-        if (!Strings.isNullOrEmpty(zip4))
+        if (!Strings.isNullOrEmpty(localZipCode))
         {
             try
             {
-                int localZipCode = extractZipCode(zip4);
                 addressBuilder = addressBuilder.withLocalZipCode(localZipCode);
             }
             catch (RuntimeException ex)
@@ -229,44 +232,21 @@ final class FileRepository implements StoreRepository
         {
             addressBuilder = addressBuilder.withCounty(county);
         }
+        
+        //Finally, generate an ID for the Store
+        UUID storeId = idGenerator.generateKey();
 
         return Store.Builder.newInstance()
+            .withStoreID(storeId)
             .withAddress(addressBuilder.build())
             .withLocation(location)
             .withName(storeName)
             .build();
     }
 
-    int extractZipCode(String zipCode)
-    {
-        try
-        {
-            return Integer.valueOf(zipCode);
-        }
-        catch (NumberFormatException ex)
-        {
-            LOG.error("Failed to parse Zip codes: {}", zipCode, ex);
-
-            aroma.begin()
-                .titled("Conversion Failed")
-                .text("Could not parse Zip Code: {}", zipCode, ex)
-                .withUrgency(Urgency.MEDIUM)
-                .send();
-
-            throw new OperationFailedException(ex);
-        }
-    }
-
     private void removeFirstLine(List<String> lines)
     {
         lines.remove(0);
-    }
-
-    private void removeDuplicates(List<String> lines)
-    {
-        Set<String> set = new LinkedHashSet<>(lines);
-        lines.clear();
-        lines.addAll(set);
     }
 
 }

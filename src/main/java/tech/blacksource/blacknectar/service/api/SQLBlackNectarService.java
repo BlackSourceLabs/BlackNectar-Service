@@ -24,6 +24,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Predicate;
 import javax.inject.Inject;
 import org.slf4j.Logger;
@@ -32,6 +33,7 @@ import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
+import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
@@ -39,6 +41,7 @@ import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static tech.blacksource.blacknectar.service.stores.Store.validStore;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.BooleanAssertions.falseStatement;
@@ -80,74 +83,19 @@ final class SQLBlackNectarService implements BlackNectarService
     }
 
     @Override
-    public List<Store> getAllStores(int limit)
-    {
-        checkThat(limit)
-            .usingMessage("limit must be >= 0")
-            .throwing(BadArgumentException.class)
-            .is(greaterThanOrEqualTo(0));
-
-        PreparedStatement statement = createStatementToGetAllStores(limit);
-
-        ResultSet results = tryToGetResults(statement, "Failed to get all stores with limit: " + limit);
-        
-        List<Store> stores = tryToGetStoresFrom(results);
-        
-        LOG.trace("SQL query to get all stores with limit {} turned up {} stores", limit, stores.size());
-        aroma.begin().titled("SQL Query Complete")
-            .text("Query to get all stores with limit {} turned up {} stores", limit, stores.size())
-            .withUrgency(Urgency.LOW)
-            .send();
-        
-        return stores;
-    }
-
-    @Override
-    public List<Store> searchForStores(BlackNectarSearchRequest request) throws OperationFailedException
-    {
-        checkThat(request)
-            .usingMessage("request missing")
-            .throwing(BadArgumentException.class)
-            .is(notNull());
-        
-        Statement statement = tryToCreateStatement();
-        String query = createSearchQueryForRequest(request);
-        
-        ResultSet results = tryToExecute(statement, query, "Could not execute SQL to search: " + request);
-        
-        List<Store> stores = tryToGetStoresFrom(results);
-        
-        String message = "Found {} stores for Search Request {}";
-        LOG.debug(message, stores.size(), request);
-        aroma.begin().titled("SQL Complete")
-            .text(message, stores.size(), request)
-            .withUrgency(Urgency.LOW)
-            .send();
-        
-        if (request.hasCenter())
-        {
-            return stores.stream()
-                .filter(nearby(request.center, request.radiusInMeters))
-                .collect(toList());
-        }
-        else 
-        {
-            return stores;
-        }
-    }
-
-    void addStore(@Required Store store) throws OperationFailedException
+    public void addStore(@Required Store store) throws OperationFailedException
     {
         checkThat(store)
             .throwing(BadArgumentException.class)
-            .is(notNull());
+            .is(notNull())
+            .is(validStore());
 
-        String insertStatement = createSQLToInsertStore();
+        String insertStatement = SQLQueries.INSERT_STORE;
         PreparedStatement statement = tryToPrepareStatement(insertStatement, "could not save Store to Database: " + store);
 
         try
         {
-            prepareStatementForStore(statement, store);
+            prepareStatementToInsertStore(statement, store);
         }
         catch (SQLException ex)
         {
@@ -180,7 +128,65 @@ final class SQLBlackNectarService implements BlackNectarService
 
     }
 
-    private PreparedStatement createStatementToGetAllStores(int limit) throws OperationFailedException
+    @Override
+    public List<Store> getAllStores(int limit) throws BlackNectarAPIException
+    {
+        checkThat(limit)
+            .usingMessage("limit must be >= 0")
+            .throwing(BadArgumentException.class)
+            .is(greaterThanOrEqualTo(0));
+
+        PreparedStatement statement = createStatementToGetAllStores(limit);
+
+        ResultSet results = tryToGetResults(statement, "Failed to get all stores with limit: " + limit);
+        
+        List<Store> stores = tryToGetStoresFrom(results);
+        
+        LOG.trace("SQL query to get all stores with limit {} turned up {} stores", limit, stores.size());
+        aroma.begin().titled("SQL Query Complete")
+            .text("Query to get all stores with limit {} turned up {} stores", limit, stores.size())
+            .withUrgency(Urgency.LOW)
+            .send();
+        
+        return stores;
+    }
+
+    @Override
+    public List<Store> searchForStores(BlackNectarSearchRequest request) throws BlackNectarAPIException
+    {
+        checkThat(request)
+            .usingMessage("request missing")
+            .throwing(BadArgumentException.class)
+            .is(notNull());
+        
+        Statement statement = tryToCreateStatement();
+        String query = createSearchQueryForRequest(request);
+        
+        ResultSet results = tryToExecute(statement, query, "Could not execute SQL to search: " + request);
+        
+        List<Store> stores = tryToGetStoresFrom(results);
+        
+        String message = "Found {} stores for Search Request {}";
+        LOG.debug(message, stores.size(), request);
+        aroma.begin().titled("SQL Complete")
+            .text(message, stores.size(), request)
+            .withUrgency(Urgency.LOW)
+            .send();
+        
+        if (request.hasCenter())
+        {
+            return stores.stream()
+                .filter(nearby(request.center, request.radiusInMeters))
+                .collect(toList());
+        }
+        else 
+        {
+            return stores;
+        }
+    }
+
+
+    private PreparedStatement createStatementToGetAllStores(int limit) throws BlackNectarAPIException
     {
         String query = createSQLTOGetAllStores(limit);
 
@@ -211,12 +217,6 @@ final class SQLBlackNectarService implements BlackNectarService
         }
     }
 
-    private String createSQLToInsertStore()
-    {
-        return "INSERT INTO Stores(store_name, latitude, longitude, address, address_line_two, city, state, county, zip_code, local_zip_code)\n" +
-               "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    }
-
     private PreparedStatement tryToPrepareStatement(String insertStatement, String message)
     {
         try
@@ -236,37 +236,24 @@ final class SQLBlackNectarService implements BlackNectarService
         }
     }
 
-    void prepareStatementForStore(PreparedStatement statement, Store store) throws SQLException
+    void prepareStatementToInsertStore(PreparedStatement statement, Store store) throws SQLException
     {
-        statement.setString(1, store.getName());
-        statement.setDouble(2, store.getLocation().getLatitude());
-        statement.setDouble(3, store.getLocation().getLongitude());
-        statement.setString(4, store.getAddress().getAddressLineOne());
-        statement.setString(5, store.getAddress().getAddressLineTwo());
-        statement.setString(6, store.getAddress().getCity());
-        statement.setString(7, store.getAddress().getState());
-        statement.setString(8, store.getAddress().getCounty());
-        statement.setString(9, "" + store.getAddress().getZip5());
-        statement.setString(10, "" + store.getAddress().getZip4());
-    }
-
-    String getStatementToCreateTable()
-    {
-        return "CREATE TABLE IF NOT EXISTS Stores\n" +
-               "(\n" +
-               "    store_name text,\n" +
-               "    latitude numeric,\n" +
-               "    longitude numeric,\n" +
-               "    address text,\n" +
-               "    address_line_two text,\n" +
-               "    city text,\n" +
-               "    state text,\n" +
-               "    county text,\n" +
-               "    zip_code text,\n" +
-               "    local_zip_code text,\n" +
-               "\n" +
-               "    PRIMARY KEY(store_name, latitude, longitude)\n" +
-               ")";
+        UUID storeUuid = UUID.fromString(store.getStoreId());
+        
+        statement.setObject(1, storeUuid);
+        statement.setString(2, store.getName());
+        statement.setDouble(3, store.getLocation().getLatitude());
+        statement.setDouble(4, store.getLocation().getLongitude());
+        //Remember for the ST_Point function, that it is longitude(x),latitude(y)
+        statement.setDouble(5, store.getLocation().getLongitude());
+        statement.setDouble(6, store.getLocation().getLatitude());
+        statement.setString(7, store.getAddress().getAddressLineOne());
+        statement.setString(8, store.getAddress().getAddressLineTwo());
+        statement.setString(9, store.getAddress().getCity());
+        statement.setString(10, store.getAddress().getState());
+        statement.setString(11, store.getAddress().getCounty());
+        statement.setString(12,  store.getAddress().getZipCode());
+        statement.setString(13, store.getAddress().getLocalZipCode());
     }
 
     private ResultSet tryToGetResults(PreparedStatement statement, String errorMessage)
@@ -382,7 +369,7 @@ final class SQLBlackNectarService implements BlackNectarService
         if (request.hasSearchTerm())
         {
             clauses += 1;
-            query += format("WHERE %s LIKE \"%%%s%%\" ", SQLColumns.STORE_NAME, request.searchTerm);
+            query += format("WHERE %s LIKE \'%%%s%%\' ", SQLColumns.STORE_NAME, request.searchTerm);
         }
         
         if (request.hasCenter())
@@ -438,6 +425,5 @@ final class SQLBlackNectarService implements BlackNectarService
             return distance <= radiusInMeters;
         };
     }
-
 
 }

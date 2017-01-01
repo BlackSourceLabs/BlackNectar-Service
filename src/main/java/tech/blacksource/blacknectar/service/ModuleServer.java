@@ -63,9 +63,32 @@ final class ModuleServer extends AbstractModule
 
     @Provides
     @Singleton
-    Connection provideSQLConnection() throws SQLException
+    Connection provideSQLConnection(Aroma aroma) throws SQLException
     {
-        return DriverManager.getConnection("jdbc:sqlite::resource:Stores.db");
+        int port = 5432;
+        String host = "database.blacksource.tech";
+        String user = Files.readFile("./secrets/postgres-user.txt").trim();
+        String password = Files.readFile("./secrets/postgres-password.txt").trim();
+        String schema = "blacknectar";
+
+        String url = String.format("jdbc:postgresql://%s:%d/postgres?user=%s&password=%s&currentSchema=%s", host, port, user,
+                                   password, schema);
+
+        try
+        {
+            return DriverManager.getConnection(url);
+        }
+        catch (SQLException ex)
+        {
+            String message = "Failed to create connection to PostgreSQL. Defaulting to SQLite.";
+            LOG.error(message, ex);
+            aroma.begin().titled("SQL Connection Failed")
+                .text(message, ex)
+                .withUrgency(Urgency.HIGH)
+                .send();
+            
+            throw ex;
+        }
     }
 
     @Provides
@@ -73,45 +96,56 @@ final class ModuleServer extends AbstractModule
     {
         try
         {
-            String cliendId = Files.readFile("../api-keys/yelp-client.txt").trim();
-            String secret = Files.readFile("../api-keys/yelp-secret.txt").trim();
+            String cliendId = Files.readFile("./secrets/yelp-client.txt").trim();
+            String secret = Files.readFile("./secrets/yelp-secret.txt").trim();
 
             return YelpAPI.Builder.newInstance()
                 .withClientCredentials(cliendId, secret)
                 .withEagerAuthentication()
                 .build();
         }
-        catch (Exception ex)
+        catch (RuntimeException ex)
         {
             aroma.begin().titled("Yelp Setup Failed")
                 .text("Failed to setup the Yelp API Client", ex)
                 .withUrgency(Urgency.HIGH)
                 .send();
-            
+
             return YelpAPI.NO_OP;
         }
     }
-    
+
     @Provides
     @Singleton
     GooglePlacesAPI provideGooglePlacesAPI(Aroma aroma) throws Exception
     {
         try
         {
-            String apiKey = Files.readFile("../api-keys/google-places.txt").trim();
-            
+            String apiKey = Files.readFile("./secrets/google-places.txt").trim();
+
             return GooglePlacesAPI.create(apiKey);
         }
-        catch(Exception ex)
+        catch (RuntimeException ex)
         {
             LOG.error("Failed to initialized Google Places API", ex);
-            
+
             aroma.begin().titled("Initialization Failed")
                 .text("Failed to initialized Google Places API", ex)
                 .withUrgency(Urgency.HIGH)
                 .send();
-            
+
             return GooglePlacesAPI.NO_OP;
         }
+    }
+
+    /**
+     * Creates a connection to the built-in SQLite database.
+     * 
+     * @return
+     * @throws SQLException 
+     */
+    private Connection createSQLiteConnection() throws SQLException
+    {
+        return DriverManager.getConnection("jdbc:sqlite::resource:Stores.db");
     }
 }

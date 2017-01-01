@@ -41,7 +41,6 @@ import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateInteger;
-import tech.sirwellington.alchemy.test.junit.runners.GenerateList;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
@@ -53,6 +52,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static sir.wellington.alchemy.collections.sets.Sets.toSet;
+import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.blacksource.blacknectar.service.JSON.collectArray;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
@@ -85,7 +85,6 @@ public class SearchStoresOperationTest
     @Mock
     private ImageLoader primaryImageLoader;
 
-    @GenerateList(Store.class)
     private List<Store> stores;
 
     private Map<Store, URL> images;
@@ -131,6 +130,8 @@ public class SearchStoresOperationTest
 
     private void setupData() throws Exception
     {
+        stores = listOf(stores());
+        
         ip = one(ip4Addresses());
         latitude = one(latitudes());
         longitude = one(longitudes());

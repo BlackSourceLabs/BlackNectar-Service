@@ -255,27 +255,6 @@ final class SQLBlackNectarService implements BlackNectarService
         statement.setString(13, store.getAddress().getLocalZipCode());
     }
 
-    String getStatementToCreateTable()
-    {
-        return "CREATE TABLE IF NOT EXISTS BlackNectar.Stores\n" +
-               "(\n" +
-               "	store_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),\n" +
-               "    store_name VARCHAR(100),\n" +
-               "    latitude NUMERIC NOT NULL,\n" +
-               "    longitude NUMERIC NOT NULL,\n" +
-               "    location GEOGRAPHY,\n" +
-               "    address_line_one VARCHAR(100),\n" +
-               "    address_line_two VARCHAR(100),\n" +
-               "    city VARCHAR(100),\n" +
-               "    state VARCHAR(5),\n" +
-               "    county VARCHAR(100),\n" +
-               "    zip_code INTEGER,\n" +
-               "    local_zip_code INTEGER,\n" +
-               "\n" +
-               "    CONSTRAINT Unique_Stores UNIQUE(store_name, latitude, longitude)\n" +
-               ");";
-    }
-
     private ResultSet tryToGetResults(PreparedStatement statement, String errorMessage)
     {
         try 

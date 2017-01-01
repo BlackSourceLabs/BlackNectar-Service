@@ -232,13 +232,6 @@ public class SQLBlackNectarServiceTest
         assertThatStatementWasPreparedAgainstStore(preparedStatement, store);
     }
 
-    @Test
-    public void testGetStatementToCreateTable()
-    {
-        String sqlStatement = instance.getStatementToCreateTable();
-        assertThat(sqlStatement.isEmpty(), is(false));
-    }
-
     private void setupResultsWithStore(ResultSet resultSet, Store store) throws SQLException
     {
         when(storeMapper.mapToStore(resultSet)).thenReturn(store);

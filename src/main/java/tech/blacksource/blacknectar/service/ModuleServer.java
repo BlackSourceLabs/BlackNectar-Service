@@ -65,10 +65,12 @@ final class ModuleServer extends AbstractModule
     @Singleton
     Connection provideSQLConnection() throws SQLException
     {
+        int port = 5432;
+        String host = "database.blacksource.tech";
         String user = Files.readFile("./secrets/postgres-user.txt").trim();
         String password = Files.readFile("./secrets/postgres-password.txt").trim();
         
-        String url = String.format("jdbc:postgresql://localhost:5432/postgres?user=%s&password=%s", user, password);
+        String url = String.format("jdbc:postgresql://%s:%d/postgres?user=%s&password=%s", host, port, user, password);
         return DriverManager.getConnection(url);
     }
 

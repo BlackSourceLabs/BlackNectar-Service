@@ -361,7 +361,7 @@ final class SQLBlackNectarService implements BlackNectarService
     private String createSearchQueryForRequest(BlackNectarSearchRequest request)
     {
         String query = "SELECT * " +
-            "FROM Stores ";
+            "FROM BlackNectar.Stores ";
         
         int clauses = 0;
         

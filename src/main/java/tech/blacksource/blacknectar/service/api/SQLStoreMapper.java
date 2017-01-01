@@ -74,7 +74,7 @@ interface SQLStoreMapper
             }
 
             String storeId = results.getString(SQLColumns.STORE_ID);
-            String address = results.getString(SQLColumns.ADDRESS);
+            String address = results.getString(SQLColumns.ADDRESS_LINE_ONE);
             String addressTwo = results.getString(SQLColumns.ADDRESS_LINE_TWO);
             String city = results.getString(SQLColumns.CITY);
             String state = results.getString(SQLColumns.STATE);

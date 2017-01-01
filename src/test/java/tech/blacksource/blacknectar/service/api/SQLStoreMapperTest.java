@@ -103,7 +103,7 @@ public class SQLStoreMapperTest
     {
         when(results.getString(SQLColumns.STORE_ID)).thenReturn(store.getStoreId());
         when(results.getString(SQLColumns.STORE_NAME)).thenReturn(store.getName());
-        when(results.getString(SQLColumns.ADDRESS)).thenReturn(store.getAddress().getAddressLineOne());
+        when(results.getString(SQLColumns.ADDRESS_LINE_ONE)).thenReturn(store.getAddress().getAddressLineOne());
         when(results.getString(SQLColumns.ADDRESS_LINE_TWO)).thenReturn(store.getAddress().getAddressLineTwo());
         when(results.getString(SQLColumns.CITY)).thenReturn(store.getAddress().getCity());
         when(results.getString(SQLColumns.STATE)).thenReturn(store.getAddress().getState());

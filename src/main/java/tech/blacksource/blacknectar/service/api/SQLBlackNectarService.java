@@ -33,6 +33,7 @@ import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
+import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
@@ -128,7 +129,7 @@ final class SQLBlackNectarService implements BlackNectarService
     }
 
     @Override
-    public List<Store> getAllStores(int limit)
+    public List<Store> getAllStores(int limit) throws BlackNectarAPIException
     {
         checkThat(limit)
             .usingMessage("limit must be >= 0")
@@ -151,7 +152,7 @@ final class SQLBlackNectarService implements BlackNectarService
     }
 
     @Override
-    public List<Store> searchForStores(BlackNectarSearchRequest request) throws OperationFailedException
+    public List<Store> searchForStores(BlackNectarSearchRequest request) throws BlackNectarAPIException
     {
         checkThat(request)
             .usingMessage("request missing")
@@ -185,7 +186,7 @@ final class SQLBlackNectarService implements BlackNectarService
     }
 
 
-    private PreparedStatement createStatementToGetAllStores(int limit) throws OperationFailedException
+    private PreparedStatement createStatementToGetAllStores(int limit) throws BlackNectarAPIException
     {
         String query = createSQLTOGetAllStores(limit);
 
@@ -207,11 +208,11 @@ final class SQLBlackNectarService implements BlackNectarService
     {
         if (limit <= 0)
         {
-            return "SELECT * FROM BlackNectar.Stores";
+            return "SELECT * FROM Stores";
         }
         else
         {
-            return "SELECT * FROM BlackNectar.Stores " +
+            return "SELECT * FROM Stores " +
                    "LIMIT " + limit;
         }
     }
@@ -361,7 +362,7 @@ final class SQLBlackNectarService implements BlackNectarService
     private String createSearchQueryForRequest(BlackNectarSearchRequest request)
     {
         String query = "SELECT * " +
-            "FROM BlackNectar.Stores ";
+            "FROM Stores ";
         
         int clauses = 0;
         

@@ -5,6 +5,6 @@
 SELECT
 	*,
 	ST_Distance(location, ST_SetSRID(ST_Point(?, ?), 4326)) AS distance_meters
-FROM BlackNectar.Stores
+FROM Stores
 WHERE ST_DWithin(location, ST_SetSRID(ST_Point(?, ?), 4326), ?)
 ORDER BY distance

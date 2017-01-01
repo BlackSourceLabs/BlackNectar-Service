@@ -1,7 +1,7 @@
 -- Used to store images from other places around the internet
 -- ===========================================================================
 
-CREATE TABLE IF NOT EXISTS BlackNectar.Images_External
+CREATE TABLE IF NOT EXISTS Images_External
 (
 		url TEXT PRIMARY KEY,
 		binary BYTEA,

@@ -20,18 +20,26 @@ import java.sql.Connection;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import tech.aroma.client.Aroma;
+import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Answers.RETURNS_MOCKS;
 
 /**
  *
  * @author SirWellington
  */
 @RunWith(AlchemyTestRunner.class)
+@IntegrationTest
 public class ModuleServerIT 
 {
+    @Mock(answer = RETURNS_MOCKS)
+    private Aroma fakeAroma;
+    
     private ModuleServer instance;
 
     @Before
@@ -44,7 +52,7 @@ public class ModuleServerIT
     @Test
     public void testProvideSQLConnection() throws Exception
     {
-        Connection connection = instance.provideSQLConnection();
+        Connection connection = instance.provideSQLConnection(fakeAroma);
         assertThat(connection.isClosed(), is(false));
     }
 

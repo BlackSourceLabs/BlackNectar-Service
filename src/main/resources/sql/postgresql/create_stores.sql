@@ -1,7 +1,7 @@
 -- Used to store Stores that support EBT
 -- ===========================================================================
 
-CREATE TABLE IF NOT EXISTS BlackNectar.Stores
+CREATE TABLE IF NOT EXISTS Stores
 (
 		store_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     store_name TEXT,

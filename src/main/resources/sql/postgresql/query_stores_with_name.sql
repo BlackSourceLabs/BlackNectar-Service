@@ -4,6 +4,6 @@
 
 SELECT
 	*
-FROM BlackNectar.Stores
+FROM Stores
 WHERE store_name LIKE ?
 ORDER BY store_name

@@ -73,7 +73,7 @@ public final class RunLoadStores implements Callable<Void>
         List<Store> stores = storeRepository.getAllStores();
         AtomicInteger counter = new AtomicInteger();
         
-        for (Store store : stores)
+        stores.parallelStream().forEach((store) ->
         {
             try
             {
@@ -89,7 +89,7 @@ public final class RunLoadStores implements Callable<Void>
                     .withUrgency(Urgency.MEDIUM)
                     .send();
             }
-        }
+        });
         
         LOG.info("Successfully saved {} stores", counter.get());
         aroma.begin().titled("RunLoadStores Complete")

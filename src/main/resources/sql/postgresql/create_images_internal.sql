@@ -2,7 +2,7 @@
 -- Typically these are images that have been uploaded by our users.
 -- ===========================================================================
 
-CREATE TABLE IF NOT EXISTS BlackNectar.Images_Internal
+CREATE TABLE IF NOT EXISTS Images_Internal
 (
 		url TEXT PRIMARY KEY,
 		binary BYTEA,

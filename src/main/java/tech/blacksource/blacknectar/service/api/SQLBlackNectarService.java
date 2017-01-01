@@ -207,11 +207,11 @@ final class SQLBlackNectarService implements BlackNectarService
     {
         if (limit <= 0)
         {
-            return "SELECT * FROM Stores";
+            return "SELECT * FROM BlackNectar.Stores";
         }
         else
         {
-            return "SELECT * FROM Stores " +
+            return "SELECT * FROM BlackNectar.Stores " +
                    "LIMIT " + limit;
         }
     }
@@ -368,7 +368,7 @@ final class SQLBlackNectarService implements BlackNectarService
         if (request.hasSearchTerm())
         {
             clauses += 1;
-            query += format("WHERE %s LIKE \"%%%s%%\" ", SQLColumns.STORE_NAME, request.searchTerm);
+            query += format("WHERE %s LIKE \'%%%s%%\' ", SQLColumns.STORE_NAME, request.searchTerm);
         }
         
         if (request.hasCenter())

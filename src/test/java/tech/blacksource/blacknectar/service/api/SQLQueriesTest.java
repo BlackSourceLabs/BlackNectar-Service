@@ -23,6 +23,7 @@ import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
  *
@@ -35,6 +36,13 @@ public class SQLQueriesTest
     @Before
     public void setUp() throws Exception
     {
+    }
+    
+    @Test
+    public void testConstructor() throws Exception
+    {
+        assertThrows(() -> new SQLQueries())
+            .isInstanceOf(IllegalAccessException.class);
     }
     
     @Test

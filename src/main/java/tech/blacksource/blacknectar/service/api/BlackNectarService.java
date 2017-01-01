@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.List;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
+import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.blacksource.blacknectar.service.stores.StoreRepository;
@@ -53,14 +54,14 @@ public interface BlackNectarService
      * @param store The store to add.
      * @throws BadArgumentException If the argument is null or invalid.
      */
-    public void addStore(@Required Store store) throws BadArgumentException;
+    public void addStore(@Required Store store) throws BlackNectarAPIException;
 
     /**
      * Get all of the EBT stores in the country.
      * 
      * @return  All of the Stores.
      */
-    default List<Store> getAllStores()
+    default List<Store> getAllStores() throws BlackNectarAPIException
     {
         return getAllStores(0);
     }
@@ -73,7 +74,7 @@ public interface BlackNectarService
      *
      * @return 
      */
-    List<Store> getAllStores(int limit);
+    List<Store> getAllStores(int limit) throws BlackNectarAPIException;
     
     /**
      * Searches for stores that match the given criteria.
@@ -83,7 +84,7 @@ public interface BlackNectarService
      * 
      * @throws OperationFailedException 
      */
-    List<Store> searchForStores(@Required BlackNectarSearchRequest request) throws OperationFailedException;
+    List<Store> searchForStores(@Required BlackNectarSearchRequest request) throws BlackNectarAPIException;
     
     /**
      * Creates a new in-memory service that performs all operations in-memory.

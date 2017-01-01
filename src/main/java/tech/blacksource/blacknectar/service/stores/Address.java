@@ -52,7 +52,9 @@ public final class Address implements JSONRepresentable
     private final String city;
     private final String state;
     private final String county;
+    /** This is the 5-part zip code. For example, 93013. */
     private final String zipCode;
+    /** This is the local 4-part zip code. For example 0351. */
     private final String localZipCode;
 
     private final JsonObject json;

@@ -35,7 +35,6 @@ import tech.sirwellington.alchemy.generator.NetworkGenerators;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateList;
-import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.is;
@@ -61,7 +60,6 @@ public class YelpImageLoaderTest
 
     private YelpBusiness matchingBusiness;
 
-    @GeneratePojo
     private Store store;
 
     @Mock(answer = RETURNS_MOCKS)
@@ -154,7 +152,7 @@ public class YelpImageLoaderTest
         yelpAddress.address2 = address.getAddressLineTwo();
         yelpAddress.city = address.getCity();
         yelpAddress.state = address.getState();
-        yelpAddress.zipCode = String.valueOf(address.getZip5());
+        yelpAddress.zipCode = String.valueOf(address.getZipCode());
 
         return yelpAddress;
     }

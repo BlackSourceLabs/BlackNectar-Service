@@ -1,0 +1,15 @@
+
+# Intro
+
+The Database for BlackNectar is created in the "blacknectar" Schema.
+It uses the user `blacknectar` to access the tables and perform queries and updates.
+
+
+## PostGIS Support
+Note that PostGIS function are stored in the `public` schema and must be
+referenced using using fully-qualified syntaxt (i.e., `public.ST_Distance()`).
+
+You can also add it to the to the search path. 
+This is done by altering the user and adding the `search_path` parameter with a value of `public`.
+This lets the user use `postgis` functions in other schemas,
+like the `blacknectar` schema.

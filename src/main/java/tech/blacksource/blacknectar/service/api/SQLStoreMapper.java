@@ -19,6 +19,7 @@ package tech.blacksource.blacknectar.service.api;
 import com.google.inject.ImplementedBy;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 import tech.blacksource.blacknectar.service.stores.Address;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
@@ -73,18 +74,14 @@ interface SQLStoreMapper
                 longitude = null;
             }
 
-            String address = results.getString(SQLColumns.ADDRESS);
+            UUID storeId = results.getObject(SQLColumns.STORE_ID, UUID.class);
+            String address = results.getString(SQLColumns.ADDRESS_LINE_ONE);
             String addressTwo = results.getString(SQLColumns.ADDRESS_LINE_TWO);
             String city = results.getString(SQLColumns.CITY);
             String state = results.getString(SQLColumns.STATE);
             String county = results.getString(SQLColumns.COUNTY);
-            Integer zipCode = results.getInt(SQLColumns.ZIP_CODE);
-            Integer localZip = results.getInt(SQLColumns.LOCAL_ZIP_CODE);
-
-            if (results.wasNull())
-            {
-                localZip = null;
-            }
+            String zipCode = results.getString(SQLColumns.ZIP_CODE);
+            String localZip = results.getString(SQLColumns.LOCAL_ZIP_CODE);
 
             //Use the data to start creating a Store object, piece by piece
             Address.Builder addressBuilder = Address.Builder.newBuilder()
@@ -103,12 +100,13 @@ interface SQLStoreMapper
                 addressBuilder.withAddressLineTwo(addressTwo);
             }
 
-            if (localZip != null && localZip > 0)
+            if (!isNullOrEmpty(localZip))
             {
                 addressBuilder.withLocalZipCode(localZip);
             }
 
             Store.Builder storeBuilder = Store.Builder.newInstance()
+                .withStoreID(storeId)
                 .withAddress(addressBuilder.build())
                 .withName(name);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 BlackWholeLabs.
+ * Copyright 2016 BlackSourceLabs.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,46 +14,41 @@
  * limitations under the License.
  */
 
-package tech.blacksource.blacknectar.service;
+package tech.blacksource.blacknectar.service.stores;
 
-import java.sql.Connection;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import tech.aroma.client.Aroma;
-import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Answers.RETURNS_MOCKS;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 /**
  *
  * @author SirWellington
  */
 @RunWith(AlchemyTestRunner.class)
-@IntegrationTest
-public class ModuleServerIT 
+public class ModuleStoresTest
 {
-    @Mock(answer = RETURNS_MOCKS)
-    private Aroma fakeAroma;
-    
-    private ModuleServer instance;
+
+    private ModuleStores instance;
 
     @Before
     public void setUp() throws Exception
     {
-        instance = new ModuleServer();
+        instance = new ModuleStores();
     }
 
-
     @Test
-    public void testProvideSQLConnection() throws Exception
+    public void testConfigure()
     {
-        Connection connection = instance.provideSQLConnection(fakeAroma);
-        assertThat(connection.isClosed(), is(false));
+        Injector injector = Guice.createInjector(instance);
+
+        IDGenerator generator = injector.getInstance(IDGenerator.class);
+        assertThat(generator, notNullValue());
     }
 
 }

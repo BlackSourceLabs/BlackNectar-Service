@@ -22,6 +22,8 @@ import java.util.stream.Stream;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sir.wellington.alchemy.collections.lists.Lists;
+import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
@@ -29,6 +31,7 @@ import tech.sirwellington.alchemy.annotations.access.Internal;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.stream.Collectors.toList;
+import static tech.blacksource.blacknectar.service.stores.Store.validStore;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThanOrEqualTo;
@@ -57,6 +60,18 @@ final class MemoryBlackNectarService implements BlackNectarService
     }
 
     @Override
+    public void addStore(Store store) throws BadArgumentException
+    {
+        checkThat(store)
+            .throwing(BadArgumentException.class)
+            .is(notNull())
+            .is(validStore());
+        
+        stores.add(store);
+        LOG.debug("Successfully saved store: {}", store);
+    }
+    
+    @Override
     public List<Store> getAllStores(int limit)
     {
         checkThat(limit)
@@ -65,7 +80,7 @@ final class MemoryBlackNectarService implements BlackNectarService
 
         if (limit == 0)
         {
-            return stores;
+            return Lists.copy(stores);
         }
 
         return stores.stream()

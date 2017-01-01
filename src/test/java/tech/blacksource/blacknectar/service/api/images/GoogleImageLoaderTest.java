@@ -34,7 +34,6 @@ import tech.redroma.google.places.requests.NearbySearchRequest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateList;
-import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateURL;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
@@ -43,19 +42,20 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_MOCKS;
 import static org.mockito.Mockito.when;
+import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.blacksource.blacknectar.service.api.images.GoogleImageLoader.DEFAULT_RADIUS;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
  *
  * @author SirWellington
  */
-@Repeat(10)
+@Repeat(25)
 @RunWith(AlchemyTestRunner.class)
 public class GoogleImageLoaderTest
 {
 
-    @GeneratePojo
     private Store store;
 
     @GenerateList(Place.class)
@@ -89,6 +89,7 @@ public class GoogleImageLoaderTest
 
     private void setupData() throws Exception
     {
+        store = one(stores());
         expectedRequest = createExpectedRequestFor(store);
         matchingPlace = Lists.oneOf(places);
         matchingPlace.name = store.getName();

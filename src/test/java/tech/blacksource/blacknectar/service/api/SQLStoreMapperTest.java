@@ -19,6 +19,7 @@ package tech.blacksource.blacknectar.service.api;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -101,14 +102,15 @@ public class SQLStoreMapperTest
     
     private void setupResultsWithStore(ResultSet results, Store store) throws SQLException
     {
+        when(results.getObject(SQLColumns.STORE_ID, UUID.class)).thenReturn(UUID.fromString(store.getStoreId()));
         when(results.getString(SQLColumns.STORE_NAME)).thenReturn(store.getName());
-        when(results.getString(SQLColumns.ADDRESS)).thenReturn(store.getAddress().getAddressLineOne());
+        when(results.getString(SQLColumns.ADDRESS_LINE_ONE)).thenReturn(store.getAddress().getAddressLineOne());
         when(results.getString(SQLColumns.ADDRESS_LINE_TWO)).thenReturn(store.getAddress().getAddressLineTwo());
         when(results.getString(SQLColumns.CITY)).thenReturn(store.getAddress().getCity());
         when(results.getString(SQLColumns.STATE)).thenReturn(store.getAddress().getState());
         when(results.getString(SQLColumns.COUNTY)).thenReturn(store.getAddress().getCounty());
-        when(results.getInt(SQLColumns.ZIP_CODE)).thenReturn(store.getAddress().getZip5());
-        when(results.getInt(SQLColumns.LOCAL_ZIP_CODE)).thenReturn(store.getAddress().getZip4());
+        when(results.getString(SQLColumns.ZIP_CODE)).thenReturn(store.getAddress().getZipCode());
+        when(results.getString(SQLColumns.LOCAL_ZIP_CODE)).thenReturn(store.getAddress().getLocalZipCode());
         when(results.getDouble(SQLColumns.LATITUDE)).thenReturn(store.getLocation().getLatitude());
         when(results.getDouble(SQLColumns.LONGITUDE)).thenReturn(store.getLocation().getLongitude());
     }

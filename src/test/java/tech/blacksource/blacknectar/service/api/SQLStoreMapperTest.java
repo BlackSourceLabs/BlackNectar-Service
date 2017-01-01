@@ -19,6 +19,7 @@ package tech.blacksource.blacknectar.service.api;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -101,7 +102,7 @@ public class SQLStoreMapperTest
     
     private void setupResultsWithStore(ResultSet results, Store store) throws SQLException
     {
-        when(results.getString(SQLColumns.STORE_ID)).thenReturn(store.getStoreId());
+        when(results.getObject(SQLColumns.STORE_ID, UUID.class)).thenReturn(UUID.fromString(store.getStoreId()));
         when(results.getString(SQLColumns.STORE_NAME)).thenReturn(store.getName());
         when(results.getString(SQLColumns.ADDRESS_LINE_ONE)).thenReturn(store.getAddress().getAddressLineOne());
         when(results.getString(SQLColumns.ADDRESS_LINE_TWO)).thenReturn(store.getAddress().getAddressLineTwo());

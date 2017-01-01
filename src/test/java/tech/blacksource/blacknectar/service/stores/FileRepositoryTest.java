@@ -17,6 +17,7 @@
 package tech.blacksource.blacknectar.service.stores;
 
 import java.util.List;
+import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -67,7 +68,9 @@ public class FileRepositoryTest
     private Store store;
     
     @GenerateString(UUID)
-    private String generatedStoreId;
+    private String storeIdString;
+    
+    private UUID storeId;
 
     @Before
     public void setUp() throws Exception
@@ -83,11 +86,13 @@ public class FileRepositoryTest
     private void setupData() throws Exception
     {
         store = one(stores());
+        storeId = java.util.UUID.fromString(storeIdString);
     }
     
     private void setupMocks() throws Exception
     {
-        when(idGenerator.generateKey()).thenReturn(generatedStoreId);
+        when(idGenerator.generateKey()).thenReturn(storeId);
+        when(idGenerator.generateKeyAsString()).thenReturn(storeIdString);
     }
 
     @DontRepeat
@@ -100,7 +105,7 @@ public class FileRepositoryTest
         assertThat(results.size(), greaterThanOrEqualTo(3000));
         assertThat(results.size(), lessThanOrEqualTo(FileRepository.MAXIMUM_STORES));
         
-        results.forEach(s -> assertThat(s.getStoreId(), is(generatedStoreId)));
+        results.forEach(s -> assertThat(s.getStoreId(), is(storeIdString)));
         verify(idGenerator, atLeastOnce()).generateKey();
     }
 

@@ -17,11 +17,12 @@
 package tech.blacksource.blacknectar.service.stores;
 
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.CONCRETE_BEHAVIOR;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.INTERFACE;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
  * This interface generates unique IDs on each call, useful for storing data in databases as the primary key.
@@ -36,35 +37,41 @@ public interface IDGenerator
      * Generates a unique key that is guaranteed to be different on each call.
      *
      * @return
+     * @see #generateKeyAsString()
      */
-    String generateKey();
+    UUID generateKey();
 
-    IDGenerator UUIDS = () -> UUID.randomUUID().toString();
+    /**
+     * Generates a unique {@link UUID} as a String.
+     *
+     * @return
+     * @see #generateKey()
+     */
+    default String generateKeyAsString()
+    {
+        UUID key = this.generateKey();
+        checkThat(key).is(notNull());
+        return key.toString();
+    }
+
+    /**
+     * Singleton instance that generates unique UUIDs.
+     */
+    IDGenerator INSTANCE = new Impl();
 
     /**
      * Generates IDs based on {@link UUID#randomUUID() }.
-     * @return 
      */
     @StrategyPattern(role = CONCRETE_BEHAVIOR)
-    static IDGenerator uuids()
+    class Impl implements IDGenerator
     {
-        return UUIDS;
-    }
 
-    /**
-     * Generates unique IDs that are integers created from an {@link AtomicInteger} as a counter.
-     * Note that these are not guaranteed to be unique across instances.
-     * @return 
-     */
-    @StrategyPattern(role = CONCRETE_BEHAVIOR)
-    static IDGenerator serialInteger()
-    {
-        final AtomicInteger counter = new AtomicInteger();
-
-        return () ->
+        @Override
+        public UUID generateKey()
         {
-            long value = counter.incrementAndGet();
-            return String.valueOf(value);
-        };
+            return UUID.randomUUID();
+        }
+
     }
+
 }

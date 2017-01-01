@@ -124,10 +124,9 @@ public class StoreTest
         assertThrows(() -> builder.withName(null)).isInstanceOf(IllegalArgumentException.class);
         assertThrows(() -> builder.withMainImageURL("")).isInstanceOf(IllegalArgumentException.class);
         assertThrows(() -> builder.withMainImageURL(null)).isInstanceOf(IllegalArgumentException.class);
-        assertThrows(() -> builder.withStoreID("")).isInstanceOf(IllegalArgumentException.class);
         assertThrows(() -> builder.withStoreID(null)).isInstanceOf(IllegalArgumentException.class);
     }
-
+    
     @Test
     public void testEquals()
     {

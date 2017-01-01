@@ -315,13 +315,12 @@ public class Store implements JSONRepresentable
          * @return
          * @throws IllegalArgumentException 
          */
-        public Builder withStoreID(@NonEmpty String storeId) throws IllegalArgumentException
+        public Builder withStoreID(@NonEmpty UUID storeId) throws IllegalArgumentException
         {
             checkThat(storeId)
-                .is(nonEmptyString())
-                .is(validUUID());
+                .is(notNull());
             
-            this.storeId = storeId;
+            this.storeId = storeId.toString();
             return this;
         }
 

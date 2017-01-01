@@ -25,7 +25,6 @@ import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateInteger;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
-import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateInteger.Type.RANGE;
@@ -47,40 +46,34 @@ public class IDGeneratorTest
     @Before
     public void setUp() throws Exception
     {
-
+        instance = new IDGenerator.Impl();
     }
 
     @Test
     public void testGenerateKey()
     {
-    }
-
-    @Test
-    public void testUuids()
-    {
-        instance = IDGenerator.uuids();
-        assertThat(instance, notNullValue());
-
         assertAllValuesAreUnique(instance);
     }
-
     @Test
-    public void testSerialInteger()
+    public void testGenerateString() throws Exception
     {
+       Set<String> ids = Sets.create();
+       
+       for (int i = 0; i < iterations; ++ i)
+       {
+           ids.add(instance.generateKeyAsString());
+       }
 
-        instance = IDGenerator.serialInteger();
-        assertThat(instance, notNullValue());
-
-        assertAllValuesAreUnique(instance);
+        assertThat(ids.size(), is(iterations));
     }
-
+    
     private void assertAllValuesAreUnique(IDGenerator generator)
     {
         Set<String> ids = Sets.create();
 
         for (int i = 0; i < iterations; ++i)
         {
-            ids.add(generator.generateKey());
+            ids.add(generator.generateKey().toString());
         }
 
         assertThat(ids.size(), is(iterations));

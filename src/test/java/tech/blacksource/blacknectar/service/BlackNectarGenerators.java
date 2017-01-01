@@ -18,6 +18,7 @@
 package tech.blacksource.blacknectar.service;
 
 
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.blacksource.blacknectar.service.stores.Address;
@@ -75,7 +76,7 @@ public class BlackNectarGenerators
         return () ->
         {
             return Store.Builder.newInstance()
-                .withStoreID(one(uuids))
+                .withStoreID(UUID.fromString(one(uuids)))
                 .withAddress(addresses().get())
                 .withLocation(locations().get())
                 .withName(one(alphabeticString()))

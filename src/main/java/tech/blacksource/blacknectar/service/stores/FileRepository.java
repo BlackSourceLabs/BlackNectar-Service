@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.slf4j.Logger;
@@ -233,7 +234,7 @@ final class FileRepository implements StoreRepository
         }
         
         //Finally, generate an ID for the Store
-        String storeId = idGenerator.generateKey();
+        UUID storeId = idGenerator.generateKey();
 
         return Store.Builder.newInstance()
             .withStoreID(storeId)

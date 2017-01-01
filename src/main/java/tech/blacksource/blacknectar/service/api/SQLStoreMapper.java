@@ -19,6 +19,7 @@ package tech.blacksource.blacknectar.service.api;
 import com.google.inject.ImplementedBy;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 import tech.blacksource.blacknectar.service.stores.Address;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
@@ -73,7 +74,7 @@ interface SQLStoreMapper
                 longitude = null;
             }
 
-            String storeId = results.getString(SQLColumns.STORE_ID);
+            UUID storeId = results.getObject(SQLColumns.STORE_ID, UUID.class);
             String address = results.getString(SQLColumns.ADDRESS_LINE_ONE);
             String addressTwo = results.getString(SQLColumns.ADDRESS_LINE_TWO);
             String city = results.getString(SQLColumns.CITY);

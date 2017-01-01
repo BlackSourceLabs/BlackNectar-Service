@@ -21,7 +21,6 @@ package tech.blacksource.blacknectar.service.stores;
 import com.google.inject.AbstractModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.blacksource.blacknectar.service.stores.IDGenerator;
 
 /**
  *
@@ -34,7 +33,7 @@ public final class ModuleStores extends AbstractModule
     @Override
     protected void configure()
     {
-        bind(IDGenerator.class).toInstance(IDGenerator.uuids());
+        bind(IDGenerator.class).toInstance(IDGenerator.INSTANCE);
     }
 
 }

@@ -36,7 +36,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
  */
 @Internal
 @NonInstantiable
-final class SQLQueries
+public final class SQLQueries
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(SQLQueries.class);

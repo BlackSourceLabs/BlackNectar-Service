@@ -16,44 +16,76 @@
 
 package tech.blacksource.blacknectar.service;
 
-import java.sql.Connection;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import javax.sql.DataSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import tech.aroma.client.Aroma;
 import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Answers.RETURNS_MOCKS;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 /**
  *
  * @author SirWellington
  */
-@RunWith(AlchemyTestRunner.class)
 @IntegrationTest
-public class ModuleServerIT 
+@RunWith(AlchemyTestRunner.class)
+public class ModuleServerIT
 {
-    @Mock(answer = RETURNS_MOCKS)
-    private Aroma fakeAroma;
-    
+
     private ModuleServer instance;
 
     @Before
     public void setUp() throws Exception
     {
+
+        setupData();
+        setupMocks();
         instance = new ModuleServer();
     }
 
+    private void setupData() throws Exception
+    {
+
+    }
+
+    private void setupMocks() throws Exception
+    {
+
+    }
+
+    @Test
+    public void testBindings()
+    {
+        Injector injector = Guice.createInjector(instance);
+
+        Server server = injector.getInstance(Server.class);
+        assertThat(server, notNullValue());
+    }
+
+    @Test
+    public void testProvideAromaClient()
+    {
+        Aroma aroma = instance.provideAromaClient();
+        assertThat(aroma, notNullValue());
+    }
+
+    @Test
+    public void testConfigure()
+    {
+    }
 
     @Test
     public void testProvideSQLConnection() throws Exception
     {
-        Connection connection = instance.provideSQLConnection(fakeAroma);
-        assertThat(connection.isClosed(), is(false));
+        Aroma aroma = instance.provideAromaClient();
+        DataSource connection = instance.provideSQLConnection(aroma);
+        assertThat(connection, notNullValue());
     }
 
 }

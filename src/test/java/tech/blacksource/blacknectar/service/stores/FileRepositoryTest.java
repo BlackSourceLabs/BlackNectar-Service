@@ -63,7 +63,7 @@ public class FileRepositoryTest
     @Mock
     private IDGenerator idGenerator;
     
-    private FileRepository instance;
+    private FileStoreDataSource instance;
     
     private Store store;
     
@@ -79,7 +79,7 @@ public class FileRepositoryTest
         setupData();
         setupMocks();
         
-        instance = new FileRepository(aroma, idGenerator);
+        instance = new FileStoreDataSource(aroma, idGenerator);
     }
 
 
@@ -103,7 +103,7 @@ public class FileRepositoryTest
         assertThat(results, notNullValue());
         assertThat(results, not(empty()));
         assertThat(results.size(), greaterThanOrEqualTo(3000));
-        assertThat(results.size(), lessThanOrEqualTo(FileRepository.MAXIMUM_STORES));
+        assertThat(results.size(), lessThanOrEqualTo(FileStoreDataSource.MAXIMUM_STORES));
         
         results.forEach(s -> assertThat(s.getStoreId(), is(storeIdString)));
         verify(idGenerator, atLeastOnce()).generateKey();

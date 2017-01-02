@@ -77,9 +77,15 @@ final class ModuleServer extends AbstractModule
         String user = Files.readFile("./secrets/postgres-user.txt").trim();
         String password = Files.readFile("./secrets/postgres-password.txt").trim();
         String schema = "blacknectar";
+        String applicationName = "BlackNectar";
 
-        String url = String.format("jdbc:postgresql://%s:%d/postgres?user=%s&password=%s&currentSchema=%s", host, port, user,
-                                   password, schema);
+        String url = String.format("jdbc:postgresql://%s:%d/postgres?user=%s&password=%s&currentSchema=%s&ApplicationName=%s",
+                                   host, 
+                                   port, 
+                                   user,
+                                   password,
+                                   schema,
+                                   applicationName);
         
         ComboPooledDataSource  dataSource = new ComboPooledDataSource();
         dataSource.setJdbcUrl(url);

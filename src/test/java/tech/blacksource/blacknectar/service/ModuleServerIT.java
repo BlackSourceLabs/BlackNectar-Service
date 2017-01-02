@@ -18,16 +18,19 @@ package tech.blacksource.blacknectar.service;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import java.sql.Connection;
 import javax.sql.DataSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import tech.aroma.client.Aroma;
 import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.Answers.RETURNS_MOCKS;
 
 /**
  *
@@ -38,6 +41,9 @@ import static org.junit.Assert.*;
 public class ModuleServerIT
 {
 
+    @Mock(answer = RETURNS_MOCKS)
+    private Aroma fakeAroma;
+    
     private ModuleServer instance;
 
     @Before
@@ -86,6 +92,20 @@ public class ModuleServerIT
         Aroma aroma = instance.provideAromaClient();
         DataSource connection = instance.provideSQLConnection(aroma);
         assertThat(connection, notNullValue());
+    }
+    
+    @Test
+    public void testSQLConnectionRefreshesOnClosure() throws Exception
+    {
+        DataSource dataSource = instance.provideSQLConnection(fakeAroma);
+        
+        Connection connection = dataSource.getConnection();
+        connection.close();
+        assertTrue(connection.isClosed());
+        
+        connection = dataSource.getConnection();
+        assertFalse(connection.isClosed());
+        
     }
 
 }

@@ -34,6 +34,7 @@ public interface ImageLoader
      * 
      * @param store The store to search for.
      * @return A URL pointing to a relevant image, null is one cannot be found.
+     * 
      * @throws BlackNectarAPIException 
      */
     URL getImageFor(@Required Store store) throws BlackNectarAPIException;

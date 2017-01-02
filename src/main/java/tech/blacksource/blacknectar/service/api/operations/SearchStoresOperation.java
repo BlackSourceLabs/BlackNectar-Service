@@ -33,6 +33,7 @@ import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
 import tech.blacksource.blacknectar.service.JSON;
 import tech.blacksource.blacknectar.service.api.BlackNectarSearchRequest;
+import tech.blacksource.blacknectar.service.api.StoreRepository;
 import tech.blacksource.blacknectar.service.api.images.Google;
 import tech.blacksource.blacknectar.service.api.images.ImageLoader;
 import tech.blacksource.blacknectar.service.api.images.Yelp;
@@ -54,8 +55,6 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.d
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.integerString;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.stringWithLengthGreaterThanOrEqualTo;
-
-import tech.blacksource.blacknectar.service.api.StoreRepository;
 
 /**
  * This operation allows searching for Stores. It takes the query parameters and constructs a {@link BlackNectarSearchRequest}

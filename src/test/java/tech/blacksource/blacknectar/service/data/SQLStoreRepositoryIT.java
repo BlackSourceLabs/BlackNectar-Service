@@ -16,12 +16,12 @@
 
 package tech.blacksource.blacknectar.service.data;
 
-import java.sql.Connection;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.jdbc.core.JdbcTemplate;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.service.TestingResources;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
@@ -55,7 +55,7 @@ public class SQLStoreRepositoryIT
     private static final Location NYC = Location.with(40.758659, -73.985217);
 
     private Aroma aroma;
-    private Connection connection;
+    private JdbcTemplate database;
     private GeoCalculator geoCalculator;
     private SQLStoreMapper storeMapper;
     
@@ -72,7 +72,7 @@ public class SQLStoreRepositoryIT
         
         setupData();
         setupMocks();
-        instance = new SQLStoreRepository(aroma, connection, geoCalculator, storeMapper);
+        instance = new SQLStoreRepository(aroma, database, geoCalculator, storeMapper);
     }
 
 
@@ -85,7 +85,7 @@ public class SQLStoreRepositoryIT
     private void setupMocks() throws Exception
     {
         aroma = TestingResources.getAroma();
-        connection = TestingResources.createSQLConnection();
+        database = TestingResources.createDatabaseConnection();
         geoCalculator = GeoCalculator.HARVESINE;
         storeMapper = SQLStoreMapper.INSTANCE;
         

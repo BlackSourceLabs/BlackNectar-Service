@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
- 
 package tech.blacksource.blacknectar.service.data;
 
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sir.wellington.alchemy.collections.lists.Lists;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
@@ -44,40 +39,34 @@ import static java.util.stream.Collectors.toList;
 import static tech.blacksource.blacknectar.service.stores.Store.validStore;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
-import static tech.sirwellington.alchemy.arguments.assertions.BooleanAssertions.falseStatement;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThanOrEqualTo;
 
 /**
  * Uses an SQL Connection to interact with Store Data.
- * 
+ *
  * @author SirWellington
  */
 final class SQLStoreRepository implements StoreRepository
 {
+
     private final static Logger LOG = LoggerFactory.getLogger(SQLStoreRepository.class);
-    
+
     private final Aroma aroma;
-    private final Connection connection;
+    private final JdbcTemplate database;
     private final GeoCalculator geoCalculator;
     private final SQLStoreMapper storeMapper;
 
     @Inject
-    SQLStoreRepository(@Required Aroma aroma, 
-                          @Required Connection connection,
-                          @Required GeoCalculator geoCalculator,
-                          @Required SQLStoreMapper storeMapper) throws IllegalArgumentException, SQLException
+    SQLStoreRepository(@Required Aroma aroma,
+                       @Required JdbcTemplate database,
+                       @Required GeoCalculator geoCalculator,
+                       @Required SQLStoreMapper storeMapper) throws IllegalArgumentException, SQLException
     {
-        checkThat(aroma, connection, geoCalculator, storeMapper)
+        checkThat(aroma, database, geoCalculator, storeMapper)
             .are(notNull());
 
         this.aroma = aroma;
-
-        boolean isClosed = connection.isClosed();
-        checkThat(isClosed)
-            .usingMessage("connection is closed")
-            .is(falseStatement());
-
-        this.connection = connection;
+        this.database = database;
         this.geoCalculator = geoCalculator;
         this.storeMapper = storeMapper;
     }
@@ -90,42 +79,23 @@ final class SQLStoreRepository implements StoreRepository
             .is(notNull())
             .is(validStore());
 
-        String insertStatement = SQLQueries.INSERT_STORE;
-        PreparedStatement statement = tryToPrepareStatement(insertStatement, "could not save Store to Database: " + store);
-
+        int inserted = 0;
         try
         {
-            prepareStatementToInsertStore(statement, store);
+            inserted = addStoreToDatabase(store, database);
         }
-        catch (SQLException ex)
+        catch (DataAccessException ex)
         {
-            LOG.error("Failed to prepare statement to insert Store [{}]", store, ex);
+            String message = "Failed to insert Store: {}";
+            makeNoteOfSQLError(message, store, ex);
 
-            aroma.begin().titled("SQL Failed")
-                .text("Could not prepare statement to insert Store: [{}]", store, ex)
-                .withUrgency(Urgency.HIGH)
-                .send();
-
-            throw new OperationFailedException(ex);
+            throw new OperationFailedException("Could not insert store", ex);
         }
 
-        try
-        {
-            int count = statement.executeUpdate();
-            LOG.info("Successfully executed statement to insert Store. Received count {} for store [{}]", count, store);
-        }
-        catch (SQLException ex)
-        {
-            LOG.error("Failed to execute statement to insert Store: [{}]", store, ex);
-
-            aroma.begin().titled("SQL Failed")
-                .text("Could not execute SQL to insert Store [{}]", store, ex)
-                .withUrgency(Urgency.HIGH)
-                .send();
-
-            throw new OperationFailedException(ex);
-        }
-
+        aroma.begin().titled("SQL Store Inserted")
+            .text("Inserted {} store: \n\n{}", inserted, store)
+            .send();
+        LOG.debug("Successfully inserted {} store", inserted);
     }
 
     @Override
@@ -136,18 +106,29 @@ final class SQLStoreRepository implements StoreRepository
             .throwing(BadArgumentException.class)
             .is(greaterThanOrEqualTo(0));
 
-        PreparedStatement statement = createStatementToGetAllStores(limit);
+        String sql = createSQLTOGetAllStores(limit);
 
-        ResultSet results = tryToGetResults(statement, "Failed to get all stores with limit: " + limit);
-        
-        List<Store> stores = tryToGetStoresFrom(results);
-        
+        List<Store> stores;
+
+        try
+        {
+            stores = database.query(sql, storeMapper);
+        }
+        catch (DataAccessException ex)
+        {
+            String message = "Failed to query for all stores with limit {}";
+            makeNoteOfSQLError(message, limit, ex);
+            
+            throw new OperationFailedException(message, ex);
+        }
+
         LOG.trace("SQL query to get all stores with limit {} turned up {} stores", limit, stores.size());
+
         aroma.begin().titled("SQL Query Complete")
             .text("Query to get all stores with limit {} turned up {} stores", limit, stores.size())
             .withUrgency(Urgency.LOW)
             .send();
-        
+
         return stores;
     }
 
@@ -158,50 +139,60 @@ final class SQLStoreRepository implements StoreRepository
             .usingMessage("request missing")
             .throwing(BadArgumentException.class)
             .is(notNull());
-        
-        Statement statement = tryToCreateStatement();
+
         String query = createSearchQueryForRequest(request);
-        
-        ResultSet results = tryToExecute(statement, query, "Could not execute SQL to search: " + request);
-        
-        List<Store> stores = tryToGetStoresFrom(results);
-        
-        String message = "Found {} stores for Search Request {}";
-        LOG.debug(message, stores.size(), request);
-        aroma.begin().titled("SQL Complete")
-            .text(message, stores.size(), request)
-            .withUrgency(Urgency.LOW)
-            .send();
-        
+
+        List<Store> stores;
+
+        try
+        {
+            stores = database.query(query, storeMapper);
+        }
+        catch (DataAccessException ex)
+        {
+            String message = "Failed to search for stores with request: {}";
+            makeNoteOfSQLError(message, request, ex);
+            throw new OperationFailedException(message, ex);
+        }
+
+        makeNoteThatStoresSearched(request, stores);
+
         if (request.hasCenter())
         {
             return stores.stream()
                 .filter(nearby(request.center, request.radiusInMeters))
                 .collect(toList());
         }
-        else 
+        else
         {
             return stores;
         }
     }
 
-
-    private PreparedStatement createStatementToGetAllStores(int limit) throws BlackNectarAPIException
+    private int addStoreToDatabase(Store store, JdbcTemplate database) throws DataAccessException
     {
-        String query = createSQLTOGetAllStores(limit);
+        String insertStatement = SQLQueries.INSERT_STORE;
+        UUID storeId = UUID.fromString(store.getStoreId());
 
-        try
-        {
-            return connection.prepareStatement(query);
-        }
-        catch (SQLException ex)
-        {
-            LOG.error("Failed to create statement to get all stores with limit {}", limit);
-            aroma.begin().titled("SQL Failed")
-                .text("Could not create statement to get all stores: {}", ex)
-                .send();
-            throw new OperationFailedException(ex);
-        }
+        double latitude = store.getLocation().getLatitude();
+        double longitude = store.getLocation().getLongitude();
+
+        return database.update(insertStatement,
+                               storeId,
+                               store.getName(),
+                               latitude,
+                               longitude,
+                               //Remember that for ST_Point function, it is longitude(x), latitude(y).
+                               longitude,
+                               latitude,
+                               store.getAddress().getAddressLineOne(),
+                               store.getAddress().getAddressLineTwo(),
+                               store.getAddress().getCity(),
+                               store.getAddress().getState(),
+                               store.getAddress().getCounty(),
+                               store.getAddress().getZipCode(),
+                               store.getAddress().getLocalZipCode());
+
     }
 
     private String createSQLTOGetAllStores(int limit)
@@ -217,178 +208,36 @@ final class SQLStoreRepository implements StoreRepository
         }
     }
 
-    private PreparedStatement tryToPrepareStatement(String insertStatement, String message)
-    {
-        try
-        {
-            return connection.prepareStatement(insertStatement);
-        }
-        catch (SQLException ex)
-        {
-            LOG.error(message, ex);
-
-            aroma.begin().titled("SQL Failed")
-                .text(message)
-                .withUrgency(Urgency.HIGH)
-                .send();
-
-            throw new OperationFailedException(ex);
-        }
-    }
-
-    void prepareStatementToInsertStore(PreparedStatement statement, Store store) throws SQLException
-    {
-        UUID storeUuid = UUID.fromString(store.getStoreId());
-        
-        statement.setObject(1, storeUuid);
-        statement.setString(2, store.getName());
-        statement.setDouble(3, store.getLocation().getLatitude());
-        statement.setDouble(4, store.getLocation().getLongitude());
-        //Remember for the ST_Point function, that it is longitude(x),latitude(y)
-        statement.setDouble(5, store.getLocation().getLongitude());
-        statement.setDouble(6, store.getLocation().getLatitude());
-        statement.setString(7, store.getAddress().getAddressLineOne());
-        statement.setString(8, store.getAddress().getAddressLineTwo());
-        statement.setString(9, store.getAddress().getCity());
-        statement.setString(10, store.getAddress().getState());
-        statement.setString(11, store.getAddress().getCounty());
-        statement.setString(12,  store.getAddress().getZipCode());
-        statement.setString(13, store.getAddress().getLocalZipCode());
-    }
-
-    private ResultSet tryToGetResults(PreparedStatement statement, String errorMessage)
-    {
-        try 
-        {
-            return statement.executeQuery();
-        }
-        catch(SQLException ex)
-        {
-            LOG.error("Failed to execute SQL statement: {}", errorMessage, ex);
-            
-            aroma.begin().titled("SQL Exception")
-                .text("Failed to execute SQL: {}", errorMessage, ex)
-                .withUrgency(Urgency.HIGH)
-                .send();
-            
-            throw new OperationFailedException(errorMessage, ex);
-        }
-    }
-
-    private List<Store> tryToGetStoresFrom(ResultSet results)
-    {
-        List<Store> stores = Lists.create();
-        
-        try
-        {
-            while (results.next())
-            {
-                Store store;
-                try
-                {
-                    store = storeMapper.mapToStore(results);
-                }
-                catch (SQLException ex)
-                {
-                    String message = "Could not extract store from row: {}";
-                    LOG.info(message, results, ex);
-                    aroma.begin().titled("SQL Exception")
-                        .text(message, results, ex)
-                        .send();
-
-                    continue;
-                }
-
-                if (store != null)
-                {
-                    stores.add(store);
-                }
-            }
-        }
-        catch (SQLException ex)
-        {
-            String message = "Failed to extract store from ResultSet: {}";
-            LOG.error(message, results, ex);
-
-            aroma.begin().titled("SQL Exception")
-                .text(message, results, ex)
-                .withUrgency(Urgency.HIGH)
-                .send();
-        }
-        
-        return stores;
-    }
-
-
-    private Statement tryToCreateStatement()
-    {
-        try 
-        {
-            return connection.createStatement();
-        }
-        catch(SQLException ex)
-        {
-            String message = "Could not prepare statement to SQL Database.";
-            LOG.error(message);
-            aroma.begin().titled("SQL Exception")
-                .text(message)
-                .withUrgency(Urgency.HIGH)
-                .send();
-            
-            throw new OperationFailedException("Failed to open Database connection", ex);
-        }
-    }
-
-    private ResultSet tryToExecute(Statement statement, String query, String errorMessage)
-    {
-        try 
-        {
-            return statement.executeQuery(query);
-        }
-        catch(SQLException ex)
-        {
-            String message = "Failed to execute SQL Statement: {}";
-            LOG.error(message, errorMessage, ex);
-            aroma.begin().titled("SQL Exception")
-                .text(message, errorMessage, ex)
-                .withUrgency(Urgency.HIGH)
-                .send();
-            
-            throw new OperationFailedException(errorMessage, ex);
-        }
-    }
-    
-    
     private String createSearchQueryForRequest(BlackNectarSearchRequest request)
     {
         String query = "SELECT * " +
-            "FROM Stores ";
-        
+                       "FROM Stores ";
+
         int clauses = 0;
-        
+
         if (request.hasSearchTerm())
         {
             clauses += 1;
             query += format("WHERE %s LIKE \'%%%s%%\' ", SQLColumns.STORE_NAME, request.searchTerm);
         }
-        
+
         if (request.hasCenter())
         {
             clauses += 1;
-            
+
             if (clauses > 1)
             {
                 query += " AND ";
             }
-            else 
+            else
             {
                 query += " WHERE ";
             }
-            
-           String locationClause = createLocationClauseFor(request);
-           query += locationClause;
+
+            String locationClause = createLocationClauseFor(request);
+            query += locationClause;
         }
-        
+
         if (request.hasLimit())
         {
             query += " LIMIT " + request.limit;
@@ -403,17 +252,17 @@ final class SQLStoreRepository implements StoreRepository
         double rightBearing = 90;
         double bottomBearing = 180;
         double leftBearing = 270;
-        
+
         Location top = geoCalculator.calculateDestinationFrom(request.center, request.radiusInMeters, topBearing);
         Location bottom = geoCalculator.calculateDestinationFrom(request.center, request.radiusInMeters, bottomBearing);
         Location left = geoCalculator.calculateDestinationFrom(request.center, request.radiusInMeters, leftBearing);
         Location right = geoCalculator.calculateDestinationFrom(request.center, request.radiusInMeters, rightBearing);
-        
+
         String clause = format("%s <= %f ", SQLColumns.LATITUDE, top.getLatitude()) +
                         format("AND %s >= %f ", SQLColumns.LATITUDE, bottom.getLatitude()) +
                         format("AND %s <= %f ", SQLColumns.LONGITUDE, right.getLongitude()) +
                         format("AND %s >= %f", SQLColumns.LONGITUDE, left.getLongitude());
-        
+
         return clause;
     }
 
@@ -424,6 +273,26 @@ final class SQLStoreRepository implements StoreRepository
             double distance = geoCalculator.distanceBetween(store.getLocation(), center);
             return distance <= radiusInMeters;
         };
+    }
+
+    private void makeNoteThatStoresSearched(BlackNectarSearchRequest request, List<Store> stores)
+    {
+        String message = "Found {} stores for Search Request {}";
+        LOG.debug(message, stores.size(), request);
+        aroma.begin().titled("SQL Complete")
+            .text(message, stores.size(), request)
+            .withUrgency(Urgency.LOW)
+            .send();
+    }
+
+    private void makeNoteOfSQLError(String message, Object... args)
+    {
+        aroma.begin().titled("SQL Failed")
+            .text(message, args)
+            .withUrgency(Urgency.HIGH)
+            .send();
+
+        LOG.error(message, args);
     }
 
 }

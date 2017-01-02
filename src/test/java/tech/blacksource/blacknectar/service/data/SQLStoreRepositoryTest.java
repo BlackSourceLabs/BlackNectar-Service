@@ -16,9 +16,6 @@
 
 package tech.blacksource.blacknectar.service.data;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
@@ -27,16 +24,21 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.stubbing.OngoingStubbing;
+import org.mockito.Mockito;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
+import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
+import tech.blacksource.blacknectar.service.stores.Address;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
+import static java.lang.String.format;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -44,6 +46,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.locations;
@@ -51,6 +54,7 @@ import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.doubles;
+import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.negativeIntegers;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
@@ -61,44 +65,38 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
  */
 @Repeat(50)
 @RunWith(AlchemyTestRunner.class)
-public class SQLStoreRepositoryTest 
+public class SQLStoreRepositoryTest
 {
+
     @Mock
-    private Connection connection;
-    
-    @Mock
-    private PreparedStatement preparedStatement;
-   
+    private JdbcTemplate database;
+
     @Mock
     private Statement statement;
-    
-    @Mock
-    private ResultSet resultSet;
-    
+
     @Mock
     private GeoCalculator geoCalculator;
-    
+
     @Mock
     private SQLStoreMapper storeMapper;
-    
+
     private List<Store> stores;
     private Store store;
-    
-    private Aroma aroma ;
-    
+
+    private Aroma aroma;
+
     private BlackNectarSearchRequest request;
     private SQLStoreRepository instance;
-    
+
     @Before
     public void setUp() throws Exception
     {
-        
+
         setupData();
         setupMocks();
-        
-        instance = new SQLStoreRepository(aroma, connection, geoCalculator, storeMapper);
-    }
 
+        instance = new SQLStoreRepository(aroma, database, geoCalculator, storeMapper);
+    }
 
     private void setupData() throws Exception
     {
@@ -115,82 +113,63 @@ public class SQLStoreRepositoryTest
     private void setupMocks() throws Exception
     {
         aroma = Aroma.create();
-        when(connection.isClosed()).thenReturn(false);
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(connection.createStatement()).thenReturn(statement);
-        
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        when(statement.executeQuery(anyString())).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(true).thenReturn(false);
-        
-        setupResultsWithStore(resultSet, store);
-        
+
+        setupSQLInsertForStore();
+
         when(geoCalculator.calculateDestinationFrom(eq(request.center), eq(request.radiusInMeters), anyDouble()))
             .thenReturn(one(locations()))
             .thenReturn(one(locations()))
             .thenReturn(one(locations()))
             .thenReturn(one(locations()));
-        
     }
-    
+
     @DontRepeat
     @Test
     public void testConstructorWithBadArguments()
     {
-        assertThrows(() -> new SQLStoreRepository(null, connection, geoCalculator, storeMapper))
+        assertThrows(() -> new SQLStoreRepository(null, database, geoCalculator, storeMapper))
             .isInstanceOf(IllegalArgumentException.class);
-        
+
         assertThrows(() -> new SQLStoreRepository(aroma, null, geoCalculator, storeMapper))
             .isInstanceOf(IllegalArgumentException.class);
-        
-        assertThrows(() -> new SQLStoreRepository(aroma, connection, null, storeMapper))
+
+        assertThrows(() -> new SQLStoreRepository(aroma, database, null, storeMapper))
             .isInstanceOf(IllegalArgumentException.class);
-        
-        assertThrows(() -> new SQLStoreRepository(aroma, connection, geoCalculator, null))
+
+        assertThrows(() -> new SQLStoreRepository(aroma, database, geoCalculator, null))
             .isInstanceOf(IllegalArgumentException.class);
-        
-    }
-    
-    @DontRepeat
-    @Test
-    public void testConstructorWithClosedConnection() throws Exception
-    {
-        when(connection.isClosed()).thenReturn(true);
-        
-        assertThrows(() -> new SQLStoreRepository(aroma, connection, geoCalculator, storeMapper))
-            .isInstanceOf(IllegalArgumentException.class);
+
     }
 
     @Test
-    public void testGetAllStores()
+    public void testGetAllStoresWithNoLimit() throws SQLException
     {
-        List<Store> results = instance.getAllStores(0);
-        assertThat(results, not(empty()));
-        
-        Store first = results.get(0);
-        assertThat(first, is(store));
-    }
+        String expectedQuery = "SELECT * FROM Stores";
 
-    @Test
-    public void testGetAllStoresWithAllStores() throws SQLException
-    {
-        OngoingStubbing<Boolean> resultStubbing = when(resultSet.next());
-        for (Store store : stores)
-        {
-            resultStubbing = resultStubbing.thenReturn(true);
-        }
-        resultStubbing.thenReturn(false);
+        when(database.query(anyString(), eq(storeMapper)))
+            .thenReturn(stores);
 
-        OngoingStubbing<Store> mapperStubbing = when(storeMapper.mapToStore(resultSet));
-        for (Store store : stores)
-        {
-            resultStubbing = resultStubbing.thenReturn(true);
-            mapperStubbing = mapperStubbing.thenReturn(store);
-        }
-        mapperStubbing.thenReturn(null);
-        
         List<Store> results = instance.getAllStores(0);
         assertThat(results, is(stores));
+
+        verify(database).query(expectedQuery, storeMapper);
+    }
+
+    @Test
+    public void testGetAllStoresWithLimit() throws Exception
+    {
+        int limit = one(integers(10, 100));
+        String expectedQuery = format("SELECT * FROM Stores LIMIT %d", limit);
+
+        when(database.query(anyString(), eq(storeMapper)))
+            .thenReturn(stores);
+
+        List<Store> results = instance.getAllStores(limit);
+        assertThat(results, not(empty()));
+        assertThat(results, is(stores));
+
+        verify(database).query(expectedQuery, storeMapper);
+
     }
 
     @Test
@@ -199,61 +178,74 @@ public class SQLStoreRepositoryTest
         int limit = one(negativeIntegers());
         assertThrows(() -> instance.getAllStores(limit)).isInstanceOf(BadArgumentException.class);
     }
+    
+    @Test
+    public void testGetAllStoresWhenFails() throws Exception
+    {
+        DataAccessException ex = mock(DataAccessException.class);
+        
+        when(database.query(anyString(), eq(storeMapper)))
+            .thenThrow(ex);
+        
+        assertThrows(() -> instance.getAllStores())
+            .isInstanceOf(BlackNectarAPIException.class);
+        
+    }
 
     @Test
     public void testSearchForStores()
     {
-            
-        List<Store> results = instance.searchForStores(request);
+        when(database.query(anyString(), eq(storeMapper)))
+            .thenReturn(stores);
         
+        List<Store> results = instance.searchForStores(request);
+
         assertThat(results, not(empty()));
-        Store first = results.get(0);
-        assertThat(first, is(store));
+        assertThat(results, is(stores));
     }
 
     @Test
     public void testAddStore() throws Exception
     {
-        when(connection.prepareStatement(anyString()))
-            .thenReturn(preparedStatement);
-        
+        when(database.update(anyString(), Mockito.<Object>anyVararg()))
+            .thenReturn(1);
+
         instance.addStore(store);
-        
-        verify(preparedStatement).executeUpdate();
-        
-        assertThatStatementWasPreparedAgainstStore(preparedStatement, store);
+
+        assertUpdateWasAgainstStore(database, store);
     }
 
-    @Test
-    public void testPrepareStatementForStore() throws Exception
+    private void assertUpdateWasAgainstStore(JdbcTemplate database, Store store) throws Exception
     {
-        instance.prepareStatementToInsertStore(preparedStatement, store);
-        
-        assertThatStatementWasPreparedAgainstStore(preparedStatement, store);
+        UUID storeId = UUID.fromString(store.getStoreId());
+        String expectedQuery = SQLQueries.INSERT_STORE;
+
+        Address address = store.getAddress();
+        double lat = store.getLocation().getLatitude();
+        double lon = store.getLocation().getLongitude();
+
+        verify(database).update(expectedQuery,
+                                storeId,
+                                store.getName(),
+                                lat,
+                                lon,
+                                lon,
+                                lat,
+                                address.getAddressLineOne(),
+                                address.getAddressLineTwo(),
+                                address.getCity(),
+                                address.getState(),
+                                address.getCounty(),
+                                address.getZipCode(),
+                                address.getLocalZipCode());
     }
 
-    private void setupResultsWithStore(ResultSet resultSet, Store store) throws SQLException
+    private void setupSQLInsertForStore()
     {
-        when(storeMapper.mapToStore(resultSet)).thenReturn(store);
-    }
+        String insert = SQLQueries.INSERT_STORE;
 
-    private void assertThatStatementWasPreparedAgainstStore(PreparedStatement preparedStatement, Store store) throws Exception
-    {
-        UUID storeUuid = UUID.fromString(store.getStoreId());
-        
-        verify(preparedStatement).setObject(1, storeUuid);
-        verify(preparedStatement).setString(2, store.getName());
-        verify(preparedStatement).setDouble(3, store.getLocation().getLatitude());
-        verify(preparedStatement).setDouble(4, store.getLocation().getLongitude());
-        verify(preparedStatement).setDouble(5, store.getLocation().getLongitude());
-        verify(preparedStatement).setDouble(6, store.getLocation().getLatitude());
-        verify(preparedStatement).setString(7, store.getAddress().getAddressLineOne());
-        verify(preparedStatement).setString(8, store.getAddress().getAddressLineTwo());
-        verify(preparedStatement).setString(9, store.getAddress().getCity());
-        verify(preparedStatement).setString(10, store.getAddress().getState());
-        verify(preparedStatement).setString(11, store.getAddress().getCounty());
-        verify(preparedStatement).setString(12, store.getAddress().getZipCode());
-        verify(preparedStatement).setString(13, store.getAddress().getLocalZipCode());
+        when(database.update(eq(insert), Mockito.<Object>anyVararg()))
+            .thenReturn(1);
     }
 
 }

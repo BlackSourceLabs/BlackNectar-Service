@@ -29,17 +29,14 @@ import tech.blacksource.blacknectar.service.stores.StoreDataSource;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 
-/*
- * TODO: Rename this interface to StoreDataSource.
- */
 /**
- * The BlackNectarService serves as the Backbone for the REST API.
+ * The StoreRepository serves as the Backbone for the REST API.
  * 
  * It allows for querying EBT stores by name and location.
  * 
  * @author SirWellington
  */
-public interface BlackNectarService 
+public interface StoreRepository 
 {
     /**
      * The default radius, in meters, used in queries where a radius is not provided.
@@ -91,12 +88,12 @@ public interface BlackNectarService
      * 
      * @return 
      */
-    static BlackNectarService newMemoryService()
+    static StoreRepository newMemoryService()
     {
         List<Store> stores = StoreDataSource.FILE.getAllStores();
         GeoCalculator formula = GeoCalculator.HARVESINE;
 
-        return new MemoryBlackNectarService(stores, formula);
+        return new MemoryStoreRepository(stores, formula);
     }
 
     
@@ -110,7 +107,7 @@ public interface BlackNectarService
      * 
      * @throws SQLException 
      */
-    static BlackNectarService newSQLService(@Required Connection connection) throws SQLException
+    static StoreRepository newSQLService(@Required Connection connection) throws SQLException
     {
         return newSQLService(Aroma.create(),
                              connection,
@@ -129,10 +126,10 @@ public interface BlackNectarService
      * 
      * @throws SQLException 
      */
-    static BlackNectarService newSQLService(@Required Aroma aroma,
+    static StoreRepository newSQLService(@Required Aroma aroma,
                                             @Required Connection connection,
                                             @Required GeoCalculator geoCalculator) throws SQLException
     {
-        return new SQLBlackNectarService(aroma, connection, geoCalculator, SQLStoreMapper.INSTANCE);
+        return new SQLStoreRepository(aroma, connection, geoCalculator, SQLStoreMapper.INSTANCE);
     }
 }

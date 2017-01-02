@@ -32,7 +32,6 @@ import spark.Response;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.service.JSON;
 import tech.blacksource.blacknectar.service.api.BlackNectarSearchRequest;
-import tech.blacksource.blacknectar.service.api.BlackNectarService;
 import tech.blacksource.blacknectar.service.api.images.ImageLoader;
 import tech.blacksource.blacknectar.service.api.operations.SearchStoresOperation.QueryKeys;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
@@ -65,6 +64,8 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateInteger.Type.POSITIVE;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.ALPHANUMERIC;
 
+import tech.blacksource.blacknectar.service.api.StoreRepository;
+
 /**
  *
  * @author SirWellington
@@ -77,7 +78,7 @@ public class SearchStoresOperationTest
     private Aroma aroma;
 
     @Mock
-    private BlackNectarService service;
+    private StoreRepository service;
 
     @Mock
     private ImageLoader secondaryImageLoader;

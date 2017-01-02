@@ -58,14 +58,14 @@ public class BlackNectarServiceTest
     @Test
     public void testNewMemoryService()
     {
-        BlackNectarService instance = BlackNectarService.newMemoryService();
+        StoreRepository instance = StoreRepository.newMemoryService();
         assertThat(instance, notNullValue());
     }
 
     @Test
     public void testNewSQLService() throws Exception
     {
-        BlackNectarService result = BlackNectarService.newSQLService(connection);
+        StoreRepository result = StoreRepository.newSQLService(connection);
         assertThat(result, notNullValue());
     }
 }

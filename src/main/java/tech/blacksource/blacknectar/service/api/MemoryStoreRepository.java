@@ -41,16 +41,16 @@ import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.g
  * @author SirWellington
  */
 @Internal
-final class MemoryBlackNectarService implements BlackNectarService
+final class MemoryStoreRepository implements StoreRepository
 {
 
-    private final static Logger LOG = LoggerFactory.getLogger(MemoryBlackNectarService.class);
+    private final static Logger LOG = LoggerFactory.getLogger(MemoryStoreRepository.class);
 
     private final List<Store> stores;
     private final GeoCalculator distanceFormula;
 
     @Inject 
-    MemoryBlackNectarService(List<Store> stores, GeoCalculator distanceFormula)
+    MemoryStoreRepository(List<Store> stores, GeoCalculator distanceFormula)
     {
         checkThat(stores, distanceFormula)
             .are(notNull());

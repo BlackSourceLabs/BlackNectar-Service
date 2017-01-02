@@ -51,7 +51,7 @@ import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.
  */
 @Repeat(50)
 @RunWith(AlchemyTestRunner.class)
-public class MemoryBlackNectarServiceTest
+public class MemoryStoreRepositoryTest
 {
 
     @GeneratePojo
@@ -71,7 +71,7 @@ public class MemoryBlackNectarServiceTest
     private List<Store> stores;
     private Store store;
     
-    private MemoryBlackNectarService instance;
+    private MemoryStoreRepository instance;
     
     @Before
     public void setUp() throws Exception
@@ -79,7 +79,7 @@ public class MemoryBlackNectarServiceTest
         setupData();
         setupMocks();
         
-        instance = new MemoryBlackNectarService(stores, GeoCalculator.HARVESINE);
+        instance = new MemoryStoreRepository(stores, GeoCalculator.HARVESINE);
     }
     
     private void setupData() throws Exception
@@ -166,7 +166,7 @@ public class MemoryBlackNectarServiceTest
             .withRadius(10)
             .withLimit(limit);
         
-        instance = new MemoryBlackNectarService(stores, GeoCalculator.HARVESINE);
+        instance = new MemoryStoreRepository(stores, GeoCalculator.HARVESINE);
         
         List<Store> results = instance.searchForStores(request);
         assertThat(results.size(), is(limit));

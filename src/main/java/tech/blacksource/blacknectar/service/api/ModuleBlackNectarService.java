@@ -34,7 +34,7 @@ public final class ModuleBlackNectarService extends AbstractModule
     @Override
     protected void configure()
     {
-        bind(BlackNectarService.class).to(SQLBlackNectarService.class).asEagerSingleton();
+        bind(StoreRepository.class).to(SQLStoreRepository.class).asEagerSingleton();
         bind(SQLStoreMapper.class).asEagerSingleton();
         bind(GeoCalculator.class).toInstance(GeoCalculator.HARVESINE);
         bind(StoreDataSource.class).asEagerSingleton();

@@ -52,9 +52,9 @@ import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.g
  * 
  * @author SirWellington
  */
-final class SQLBlackNectarService implements BlackNectarService
+final class SQLStoreRepository implements StoreRepository
 {
-    private final static Logger LOG = LoggerFactory.getLogger(SQLBlackNectarService.class);
+    private final static Logger LOG = LoggerFactory.getLogger(SQLStoreRepository.class);
     
     private final Aroma aroma;
     private final Connection connection;
@@ -62,7 +62,7 @@ final class SQLBlackNectarService implements BlackNectarService
     private final SQLStoreMapper storeMapper;
 
     @Inject
-    SQLBlackNectarService(@Required Aroma aroma, 
+    SQLStoreRepository(@Required Aroma aroma, 
                           @Required Connection connection,
                           @Required GeoCalculator geoCalculator,
                           @Required SQLStoreMapper storeMapper) throws IllegalArgumentException, SQLException

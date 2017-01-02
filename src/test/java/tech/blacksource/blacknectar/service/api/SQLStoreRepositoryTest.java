@@ -61,7 +61,7 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
  */
 @Repeat(50)
 @RunWith(AlchemyTestRunner.class)
-public class SQLBlackNectarServiceTest 
+public class SQLStoreRepositoryTest 
 {
     @Mock
     private Connection connection;
@@ -87,7 +87,7 @@ public class SQLBlackNectarServiceTest
     private Aroma aroma ;
     
     private BlackNectarSearchRequest request;
-    private SQLBlackNectarService instance;
+    private SQLStoreRepository instance;
     
     @Before
     public void setUp() throws Exception
@@ -96,7 +96,7 @@ public class SQLBlackNectarServiceTest
         setupData();
         setupMocks();
         
-        instance = new SQLBlackNectarService(aroma, connection, geoCalculator, storeMapper);
+        instance = new SQLStoreRepository(aroma, connection, geoCalculator, storeMapper);
     }
 
 
@@ -137,16 +137,16 @@ public class SQLBlackNectarServiceTest
     @Test
     public void testConstructorWithBadArguments()
     {
-        assertThrows(() -> new SQLBlackNectarService(null, connection, geoCalculator, storeMapper))
+        assertThrows(() -> new SQLStoreRepository(null, connection, geoCalculator, storeMapper))
             .isInstanceOf(IllegalArgumentException.class);
         
-        assertThrows(() -> new SQLBlackNectarService(aroma, null, geoCalculator, storeMapper))
+        assertThrows(() -> new SQLStoreRepository(aroma, null, geoCalculator, storeMapper))
             .isInstanceOf(IllegalArgumentException.class);
         
-        assertThrows(() -> new SQLBlackNectarService(aroma, connection, null, storeMapper))
+        assertThrows(() -> new SQLStoreRepository(aroma, connection, null, storeMapper))
             .isInstanceOf(IllegalArgumentException.class);
         
-        assertThrows(() -> new SQLBlackNectarService(aroma, connection, geoCalculator, null))
+        assertThrows(() -> new SQLStoreRepository(aroma, connection, geoCalculator, null))
             .isInstanceOf(IllegalArgumentException.class);
         
     }
@@ -157,7 +157,7 @@ public class SQLBlackNectarServiceTest
     {
         when(connection.isClosed()).thenReturn(true);
         
-        assertThrows(() -> new SQLBlackNectarService(aroma, connection, geoCalculator, storeMapper))
+        assertThrows(() -> new SQLStoreRepository(aroma, connection, geoCalculator, storeMapper))
             .isInstanceOf(IllegalArgumentException.class);
     }
 

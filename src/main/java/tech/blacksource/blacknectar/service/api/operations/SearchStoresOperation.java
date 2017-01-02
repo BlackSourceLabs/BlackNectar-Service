@@ -33,7 +33,6 @@ import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
 import tech.blacksource.blacknectar.service.JSON;
 import tech.blacksource.blacknectar.service.api.BlackNectarSearchRequest;
-import tech.blacksource.blacknectar.service.api.BlackNectarService;
 import tech.blacksource.blacknectar.service.api.images.Google;
 import tech.blacksource.blacknectar.service.api.images.ImageLoader;
 import tech.blacksource.blacknectar.service.api.images.Yelp;
@@ -56,9 +55,11 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.i
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.stringWithLengthGreaterThanOrEqualTo;
 
+import tech.blacksource.blacknectar.service.api.StoreRepository;
+
 /**
  * This operation allows searching for Stores. It takes the query parameters and constructs a {@link BlackNectarSearchRequest}
- * object that it then passes to the {@link BlackNectarService}.
+ * object that it then passes to the {@link StoreRepository}.
  *
  * @author SirWellington
  */
@@ -72,13 +73,13 @@ public class SearchStoresOperation implements Route
     private final static int DEFAULT_LIMIT = 250;
 
     private final Aroma aroma;
-    private final BlackNectarService service;
+    private final StoreRepository service;
     private final ImageLoader primaryImageLoader;
     private final ImageLoader secondaryImageLoader;
 
     @Inject
     public SearchStoresOperation(Aroma aroma,
-                                 BlackNectarService service,
+                                 StoreRepository service,
                                  @Google ImageLoader primaryImageLoader,
                                  @Yelp ImageLoader secondaryImageLoader)
     {
@@ -184,7 +185,7 @@ public class SearchStoresOperation implements Route
     {
         if (!hasRadiusParameter(queryParameters))
         {
-            request.withRadius(BlackNectarService.DEFAULT_RADIUS);
+            request.withRadius(StoreRepository.DEFAULT_RADIUS);
             return;
         }
 

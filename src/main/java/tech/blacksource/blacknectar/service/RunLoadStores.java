@@ -26,12 +26,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
-import tech.blacksource.blacknectar.service.api.BlackNectarService;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.blacksource.blacknectar.service.stores.StoreDataSource;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+
+import tech.blacksource.blacknectar.service.api.StoreRepository;
 
 /**
  *
@@ -43,11 +44,11 @@ public final class RunLoadStores implements Callable<Void>
     private final static Logger LOG = LoggerFactory.getLogger(RunLoadStores.class);
 
     private final Aroma aroma;
-    private final BlackNectarService service;
+    private final StoreRepository service;
     private final StoreDataSource storeRepository;
 
     @Inject
-    RunLoadStores(Aroma aroma, BlackNectarService service, StoreDataSource storeRepository)
+    RunLoadStores(Aroma aroma, StoreRepository service, StoreDataSource storeRepository)
     {
         checkThat(aroma, service, storeRepository)
             .are(notNull());

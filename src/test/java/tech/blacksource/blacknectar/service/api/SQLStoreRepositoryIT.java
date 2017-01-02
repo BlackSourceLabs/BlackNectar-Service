@@ -50,7 +50,7 @@ import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
  */
 @IntegrationTest
 @RunWith(AlchemyTestRunner.class)
-public class SQLBlackNectarServiceIT 
+public class SQLStoreRepositoryIT 
 {
     private static final Location NYC = Location.with(40.758659, -73.985217);
 
@@ -59,7 +59,7 @@ public class SQLBlackNectarServiceIT
     private GeoCalculator geoCalculator;
     private SQLStoreMapper storeMapper;
     
-    private SQLBlackNectarService instance;
+    private SQLStoreRepository instance;
     
     private List<Store> stores;
     
@@ -72,7 +72,7 @@ public class SQLBlackNectarServiceIT
         
         setupData();
         setupMocks();
-        instance = new SQLBlackNectarService(aroma, connection, geoCalculator, storeMapper);
+        instance = new SQLStoreRepository(aroma, connection, geoCalculator, storeMapper);
     }
 
 

@@ -53,6 +53,7 @@ public class SQLQueriesTest
         assertThat(SQLQueries.INSERT_STORE, not(isEmptyOrNullString()));
         assertThat(SQLQueries.QUERY_STORES_WITH_LOCATION, not(isEmptyOrNullString()));
         assertThat(SQLQueries.QUERY_STORES_WITH_NAME, not(isEmptyOrNullString()));
+        assertThat(SQLQueries.QUERY_STORES_WITH_NAME_AND_LOCATION, not(isEmptyOrNullString()));
     }
 
 

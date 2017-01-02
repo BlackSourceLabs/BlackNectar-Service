@@ -41,9 +41,6 @@ public class StoreRepositoryTest
     private Aroma aroma;
     
     @Mock
-    private GeoCalculator geoCalculator;
-    
-    @Mock
     private JdbcTemplate database;
 
     @Before
@@ -81,7 +78,7 @@ public class StoreRepositoryTest
     @Test
     public void testNewSQLServicWith3args() throws Exception
     {
-        StoreRepository result = StoreRepository.newSQLService(aroma, database, geoCalculator);
+        StoreRepository result = StoreRepository.newSQLService(aroma, database);
         assertThat(result, notNullValue());
     }
 

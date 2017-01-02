@@ -7,4 +7,3 @@ SELECT
 FROM Stores
 WHERE store_name LIKE ?
 ORDER BY store_name
-LIMIT 100

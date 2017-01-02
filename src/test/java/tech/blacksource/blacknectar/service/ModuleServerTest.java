@@ -21,7 +21,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.jdbc.core.JdbcTemplate;
 import tech.aroma.client.Aroma;
+import tech.redroma.google.places.GooglePlacesAPI;
+import tech.redroma.yelp.YelpAPI;
 import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
@@ -35,11 +38,15 @@ import static org.mockito.Answers.RETURNS_MOCKS;
  */
 @RunWith(AlchemyTestRunner.class)
 @IntegrationTest
-public class ModuleServerTest 
+public class ModuleServerTest
 {
+
     @Mock(answer = RETURNS_MOCKS)
     private Aroma fakeAroma;
-    
+
+    @Mock
+    private DataSource fakeDataSource;
+
     private ModuleServer instance;
 
     @Before
@@ -48,12 +55,39 @@ public class ModuleServerTest
         instance = new ModuleServer();
     }
 
-
     @Test
     public void testProvideSQLConnection() throws Exception
     {
         DataSource connection = instance.provideSQLConnection(fakeAroma);
         assertThat(connection, notNullValue());
+    }
+
+    @Test
+    public void testProvideAromaClient()
+    {
+        Aroma aroma = instance.provideAromaClient();
+        assertThat(aroma, notNullValue());
+    }
+
+    @Test
+    public void testProvideJDBCTemplate()
+    {
+        JdbcTemplate jdbc = instance.provideJDBCTemplate(fakeDataSource);
+        assertThat(jdbc, notNullValue());
+    }
+
+    @Test
+    public void testProvideYelpAPI() throws Exception
+    {
+        YelpAPI yelp = instance.provideYelpAPI(fakeAroma);
+        assertThat(yelp, notNullValue());
+    }
+
+    @Test
+    public void testProvideGooglePlacesAPI() throws Exception
+    {
+        GooglePlacesAPI google = instance.provideGooglePlacesAPI(fakeAroma);
+        assertThat(google, notNullValue());
     }
 
 }

@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import spark.ExceptionHandler;
 import tech.aroma.client.Aroma;
@@ -104,6 +105,13 @@ final class ModuleServer extends AbstractModule
         return dataSource;
     }
 
+    @Singleton
+    @Provides
+    JdbcTemplate provideJDBCTemplate(DataSource dataSource)
+    {
+        return new JdbcTemplate(dataSource, false);
+    }
+    
     @Provides
     YelpAPI provideYelpAPI(Aroma aroma) throws Exception
     {

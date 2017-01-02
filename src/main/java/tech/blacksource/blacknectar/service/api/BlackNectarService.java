@@ -25,8 +25,8 @@ import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
 import tech.blacksource.blacknectar.service.stores.Store;
-import tech.sirwellington.alchemy.annotations.arguments.Required;
 import tech.blacksource.blacknectar.service.stores.StoreDataSource;
+import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 
 /*

@@ -27,6 +27,7 @@ import tech.blacksource.blacknectar.service.TestingResources;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
+import tech.blacksource.blacknectar.service.stores.StoreDataSource;
 import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
@@ -42,8 +43,6 @@ import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.doubles;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
-
-import tech.blacksource.blacknectar.service.stores.StoreDataSource;
 
 /**
  *

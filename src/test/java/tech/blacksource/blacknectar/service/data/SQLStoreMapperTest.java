@@ -78,7 +78,7 @@ public class SQLStoreMapperTest
     @Test
     public void testMapToStore() throws Exception
     {
-        Store result = instance.mapToStore(results);
+        Store result = instance.mapRow(results, 1);
         assertThat(result, is(store));
     }
     
@@ -88,7 +88,7 @@ public class SQLStoreMapperTest
         for (Store store : stores)
         {
             setupResultsWithStore(results, store);
-            Store result = instance.mapToStore(results);
+            Store result = instance.mapRow(results, 1);
             assertThat(result, is(store));
         }
     }
@@ -97,7 +97,7 @@ public class SQLStoreMapperTest
     @Test
     public void testMapToStoreWithBadArguments() throws Exception
     {
-        assertThrows(() -> instance.mapToStore(null)).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(() -> instance.mapRow(null, 1)).isInstanceOf(IllegalArgumentException.class);
     }
     
     private void setupResultsWithStore(ResultSet results, Store store) throws SQLException

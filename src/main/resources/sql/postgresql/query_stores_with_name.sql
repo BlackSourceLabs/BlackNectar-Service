@@ -1,5 +1,5 @@
 -- Find Stores that match a specific name.
--- Returns resulting stores that match the specified name, limited to 100.
+-- Returns resulting stores that match the specified name.
 -- ===========================================================================
 
 SELECT

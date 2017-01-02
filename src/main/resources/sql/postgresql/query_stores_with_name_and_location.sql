@@ -4,8 +4,8 @@
 
 SELECT
 	*,
-	ST_Distance(location, ST_SetSRID(ST_Point(?, ?), 4326)) AS distance_meters
+	ST_Distance(location, ST_SetSRID(ST_Point(?, ?), 4326)::geography) AS distance_meters
 FROM Stores
 WHERE store_name LIKE ?
-AND ST_DWithin(location, ST_SetSRID(ST_Point(?, ?), 4326), ?)
-ORDER BY distance
+AND ST_DWithin(location, ST_SetSRID(ST_Point(?, ?), 4326)::geography, ?)
+ORDER BY distance_meters

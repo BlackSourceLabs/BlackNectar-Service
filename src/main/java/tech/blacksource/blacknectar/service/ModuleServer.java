@@ -76,15 +76,16 @@ final class ModuleServer extends AbstractModule
         String host = "database.blacksource.tech";
         String user = Files.readFile("./secrets/postgres-user.txt").trim();
         String password = Files.readFile("./secrets/postgres-password.txt").trim();
+        //Explicitly setting the schema seems to conflict with Postgis functions, so 
+        //ignoring for now.
         String schema = "blacknectar";
         String applicationName = "BlackNectar";
 
-        String url = String.format("jdbc:postgresql://%s:%d/postgres?user=%s&password=%s&currentSchema=%s&ApplicationName=%s",
+        String url = String.format("jdbc:postgresql://%s:%d/postgres?user=%s&password=%s&ApplicationName=%s",
                                    host, 
                                    port, 
                                    user,
                                    password,
-                                   schema,
                                    applicationName);
         
         ComboPooledDataSource  dataSource = new ComboPooledDataSource();

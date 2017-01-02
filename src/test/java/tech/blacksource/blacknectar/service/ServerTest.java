@@ -22,9 +22,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import spark.ExceptionHandler;
 import tech.aroma.client.Aroma;
-import tech.blacksource.blacknectar.service.api.operations.GetSampleStoreOperation;
-import tech.blacksource.blacknectar.service.api.operations.SayHelloOperation;
-import tech.blacksource.blacknectar.service.api.operations.SearchStoresOperation;
+import tech.blacksource.blacknectar.service.operations.GetSampleStoreOperation;
+import tech.blacksource.blacknectar.service.operations.SayHelloOperation;
+import tech.blacksource.blacknectar.service.operations.SearchStoresOperation;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;

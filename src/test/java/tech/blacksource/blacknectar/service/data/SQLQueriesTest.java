@@ -50,7 +50,11 @@ public class SQLQueriesTest
     {
         assertThat(SQLQueries.CREATE_ADDRESS_TABLE, not(isEmptyOrNullString()));
         assertThat(SQLQueries.CREATE_STORES_TABLE, not(isEmptyOrNullString()));
+        
         assertThat(SQLQueries.INSERT_STORE, not(isEmptyOrNullString()));
+        assertThat(SQLQueries.INSERT_STORE_IMAGE, not(isEmptyOrNullString()));
+        assertThat(SQLQueries.INSERT_IMAGE, not(isEmptyOrNullString()));
+        
         assertThat(SQLQueries.QUERY_STORES_WITH_LOCATION, not(isEmptyOrNullString()));
         assertThat(SQLQueries.QUERY_STORES_WITH_NAME, not(isEmptyOrNullString()));
         assertThat(SQLQueries.QUERY_STORES_WITH_NAME_AND_LOCATION, not(isEmptyOrNullString()));

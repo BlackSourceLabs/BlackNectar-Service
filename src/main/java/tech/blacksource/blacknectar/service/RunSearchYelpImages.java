@@ -208,7 +208,7 @@ public final class RunSearchYelpImages implements Callable<Void>
 
         database.update(statementToInsertStoreImage,
                         storeId,
-                        imageType,
+                        imageId,
                         "Cover");
     }
 

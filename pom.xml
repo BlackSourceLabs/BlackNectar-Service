@@ -222,6 +222,13 @@
             <version>4.2.5.RELEASE</version>
         </dependency>
         
+        <!-- C3P0 CONNECTION POOLING-->
+        <dependency>
+            <groupId>com.mchange</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>0.9.5.2</version>
+        </dependency>
+        
         
         <!--=======================-->
         <!--YELP-->

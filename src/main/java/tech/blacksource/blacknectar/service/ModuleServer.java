@@ -18,6 +18,7 @@ package tech.blacksource.blacknectar.service;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.mchange.v2.c3p0.ComboPooledDataSource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -26,7 +27,6 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import spark.ExceptionHandler;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
@@ -81,10 +81,18 @@ final class ModuleServer extends AbstractModule
         String url = String.format("jdbc:postgresql://%s:%d/postgres?user=%s&password=%s&currentSchema=%s", host, port, user,
                                    password, schema);
         
-        DriverManagerDataSource dataSource = new DriverManagerDataSource(url);
+        ComboPooledDataSource  dataSource = new ComboPooledDataSource();
+        dataSource.setJdbcUrl(url);
 
+        //Configure with pooling settings
+        dataSource.setMinPoolSize(3);
+        dataSource.setMaxPoolSize(30);
+        dataSource.setAcquireIncrement(3);
+        dataSource.setTestConnectionOnCheckin(true);
+        
         try
         {
+            
             Connection connection = dataSource.getConnection();
             
             checkThat(connection)

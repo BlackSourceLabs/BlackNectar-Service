@@ -19,7 +19,6 @@ package tech.blacksource.blacknectar.service.data;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Predicate;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -264,15 +263,6 @@ final class SQLStoreRepository implements StoreRepository
                         format("AND %s >= %f", SQLColumns.LONGITUDE, left.getLongitude());
 
         return clause;
-    }
-
-    private Predicate<? super Store> nearby(Location center, double radiusInMeters)
-    {
-        return store ->
-        {
-            double distance = geoCalculator.distanceBetween(store.getLocation(), center);
-            return distance <= radiusInMeters;
-        };
     }
 
     private void makeNoteThatStoresSearched(BlackNectarSearchRequest request, List<Store> stores)

@@ -22,8 +22,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import javax.inject.Singleton;
+import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import spark.ExceptionHandler;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
@@ -33,6 +36,10 @@ import tech.blacksource.blacknectar.service.operations.ModuleOperations;
 import tech.redroma.google.places.GooglePlacesAPI;
 import tech.redroma.yelp.YelpAPI;
 import tech.sirwellington.alchemy.annotations.access.Internal;
+import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
+import tech.sirwellington.alchemy.arguments.FailedAssertionException;
+
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 
 /**
  *
@@ -63,7 +70,7 @@ final class ModuleServer extends AbstractModule
 
     @Provides
     @Singleton
-    Connection provideSQLConnection(Aroma aroma) throws SQLException
+    DataSource provideSQLConnection(Aroma aroma) throws SQLException
     {
         int port = 5432;
         String host = "database.blacksource.tech";
@@ -73,10 +80,18 @@ final class ModuleServer extends AbstractModule
 
         String url = String.format("jdbc:postgresql://%s:%d/postgres?user=%s&password=%s&currentSchema=%s", host, port, user,
                                    password, schema);
+        
+        DriverManagerDataSource dataSource = new DriverManagerDataSource(url);
 
         try
         {
-            return DriverManager.getConnection(url);
+            Connection connection = dataSource.getConnection();
+            
+            checkThat(connection)
+                .throwing(SQLException.class)
+                .is(connected());
+            
+            connection.close();
         }
         catch (SQLException ex)
         {
@@ -89,8 +104,17 @@ final class ModuleServer extends AbstractModule
             
             throw ex;
         }
+        
+        return dataSource;
     }
 
+    @Singleton
+    @Provides
+    JdbcTemplate provideJDBCTemplate(DataSource dataSource)
+    {
+        return new JdbcTemplate(dataSource, false);
+    }
+    
     @Provides
     YelpAPI provideYelpAPI(Aroma aroma) throws Exception
     {
@@ -147,5 +171,24 @@ final class ModuleServer extends AbstractModule
     private Connection createSQLiteConnection() throws SQLException
     {
         return DriverManager.getConnection("jdbc:sqlite::resource:Stores.db");
+    }
+    
+    private AlchemyAssertion<Connection> connected()
+    {
+        return connection ->
+        {
+            try            
+            {
+                if (connection.isClosed())
+                {
+                    throw new FailedAssertionException("Database is not connected");
+                }
+                
+            }
+            catch (SQLException ex)
+            {
+                throw new FailedAssertionException("Could not check for connection", ex);
+            }
+        };
     }
 }

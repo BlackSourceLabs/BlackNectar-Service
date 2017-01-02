@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 BlackWholeLabs.
+ * Copyright 2017 BlackSourceLabs.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package tech.blacksource.blacknectar.service;
+package tech.blacksource.blacknectar.service.data;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import javax.sql.DataSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.springframework.jdbc.core.JdbcTemplate;
 import tech.aroma.client.Aroma;
-import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
+import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -33,12 +32,19 @@ import static org.junit.Assert.*;
  *
  * @author SirWellington
  */
-@IntegrationTest
+@Repeat(25)
 @RunWith(AlchemyTestRunner.class)
-public class ModuleServerIT
+public class StoreRepositoryTest
 {
 
-    private ModuleServer instance;
+    @Mock
+    private Aroma aroma;
+    
+    @Mock
+    private GeoCalculator geoCalculator;
+    
+    @Mock
+    private JdbcTemplate database;
 
     @Before
     public void setUp() throws Exception
@@ -46,7 +52,6 @@ public class ModuleServerIT
 
         setupData();
         setupMocks();
-        instance = new ModuleServer();
     }
 
     private void setupData() throws Exception
@@ -60,32 +65,24 @@ public class ModuleServerIT
     }
 
     @Test
-    public void testBindings()
+    public void testNewMemoryService()
     {
-        Injector injector = Guice.createInjector(instance);
-
-        Server server = injector.getInstance(Server.class);
-        assertThat(server, notNullValue());
+        StoreRepository result = StoreRepository.newMemoryService();
+        assertThat(result, notNullValue());
     }
 
     @Test
-    public void testProvideAromaClient()
+    public void testNewSQLServiceWithJdbcTemplate() throws Exception
     {
-        Aroma aroma = instance.provideAromaClient();
-        assertThat(aroma, notNullValue());
+        StoreRepository result = StoreRepository.newSQLService(database);
+        assertThat(result, notNullValue());
     }
 
     @Test
-    public void testConfigure()
+    public void testNewSQLServicWith3args() throws Exception
     {
-    }
-
-    @Test
-    public void testProvideSQLConnection() throws Exception
-    {
-        Aroma aroma = instance.provideAromaClient();
-        DataSource connection = instance.provideSQLConnection(aroma);
-        assertThat(connection, notNullValue());
+        StoreRepository result = StoreRepository.newSQLService(aroma, database, geoCalculator);
+        assertThat(result, notNullValue());
     }
 
 }

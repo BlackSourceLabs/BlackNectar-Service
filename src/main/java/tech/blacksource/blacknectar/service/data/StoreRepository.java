@@ -17,9 +17,9 @@
 
 package tech.blacksource.blacknectar.service.data;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import org.springframework.jdbc.core.JdbcTemplate;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
@@ -101,16 +101,16 @@ public interface StoreRepository
      * Creates a new SQL-backed Service that performs all operations against 
      * a JDBC connection.
      * 
-     * @param connection The JDBC connection, must be open.
+     * @param database The {@linkplain JdbcTemplate JDBC connection} , must be open.
      * 
      * @return
      * 
      * @throws SQLException 
      */
-    static StoreRepository newSQLService(@Required Connection connection) throws SQLException
+    static StoreRepository newSQLService(@Required JdbcTemplate database) throws SQLException
     {
         return newSQLService(Aroma.create(),
-                             connection,
+                             database,
                              GeoCalculator.HARVESINE);
     }
     
@@ -119,7 +119,7 @@ public interface StoreRepository
      * a JDBC connection.
      * 
      * @param aroma
-     * @param connection The JDBC connection, must be open.
+     * @param database The {@linkplain JdbcTemplate JDBC connection} , must be open.
      * @param geoCalculator Used to make Geodetic calculations
      * 
      * @return
@@ -127,9 +127,9 @@ public interface StoreRepository
      * @throws SQLException 
      */
     static StoreRepository newSQLService(@Required Aroma aroma,
-                                            @Required Connection connection,
+                                            @Required JdbcTemplate database,
                                             @Required GeoCalculator geoCalculator) throws SQLException
     {
-        return new SQLStoreRepository(aroma, connection, geoCalculator, SQLStoreMapper.INSTANCE);
+        return new SQLStoreRepository(aroma, database, geoCalculator, SQLStoreMapper.INSTANCE);
     }
 }

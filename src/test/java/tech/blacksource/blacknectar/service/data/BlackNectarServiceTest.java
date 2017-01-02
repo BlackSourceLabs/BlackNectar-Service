@@ -16,11 +16,11 @@
 
 package tech.blacksource.blacknectar.service.data;
 
-import java.sql.Connection;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.jdbc.core.JdbcTemplate;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
 import static org.hamcrest.Matchers.notNullValue;
@@ -35,7 +35,7 @@ public class BlackNectarServiceTest
 {
     
     @Mock
-    private Connection connection;
+    private JdbcTemplate database;
     
     @Before
     public void setUp() throws Exception
@@ -65,7 +65,7 @@ public class BlackNectarServiceTest
     @Test
     public void testNewSQLService() throws Exception
     {
-        StoreRepository result = StoreRepository.newSQLService(connection);
+        StoreRepository result = StoreRepository.newSQLService(database);
         assertThat(result, notNullValue());
     }
 }

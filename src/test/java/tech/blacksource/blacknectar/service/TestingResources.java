@@ -20,11 +20,9 @@ package tech.blacksource.blacknectar.service;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
 import tech.aroma.client.Aroma;
 
 /**
@@ -41,21 +39,10 @@ public class TestingResources
     {
         return INJECTOR;
     }
-
-    public static Connection createSQLConnection() throws SQLException
+    
+    public static JdbcTemplate createDatabaseConnection()
     {
-        return createReadOnlySQLConnection();
-    }
-
-    private static Connection createReadOnlySQLConnection() throws SQLException
-    {
-        return INJECTOR.getInstance(Connection.class);
-    }
-
-    private static Connection createWritableSQLConnection() throws SQLException
-    {
-        String file = "/Users/SirWellington/Documents/Code/BlackWholeLabs/BlackNectar/BlackNectar-Service/src/main/resources/Stores.db";
-        return DriverManager.getConnection("jdbc:sqlite:" + file);
+        return INJECTOR.getInstance(JdbcTemplate.class);
     }
 
     public static Aroma getAroma()

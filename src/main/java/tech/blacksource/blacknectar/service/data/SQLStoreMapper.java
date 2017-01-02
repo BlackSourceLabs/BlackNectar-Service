@@ -20,46 +20,48 @@ import com.google.inject.ImplementedBy;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
+import org.springframework.jdbc.core.RowMapper;
 import tech.blacksource.blacknectar.service.stores.Address;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
-import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
- * This interface is a {@link FunctionalInterface} responsible for extracting a 
- * {@link Store} from a JDBC {@linkplain ResultSet Row}.
- * 
+ * This interface is a {@link FunctionalInterface} responsible for extracting a {@link Store} from a JDBC
+ * {@linkplain ResultSet Row}.
+ *
  * @author SirWellington
  */
 @FunctionalInterface
 @ImplementedBy(SQLStoreMapper.Impl.class)
-interface SQLStoreMapper
+interface SQLStoreMapper extends RowMapper<Store>
 {
+
     /**
      * Takes a JDBC {@link ResultSet} and converts it into a {@link Store}.
-     *  
+     *
      * @param results The SQL Row to read.
-     * 
-     * @return A {@link Store} representation of the data, or null if it could not be extracted proplerly.
-     * 
-     * @throws SQLException 
+     * @param rowNum
+     * @return A {@link Store} representation of the data, or null if it could not be extracted properly.
+     *
+     * @throws SQLException
      */
-    Store mapToStore(@Required ResultSet results) throws SQLException;
+    @Override
+    Store mapRow(ResultSet results, int rowNum) throws SQLException;
 
     static SQLStoreMapper INSTANCE = new Impl();
-    
+
     static class Impl implements SQLStoreMapper
     {
 
         @Override
-        public Store mapToStore(ResultSet results) throws SQLException
+        public Store mapRow(ResultSet results, int rowNum) throws SQLException
         {
             checkThat(results).is(notNull());
-            
+
             //Pull data from the ResultSet
             String name = results.getString(SQLColumns.STORE_NAME);
             Double latitude = results.getDouble(SQLColumns.LATITUDE);

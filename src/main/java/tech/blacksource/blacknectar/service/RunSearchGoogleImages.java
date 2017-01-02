@@ -133,7 +133,18 @@ public final class RunSearchGoogleImages implements Callable<Void>
             return;
         }
 
-        BufferedImage image = ImageIO.read(imageURL);
+        BufferedImage image;
+        try
+        {
+            image = ImageIO.read(imageURL);
+        }
+        catch (IOException ex)
+        {
+            String message = "Could not download Image at [{}]";
+            LOG.error(message, imageURL, ex);
+            aroma.begin().titled("Image Download Failed").text(message, imageURL, ex).withUrgency(Urgency.HIGH).send();
+            throw ex;
+        }
 
         int height = image.getHeight();
         int width = image.getWidth();

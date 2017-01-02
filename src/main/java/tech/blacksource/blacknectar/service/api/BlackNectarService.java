@@ -25,12 +25,12 @@ import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
 import tech.blacksource.blacknectar.service.stores.Store;
-import tech.blacksource.blacknectar.service.stores.StoreRepository;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
+import tech.blacksource.blacknectar.service.stores.StoreDataSource;
 
 
 /*
- * TODO: Rename this interface to StoreRepository.
+ * TODO: Rename this interface to StoreDataSource.
  */
 /**
  * The BlackNectarService serves as the Backbone for the REST API.
@@ -93,7 +93,7 @@ public interface BlackNectarService
      */
     static BlackNectarService newMemoryService()
     {
-        List<Store> stores = StoreRepository.FILE.getAllStores();
+        List<Store> stores = StoreDataSource.FILE.getAllStores();
         GeoCalculator formula = GeoCalculator.HARVESINE;
 
         return new MemoryBlackNectarService(stores, formula);

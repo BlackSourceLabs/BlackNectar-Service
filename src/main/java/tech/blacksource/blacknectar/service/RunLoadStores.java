@@ -28,10 +28,11 @@ import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
 import tech.blacksource.blacknectar.service.api.BlackNectarService;
 import tech.blacksource.blacknectar.service.stores.Store;
-import tech.blacksource.blacknectar.service.stores.StoreRepository;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+
+import tech.blacksource.blacknectar.service.stores.StoreDataSource;
 
 /**
  *
@@ -44,10 +45,10 @@ public final class RunLoadStores implements Callable<Void>
 
     private final Aroma aroma;
     private final BlackNectarService service;
-    private final StoreRepository storeRepository;
+    private final StoreDataSource storeRepository;
 
     @Inject
-    RunLoadStores(Aroma aroma, BlackNectarService service, StoreRepository storeRepository)
+    RunLoadStores(Aroma aroma, BlackNectarService service, StoreDataSource storeRepository)
     {
         checkThat(aroma, service, storeRepository)
             .are(notNull());

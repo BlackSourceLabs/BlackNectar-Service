@@ -21,11 +21,15 @@ import java.util.List;
 import tech.aroma.client.Aroma;
 
 /**
- *
+ * A {@link StoreDataSource} represents a resource that can provide access to all EBT stores.
+ * For a file-based Data Source that loads stores from a government-provided CSV file, see
+ * {@link #FILE}.
+ * 
  * @author SirWellington
+ * @see #FILE
  */
-@ImplementedBy(FileRepository.class)
-public interface StoreRepository
+@ImplementedBy(FileStoreDataSource.class)
+public interface StoreDataSource
 {
 
     /**
@@ -35,5 +39,5 @@ public interface StoreRepository
      */
     List<Store> getAllStores();
     
-    static StoreRepository FILE = new FileRepository(Aroma.create(), IDGenerator.INSTANCE);
+    static StoreDataSource FILE = new FileStoreDataSource(Aroma.create(), IDGenerator.INSTANCE);
 }

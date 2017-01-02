@@ -44,10 +44,10 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
  * @author SirWellington
  */
 @Internal
-final class FileRepository implements StoreRepository
+final class FileStoreDataSource implements StoreDataSource
 {
 
-    private final static Logger LOG = LoggerFactory.getLogger(FileRepository.class);
+    private final static Logger LOG = LoggerFactory.getLogger(FileStoreDataSource.class);
     private static final String FILENAME = "Stores.csv";
 
     private final List<Store> stores;
@@ -57,7 +57,7 @@ final class FileRepository implements StoreRepository
     private final IDGenerator idGenerator;
 
     @Inject
-    FileRepository(Aroma aroma, IDGenerator idGenerator)
+    FileStoreDataSource(Aroma aroma, IDGenerator idGenerator)
     {
         checkThat(aroma, idGenerator)
             .is(notNull());

@@ -11,5 +11,6 @@ CREATE TABLE IF NOT EXISTS Images
 		width INT,
 		size_in_bytes INT,
 		file_type TEXT,
-		source TEXT
+		source TEXT,
+		url TEXT
 );

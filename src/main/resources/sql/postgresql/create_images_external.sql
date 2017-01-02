@@ -10,5 +10,6 @@ CREATE TABLE IF NOT EXISTS Images_External
 		width INT,
 		size_in_bytes INT,
 		file_type TEXT,
-		source TEXT
+		source TEXT,
+		url TEXT
 );

@@ -57,7 +57,6 @@ public class SQLStoreRepositoryIT
 
     private Aroma aroma;
     private JdbcTemplate database;
-    private GeoCalculator geoCalculator;
     private SQLStoreMapper storeMapper;
     
     private SQLStoreRepository instance;
@@ -73,7 +72,7 @@ public class SQLStoreRepositoryIT
         
         setupData();
         setupMocks();
-        instance = new SQLStoreRepository(aroma, database, geoCalculator, storeMapper);
+        instance = new SQLStoreRepository(aroma, database, storeMapper);
     }
 
 
@@ -87,7 +86,6 @@ public class SQLStoreRepositoryIT
     {
         aroma = TestingResources.getAroma();
         database = TestingResources.createDatabaseConnection();
-        geoCalculator = GeoCalculator.HARVESINE;
         storeMapper = SQLStoreMapper.INSTANCE;
         
     }

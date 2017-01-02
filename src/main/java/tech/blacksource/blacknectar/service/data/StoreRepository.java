@@ -109,9 +109,7 @@ public interface StoreRepository
      */
     static StoreRepository newSQLService(@Required JdbcTemplate database) throws SQLException
     {
-        return newSQLService(Aroma.create(),
-                             database,
-                             GeoCalculator.HARVESINE);
+        return newSQLService(Aroma.create(), database);
     }
     
     /**
@@ -120,16 +118,14 @@ public interface StoreRepository
      * 
      * @param aroma
      * @param database The {@linkplain JdbcTemplate JDBC connection} , must be open.
-     * @param geoCalculator Used to make Geodetic calculations
      * 
      * @return
      * 
      * @throws SQLException 
      */
     static StoreRepository newSQLService(@Required Aroma aroma,
-                                            @Required JdbcTemplate database,
-                                            @Required GeoCalculator geoCalculator) throws SQLException
+                                            @Required JdbcTemplate database) throws SQLException
     {
-        return new SQLStoreRepository(aroma, database, geoCalculator, SQLStoreMapper.INSTANCE);
+        return new SQLStoreRepository(aroma, database, SQLStoreMapper.INSTANCE);
     }
 }

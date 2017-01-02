@@ -50,21 +50,18 @@ final class SQLStoreRepository implements StoreRepository
 
     private final Aroma aroma;
     private final JdbcTemplate database;
-    private final GeoCalculator geoCalculator;
     private final SQLStoreMapper storeMapper;
 
     @Inject
     SQLStoreRepository(@Required Aroma aroma,
                        @Required JdbcTemplate database,
-                       @Required GeoCalculator geoCalculator,
                        @Required SQLStoreMapper storeMapper) throws IllegalArgumentException, SQLException
     {
-        checkThat(aroma, database, geoCalculator, storeMapper)
+        checkThat(aroma, database, storeMapper)
             .are(notNull());
 
         this.aroma = aroma;
         this.database = database;
-        this.geoCalculator = geoCalculator;
         this.storeMapper = storeMapper;
     }
 

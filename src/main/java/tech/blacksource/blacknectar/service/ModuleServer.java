@@ -86,9 +86,12 @@ final class ModuleServer extends AbstractModule
         try
         {
             Connection connection = dataSource.getConnection();
+            
             checkThat(connection)
                 .throwing(SQLException.class)
                 .is(connected());
+            
+            connection.close();
         }
         catch (SQLException ex)
         {
@@ -179,8 +182,8 @@ final class ModuleServer extends AbstractModule
                 if (connection.isClosed())
                 {
                     throw new FailedAssertionException("Database is not connected");
-            
                 }
+                
             }
             catch (SQLException ex)
             {

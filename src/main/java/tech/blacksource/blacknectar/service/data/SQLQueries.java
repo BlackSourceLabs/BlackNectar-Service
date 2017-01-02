@@ -46,8 +46,11 @@ final class SQLQueries
     public static final String CREATE_ADDRESS_TABLE = loadQuery("create_addresses.sql");
     public static final String CREATE_STORES_TABLE = loadQuery("create_stores.sql");
     public static final String INSERT_STORE = loadQuery("insert_store.sql");
+    
+    //Queries
     public static final String QUERY_STORES_WITH_LOCATION = loadQuery("query_stores_with_location.sql");
     public static final String QUERY_STORES_WITH_NAME = loadQuery("query_stores_with_name.sql");
+    public static final String QUERY_STORES_WITH_NAME_AND_LOCATION = loadQuery("query_stores_with_name_and_location.sql");
 
     SQLQueries() throws IllegalAccessException
     {

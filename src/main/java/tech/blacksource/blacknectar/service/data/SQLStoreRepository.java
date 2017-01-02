@@ -19,23 +19,20 @@ package tech.blacksource.blacknectar.service.data;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Predicate;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
-import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
 import static tech.blacksource.blacknectar.service.stores.Store.validStore;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
@@ -53,21 +50,18 @@ final class SQLStoreRepository implements StoreRepository
 
     private final Aroma aroma;
     private final JdbcTemplate database;
-    private final GeoCalculator geoCalculator;
     private final SQLStoreMapper storeMapper;
 
     @Inject
     SQLStoreRepository(@Required Aroma aroma,
                        @Required JdbcTemplate database,
-                       @Required GeoCalculator geoCalculator,
                        @Required SQLStoreMapper storeMapper) throws IllegalArgumentException, SQLException
     {
-        checkThat(aroma, database, geoCalculator, storeMapper)
+        checkThat(aroma, database, storeMapper)
             .are(notNull());
 
         this.aroma = aroma;
         this.database = database;
-        this.geoCalculator = geoCalculator;
         this.storeMapper = storeMapper;
     }
 
@@ -106,7 +100,7 @@ final class SQLStoreRepository implements StoreRepository
             .throwing(BadArgumentException.class)
             .is(greaterThanOrEqualTo(0));
 
-        String sql = createSQLTOGetAllStores(limit);
+        String sql = createSQLToGetAllStores(limit);
 
         List<Store> stores;
 
@@ -118,7 +112,7 @@ final class SQLStoreRepository implements StoreRepository
         {
             String message = "Failed to query for all stores with limit {}";
             makeNoteOfSQLError(message, limit, ex);
-            
+
             throw new OperationFailedException(message, ex);
         }
 
@@ -140,13 +134,11 @@ final class SQLStoreRepository implements StoreRepository
             .throwing(BadArgumentException.class)
             .is(notNull());
 
-        String query = createSearchQueryForRequest(request);
-
         List<Store> stores;
 
         try
         {
-            stores = database.query(query, storeMapper);
+            stores = findStoresBasedOfRequest(request);
         }
         catch (DataAccessException ex)
         {
@@ -157,16 +149,7 @@ final class SQLStoreRepository implements StoreRepository
 
         makeNoteThatStoresSearched(request, stores);
 
-        if (request.hasCenter())
-        {
-            return stores.stream()
-                .filter(nearby(request.center, request.radiusInMeters))
-                .collect(toList());
-        }
-        else
-        {
-            return stores;
-        }
+        return stores;
     }
 
     private int addStoreToDatabase(Store store, JdbcTemplate database) throws DataAccessException
@@ -195,7 +178,7 @@ final class SQLStoreRepository implements StoreRepository
 
     }
 
-    private String createSQLTOGetAllStores(int limit)
+    private String createSQLToGetAllStores(int limit)
     {
         if (limit <= 0)
         {
@@ -206,73 +189,6 @@ final class SQLStoreRepository implements StoreRepository
             return "SELECT * FROM Stores " +
                    "LIMIT " + limit;
         }
-    }
-
-    private String createSearchQueryForRequest(BlackNectarSearchRequest request)
-    {
-        String query = "SELECT * " +
-                       "FROM Stores ";
-
-        int clauses = 0;
-
-        if (request.hasSearchTerm())
-        {
-            clauses += 1;
-            query += format("WHERE %s LIKE \'%%%s%%\' ", SQLColumns.STORE_NAME, request.searchTerm);
-        }
-
-        if (request.hasCenter())
-        {
-            clauses += 1;
-
-            if (clauses > 1)
-            {
-                query += " AND ";
-            }
-            else
-            {
-                query += " WHERE ";
-            }
-
-            String locationClause = createLocationClauseFor(request);
-            query += locationClause;
-        }
-
-        if (request.hasLimit())
-        {
-            query += " LIMIT " + request.limit;
-        }
-
-        return query;
-    }
-
-    private String createLocationClauseFor(BlackNectarSearchRequest request)
-    {
-        double topBearing = 0.0;
-        double rightBearing = 90;
-        double bottomBearing = 180;
-        double leftBearing = 270;
-
-        Location top = geoCalculator.calculateDestinationFrom(request.center, request.radiusInMeters, topBearing);
-        Location bottom = geoCalculator.calculateDestinationFrom(request.center, request.radiusInMeters, bottomBearing);
-        Location left = geoCalculator.calculateDestinationFrom(request.center, request.radiusInMeters, leftBearing);
-        Location right = geoCalculator.calculateDestinationFrom(request.center, request.radiusInMeters, rightBearing);
-
-        String clause = format("%s <= %f ", SQLColumns.LATITUDE, top.getLatitude()) +
-                        format("AND %s >= %f ", SQLColumns.LATITUDE, bottom.getLatitude()) +
-                        format("AND %s <= %f ", SQLColumns.LONGITUDE, right.getLongitude()) +
-                        format("AND %s >= %f", SQLColumns.LONGITUDE, left.getLongitude());
-
-        return clause;
-    }
-
-    private Predicate<? super Store> nearby(Location center, double radiusInMeters)
-    {
-        return store ->
-        {
-            double distance = geoCalculator.distanceBetween(store.getLocation(), center);
-            return distance <= radiusInMeters;
-        };
     }
 
     private void makeNoteThatStoresSearched(BlackNectarSearchRequest request, List<Store> stores)
@@ -293,6 +209,77 @@ final class SQLStoreRepository implements StoreRepository
             .send();
 
         LOG.error(message, args);
+    }
+
+    private List<Store> findStoresBasedOfRequest(BlackNectarSearchRequest request)
+    {
+        
+        String query = createSQLQueryFor(request);
+
+        if (request.hasSearchTerm() && request.hasCenter())
+        {
+            double latitude = request.center.getLatitude();
+            double longitude = request.center.getLongitude();
+
+            return database.query(query, storeMapper,
+                                  longitude,
+                                  latitude,
+                                  toSQLSearchTerm(request.searchTerm),
+                                  longitude,
+                                  latitude,
+                                  request.radiusInMeters);
+        }
+        else if (request.hasCenter())
+        {
+            double latitude = request.center.getLatitude();
+            double longitude = request.center.getLongitude();
+
+            return database.query(query, storeMapper,
+                                  longitude,
+                                  latitude,
+                                  longitude,
+                                  latitude,
+                                  request.radiusInMeters);
+        }
+        else if (request.hasSearchTerm())
+        {
+            return database.query(query, storeMapper, toSQLSearchTerm(request.searchTerm));
+        }
+        else 
+        {
+            return Lists.emptyList();
+        }
+
+    }
+
+    private String createSQLQueryFor(BlackNectarSearchRequest request)
+    {
+        String query = "";
+        
+        if (request.hasSearchTerm() && request.hasCenter())
+        {
+            query = SQLQueries.QUERY_STORES_WITH_NAME_AND_LOCATION;
+        }
+        else if (request.hasCenter())
+        {
+            query = SQLQueries.QUERY_STORES_WITH_LOCATION;
+        }
+        else if (request.hasSearchTerm())
+        {
+            query = SQLQueries.QUERY_STORES_WITH_NAME;
+        }
+        
+        if (request.hasLimit())
+        {
+            query += " LIMIT " + request.limit;
+        }
+        
+        return query;
+    }
+    
+    private String toSQLSearchTerm(String searchTerm)
+    {
+        return String.format("%%%s%%", searchTerm);
     }
 
 }

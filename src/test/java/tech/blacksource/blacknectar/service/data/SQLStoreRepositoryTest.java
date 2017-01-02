@@ -43,7 +43,6 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -75,9 +74,6 @@ public class SQLStoreRepositoryTest
     private Statement statement;
 
     @Mock
-    private GeoCalculator geoCalculator;
-
-    @Mock
     private SQLStoreMapper storeMapper;
 
     private List<Store> stores;
@@ -95,7 +91,7 @@ public class SQLStoreRepositoryTest
         setupData();
         setupMocks();
 
-        instance = new SQLStoreRepository(aroma, database, geoCalculator, storeMapper);
+        instance = new SQLStoreRepository(aroma, database, storeMapper);
     }
 
     private void setupData() throws Exception
@@ -115,28 +111,19 @@ public class SQLStoreRepositoryTest
         aroma = Aroma.create();
 
         setupSQLInsertForStore();
-
-        when(geoCalculator.calculateDestinationFrom(eq(request.center), eq(request.radiusInMeters), anyDouble()))
-            .thenReturn(one(locations()))
-            .thenReturn(one(locations()))
-            .thenReturn(one(locations()))
-            .thenReturn(one(locations()));
     }
 
     @DontRepeat
     @Test
     public void testConstructorWithBadArguments()
     {
-        assertThrows(() -> new SQLStoreRepository(null, database, geoCalculator, storeMapper))
+        assertThrows(() -> new SQLStoreRepository(null, database, storeMapper))
             .isInstanceOf(IllegalArgumentException.class);
 
-        assertThrows(() -> new SQLStoreRepository(aroma, null, geoCalculator, storeMapper))
+        assertThrows(() -> new SQLStoreRepository(aroma, null, storeMapper))
             .isInstanceOf(IllegalArgumentException.class);
 
-        assertThrows(() -> new SQLStoreRepository(aroma, database, null, storeMapper))
-            .isInstanceOf(IllegalArgumentException.class);
-
-        assertThrows(() -> new SQLStoreRepository(aroma, database, geoCalculator, null))
+        assertThrows(() -> new SQLStoreRepository(aroma, database, null))
             .isInstanceOf(IllegalArgumentException.class);
 
     }

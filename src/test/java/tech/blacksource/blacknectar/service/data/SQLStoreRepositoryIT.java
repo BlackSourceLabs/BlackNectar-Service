@@ -53,10 +53,10 @@ import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
 public class SQLStoreRepositoryIT 
 {
     private static final Location NYC = Location.with(40.758659, -73.985217);
+    private static final Location LA = Location.with(34.0420322, -118.2541062);
 
     private Aroma aroma;
     private JdbcTemplate database;
-    private GeoCalculator geoCalculator;
     private SQLStoreMapper storeMapper;
     
     private SQLStoreRepository instance;
@@ -72,7 +72,7 @@ public class SQLStoreRepositoryIT
         
         setupData();
         setupMocks();
-        instance = new SQLStoreRepository(aroma, database, geoCalculator, storeMapper);
+        instance = new SQLStoreRepository(aroma, database, storeMapper);
     }
 
 
@@ -86,7 +86,6 @@ public class SQLStoreRepositoryIT
     {
         aroma = TestingResources.getAroma();
         database = TestingResources.createDatabaseConnection();
-        geoCalculator = GeoCalculator.HARVESINE;
         storeMapper = SQLStoreMapper.INSTANCE;
         
     }
@@ -131,10 +130,10 @@ public class SQLStoreRepositoryIT
     @Test
     public void testSearchForStoreWithCenter()
     {
-        double radius = one(doubles(3_000, 30_000));
+        double radius = one(doubles(1_000, 10_000));
         
         BlackNectarSearchRequest request = new BlackNectarSearchRequest()
-            .withCenter(NYC)
+            .withCenter(LA)
             .withRadius(radius);
         
         List<Store> results = instance.searchForStores(request);

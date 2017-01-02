@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS Images
 		height INT,
 		width INT,
 		size_in_bytes INT,
-		file_type TEXT,
+		content_type TEXT,
+		image_type TEXT,
 		source TEXT,
 		url TEXT
 );

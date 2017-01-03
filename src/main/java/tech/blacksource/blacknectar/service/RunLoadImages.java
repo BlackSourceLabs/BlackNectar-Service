@@ -207,7 +207,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
                                   String source)
     {
 
-        String statementToInsertImage = SQLQueries.INSERT_IMAGE;
+        String statementToInsertImage = SQLQueries.INSERT_STORE_IMAGE;
 
         UUID storeId = UUID.fromString(store.getStoreId());
         String imageLink = imageURL.toString();

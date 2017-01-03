@@ -21,6 +21,7 @@ import com.google.common.io.Resources;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -132,17 +133,17 @@ public final class RunSearchYelpImages implements Callable<Void>
             LOG.info("No Image found for Store: {}", store);
             return;
         }
-
-        BufferedImage image = ImageIO.read(imageURL);
+        
+        byte[] imageData = Resources.toByteArray(imageURL);
+        BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageData));
 
         int height = image.getHeight();
         int width = image.getWidth();
-        byte[] binary = Resources.toByteArray(imageURL);
-        int size = binary.length;
+        int size = imageData.length;
         String contentType = getContentTypeFor(imageURL);
         String imageType = getImageTypeFrom(contentType);
 
-        saveImageInfoFor(store, imageURL, width, height, binary, size, contentType, imageType);
+        saveImageInfoFor(store, imageURL, width, height, imageData, size, contentType, imageType);
 
         makeNoteThatImageSavedForStore(imageURL, store);
     }

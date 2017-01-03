@@ -64,7 +64,7 @@ public final class RunSearchYelpImages implements Callable<Void>
     private final AtomicInteger successful = new AtomicInteger();
     private final String source = "Yelp";
 
-    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(5);
 
     @Inject
     RunSearchYelpImages(Aroma aroma, JdbcTemplate database, StoreRepository storeRepository, @Yelp ImageLoader imageLoader)

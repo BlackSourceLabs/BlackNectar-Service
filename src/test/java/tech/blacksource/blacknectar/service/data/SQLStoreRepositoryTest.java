@@ -182,7 +182,7 @@ public class SQLStoreRepositoryTest
     @Test
     public void testSearchForStores()
     {
-        when(database.query(anyString(), eq(storeMapper)))
+        when(database.query(anyString(), eq(storeMapper), Mockito.<Object>anyVararg()))
             .thenReturn(stores);
         
         List<Store> results = instance.searchForStores(request);

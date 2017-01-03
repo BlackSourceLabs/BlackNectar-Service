@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 BlackSourceLabs.
+ * Copyright 2017 BlackSource, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

@@ -65,7 +65,7 @@ final class ModuleServer extends AbstractModule
     @Singleton
     Aroma provideAromaClient()
     {
-        return Aroma.create("ec07e6fe-7203-4f18-abf4-f33b48ec904d");
+        return Aroma.create("82c636ca-eb6d-48c6-bdd4-ff9dedae8ac4");
     }
 
     @Provides

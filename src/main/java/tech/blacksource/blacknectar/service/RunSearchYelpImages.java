@@ -17,31 +17,14 @@
 package tech.blacksource.blacknectar.service;
 
 import com.google.common.collect.Queues;
-import com.google.common.io.Resources;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Queue;
-import java.util.UUID;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
-import tech.blacksource.blacknectar.service.data.SQLQueries;
 import tech.blacksource.blacknectar.service.data.StoreRepository;
 import tech.blacksource.blacknectar.service.images.ImageLoader;
 import tech.blacksource.blacknectar.service.images.Yelp;
@@ -57,30 +40,21 @@ public final class RunSearchYelpImages implements Callable<Void>
     private final static Logger LOG = LoggerFactory.getLogger(RunSearchYelpImages.class);
 
     private final Aroma aroma;
-    private final JdbcTemplate database;
-    private final StoreRepository storeRepository;
-    private final ImageLoader imageLoader;
-
-    private final AtomicInteger successful = new AtomicInteger();
+    private final ImageLoader yelpImageLoader;
     private final String source = "Yelp";
-
-    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(5);
+    private final RunLoadImages runner;
+    private final StoreRepository storeRepository;
 
     @Inject
-    RunSearchYelpImages(Aroma aroma, JdbcTemplate database, StoreRepository storeRepository, @Yelp ImageLoader imageLoader)
+    RunSearchYelpImages(Aroma aroma,
+                        @Yelp ImageLoader yelpImageLoader,
+                        RunLoadImages runner,
+                        StoreRepository storeRepository)
     {
         this.aroma = aroma;
-        this.database = database;
+        this.yelpImageLoader = yelpImageLoader;
+        this.runner = runner;
         this.storeRepository = storeRepository;
-        this.imageLoader = imageLoader;
-    }
-
-    public static void main(String[] args) throws Exception
-    {
-        Injector injector = Guice.createInjector(new ModuleServer());
-
-        RunSearchYelpImages instance = injector.getInstance(RunSearchYelpImages.class);
-        instance.call();
     }
 
     @Override
@@ -89,158 +63,20 @@ public final class RunSearchYelpImages implements Callable<Void>
         LOG.debug("Beginning script.");
 
         List<Store> stores = storeRepository.getAllStores();
-
         Queue<Store> queue = Queues.newLinkedBlockingQueue(stores);
 
-        loadNextStore(queue);
+        RunLoadImages.Arguments args = RunLoadImages.Arguments.Builder.newInstance()
+            .withFrequency(400)
+            .withTimeUnit(TimeUnit.MILLISECONDS)
+            .withSource(source)
+            .withImageLoader(yelpImageLoader)
+            .withStores(queue)
+            .build();
 
-        return null;
-    }
-
-    private void loadNextStore(Queue<Store> queue)
-    {
-        Store store = queue.poll();
-
-        if (store == null)
-        {
-            makeNoteOfCompletion();
-            return;
-        }
-
-        tryToSaveImageFor(store);
-
-        executor.schedule(() -> this.loadNextStore(queue), 2, TimeUnit.SECONDS);
-    }
-
-    private void tryToSaveImageFor(Store store)
-    {
-        try
-        {
-            saveImageFor(store);
-        }
-        catch (Exception ex)
-        {
-            makeNoteThatOperationToSaveImageFailed(store, ex);
-        }
-    }
-
-    private void saveImageFor(Store store) throws IOException
-    {
-
-        URL imageURL = imageLoader.getImageFor(store);
-        if (Objects.isNull(imageURL))
-        {
-            LOG.info("No Image found for Store: {}", store);
-            return;
-        }
+        runner.accept(args);
         
-        byte[] imageData = Resources.toByteArray(imageURL);
-        BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageData));
-
-        int height = image.getHeight();
-        int width = image.getWidth();
-        int size = imageData.length;
-        String contentType = getContentTypeFor(imageURL);
-        String imageType = getImageTypeFrom(contentType);
-
-        saveImageInfoFor(store, imageURL, width, height, imageData, size, contentType, imageType);
-
-        makeNoteThatImageSavedForStore(imageURL, store);
-    }
-
-    private String getImageTypeFrom(String contentType) throws IOException
-    {
-        switch (contentType)
-        {
-            case "image/png":
-            case "IMAGE/PNG":
-                return "PNG";
-            case "image/jpg":
-            case "image/jpeg":
-            case "IMAGE/JPEG":
-            case "IMAGE/JPG":
-                return "JPG";
-            case "image/bmp":
-            case "IMAGE/BMP":
-                return "BMP";
-        }
-
+        makeNoteThatScriptIsDone();
+        
         return null;
     }
-
-    private void makeNoteOfCompletion()
-    {
-        String message = "Successfully found yelp images for {} stores";
-        LOG.info(message, successful.get());
-        aroma.begin().titled("Script Finished")
-            .text(message, successful.get())
-            .withUrgency(Urgency.MEDIUM)
-            .send();
-    }
-
-    private void saveImageInfoFor(Store store,
-                                  URL imageURL,
-                                  int width,
-                                  int height,
-                                  byte[] binary,
-                                  int size,
-                                  String contentType,
-                                  String imageType)
-    {
-
-        String statementToInsertImage = SQLQueries.INSERT_IMAGE;
-
-        String imageId = UUID.randomUUID().toString();
-
-        database.update(statementToInsertImage,
-                        imageId,
-                        binary,
-                        height,
-                        width,
-                        size,
-                        contentType,
-                        imageType,
-                        source,
-                        imageURL.toString());
-
-        String statementToInsertStoreImage = SQLQueries.INSERT_STORE_IMAGE;
-
-        UUID storeId = UUID.fromString(store.getStoreId());
-
-        database.update(statementToInsertStoreImage,
-                        storeId,
-                        imageId,
-                        "Cover");
-    }
-
-    private String getContentTypeFor(URL imageURL) throws IOException
-    {
-        URLConnection connection = imageURL.openConnection();
-        String contentType = connection.getContentType();
-
-        return contentType;
-    }
-
-    private void makeNoteThatImageSavedForStore(URL imageURL, Store store)
-    {
-        int count = successful.incrementAndGet();
-
-        String message = "{} - Successfully saved Image [{}: {}] for store: {}";
-        LOG.debug(message, count, source, imageURL, store);
-        aroma.begin().titled("Image Saved")
-            .text(message, count, source, imageURL, store)
-            .withUrgency(Urgency.LOW)
-            .send();
-    }
-
-    private void makeNoteThatOperationToSaveImageFailed(Store store, Exception ex)
-    {
-        String message = "Failed to find and save an image for store: {}";
-        LOG.error(message, store, ex);
-        aroma.begin().titled("Image Load Failed")
-            .text(message, store, ex)
-            .withUrgency(Urgency.HIGH)
-            .send();
-    }
-
 }

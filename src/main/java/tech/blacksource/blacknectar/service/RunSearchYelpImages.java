@@ -17,6 +17,8 @@
 package tech.blacksource.blacknectar.service;
 
 import com.google.common.collect.Queues;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.Callable;
@@ -56,6 +58,14 @@ public final class RunSearchYelpImages implements Callable<Void>
         this.runner = runner;
         this.storeRepository = storeRepository;
     }
+    
+    public static void main(String[] args) throws Exception
+    {
+        Injector injector = Guice.createInjector(new ModuleServer());
+        
+        RunSearchYelpImages instance = injector.getInstance(RunSearchYelpImages.class);
+        instance.call();
+    }
 
     @Override
     public Void call() throws Exception
@@ -74,8 +84,6 @@ public final class RunSearchYelpImages implements Callable<Void>
             .build();
 
         runner.accept(args);
-        
-        makeNoteThatScriptIsDone();
         
         return null;
     }

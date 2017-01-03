@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.UUID;
@@ -318,7 +319,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
             checkThat(timeUnit, source, imageLoader, stores)
                 .are(notNull());
 
-            checkThat(stores)
+            checkThat((Collection<Store>) stores)
                 .usingMessage("stores cannot be empty")
                 .is(nonEmptyCollection());
 
@@ -443,7 +444,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
 
             Builder withStores(@NonEmpty Queue<Store> stores)
             {
-                checkThat(stores)
+                checkThat((Collection<Store>) stores)
                     .is(nonEmptyCollection());
 
                 this.stores = Queues.newArrayDeque(stores);
@@ -460,7 +461,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
                     .usingMessage("imageLoader is missing")
                     .is(notNull());
 
-                checkThat(stores)
+                checkThat((Collection<Store>) stores)
                     .is(nonEmptyCollection());
 
                 return new Arguments(timeUnit, frequency, source, imageLoader, stores);

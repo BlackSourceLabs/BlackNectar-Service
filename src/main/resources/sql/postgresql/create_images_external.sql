@@ -12,5 +12,7 @@ CREATE TABLE IF NOT EXISTS Images_External
 	content_type TEXT,
 	image_type TEXT,
 	source TEXT,
-	url TEXT
+	url TEXT,
+
+	CONSTRAINT Unique_Images UNIQUE(URL)
 );

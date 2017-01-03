@@ -30,6 +30,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import javax.imageio.ImageIO;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -66,8 +67,15 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
 
     private final static Logger LOG = LoggerFactory.getLogger(RunLoadImages.class);
 
-    private Aroma aroma;
-    private JdbcTemplate database;
+    private final Aroma aroma;
+    private final JdbcTemplate database;
+
+    @Inject
+    RunLoadImages(Aroma aroma, JdbcTemplate database)
+    {
+        this.aroma = aroma;
+        this.database = database;
+    }
 
     @Override
     public void accept(RunLoadImages.Arguments args)
@@ -105,11 +113,11 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
 
             tryToSleepFor(sleepTime);
         }
-        
+
         long endTime = System.currentTimeMillis();
         long runtimeMillis = endTime - startTime;
         long runtimeHours = TimeUnit.MILLISECONDS.toHours(runtimeMillis);
-        
+
         makeNoteOfScriptCompletion(args, totalSuccesses, totalStoresProcessed, totalStores, runtimeHours);
     }
 
@@ -188,18 +196,6 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         return null;
     }
 
-    private void makeNoteOfCompletion(Arguments args, Store store, int totalSuccesses, int totalStoresProcessed, int totalStores)
-    {
-        String source = args.source;
-        String message = "Found image from {} for Store. {}/{} successful. {}/{} done. \n\nStore: {}";
-        LOG.info(message, source, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores, store);
-        aroma.begin().titled("Image Saved")
-            .text(message, source, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores, store)
-            .withUrgency(Urgency.LOW)
-            .send();
-
-    }
-
     private void saveImageInfoFor(Store store,
                                   URL imageURL,
                                   int width,
@@ -213,9 +209,12 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
 
         String statementToInsertImage = SQLQueries.INSERT_IMAGE;
 
-        String imageId = UUID.randomUUID().toString();
+        UUID storeId = UUID.fromString(store.getStoreId());
+        String imageLink = imageURL.toString();
+        String imageId = imageLink;
 
         database.update(statementToInsertImage,
+                        storeId,
                         imageId,
                         binary,
                         height,
@@ -224,16 +223,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
                         contentType,
                         imageType,
                         source,
-                        imageURL.toString());
-
-        String statementToInsertStoreImage = SQLQueries.INSERT_STORE_IMAGE;
-
-        UUID storeId = UUID.fromString(store.getStoreId());
-
-        database.update(statementToInsertStoreImage,
-                        storeId,
-                        imageId,
-                        "Cover");
+                        imageLink);
     }
 
     private String getContentTypeFor(URL imageURL) throws IOException
@@ -242,6 +232,18 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         String contentType = connection.getContentType();
 
         return contentType;
+    }
+
+    private void makeNoteOfCompletion(Arguments args, Store store, int totalSuccesses, int totalStoresProcessed, int totalStores)
+    {
+        String source = args.source;
+        String message = "Found image from {} for Store. {}/{} successful. {}/{} done. \n\nStore: {}";
+        LOG.info(message, source, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores, store);
+        aroma.begin().titled("Image Saved")
+            .text(message, source, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores, store)
+            .withUrgency(Urgency.LOW)
+            .send();
+
     }
 
     private void makeNoteThatImageSavedForStore(URL imageURL, Store store, Arguments args)
@@ -279,10 +281,10 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
     }
 
     private void makeNoteThatOperationToProcessStoreFailed(Store store,
-                                                          Arguments args,
-                                                          int totalSuccesses,
-                                                          int totalStoresProcessed,
-                                                          int totalStores)
+                                                           Arguments args,
+                                                           int totalSuccesses,
+                                                           int totalStoresProcessed,
+                                                           int totalStores)
     {
         String source = args.source;
         String message = "{}/{} - Failed to process image from {} for store: {}";
@@ -293,12 +295,13 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
             .send();
     }
 
-    private void makeNoteOfScriptCompletion(Arguments args, int totalSuccesses, int totalStoresProcessed, int totalStores, long runtimeHours)
+    private void makeNoteOfScriptCompletion(Arguments args, int totalSuccesses, int totalStoresProcessed, int totalStores,
+                                            long runtimeHours)
     {
         String message = "Script[{}] completed in {} hours, with {}/{} successful and {}/{} processed";
         String source = args.source;
         LOG.info(message, source, runtimeHours, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores);
-        
+
         aroma.begin().titled("Script Finished")
             .text(message, source, runtimeHours, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores)
             .withUrgency(Urgency.MEDIUM)

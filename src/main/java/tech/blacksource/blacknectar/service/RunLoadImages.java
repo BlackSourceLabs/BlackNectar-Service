@@ -153,13 +153,11 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         ImageLoader imageLoader = args.imageLoader;
 
         URL imageURL = imageLoader.getImageFor(store);
-
-        if (Objects.isNull(imageURL))
-        {
-            LOG.info("No Image found for Store: {}", store);
-            return;
-        }
-
+        
+        checkThat(imageURL)
+            .usingMessage("No Image found for Store: " + store)
+            .is(notNull());
+        
         byte[] imageData = Resources.toByteArray(imageURL);
 
         BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageData));

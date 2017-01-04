@@ -387,7 +387,19 @@ public final class Image
             this.url = url;
             return this;
         }
-
+        
+        public Builder unsetURL()
+        {
+            this.url = null;
+            return this;
+        }
+        
+        public Builder unsetImageData()
+        {
+            this.imageData = null;
+            return this;
+        }
+        
         public Image build() throws IllegalStateException
         {
             checkThat(storeId)

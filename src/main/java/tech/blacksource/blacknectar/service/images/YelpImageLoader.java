@@ -116,7 +116,7 @@ final class YelpImageLoader implements ImageLoader
 
             LOG.error(message, ex);
             aroma.begin().titled("Yelp Call Failed")
-                .text("{}\n\nFor Request:\n{}", message, request)
+                .text("{}\n\nFor Request:\n{}", message, request, ex)
                 .withUrgency(Urgency.HIGH)
                 .send();
         }

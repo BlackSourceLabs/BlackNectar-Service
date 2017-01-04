@@ -17,7 +17,6 @@
 package tech.blacksource.blacknectar.service.operations;
 
 import com.google.gson.JsonArray;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,6 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import sir.wellington.alchemy.collections.lists.Lists;
 import sir.wellington.alchemy.collections.maps.Maps;
 import spark.QueryParamsMap;
 import spark.Request;
@@ -34,7 +34,10 @@ import tech.blacksource.blacknectar.service.JSON;
 import tech.blacksource.blacknectar.service.data.BlackNectarSearchRequest;
 import tech.blacksource.blacknectar.service.data.StoreRepository;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
-import tech.blacksource.blacknectar.service.images.ImageLoader;
+import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
+import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
+import tech.blacksource.blacknectar.service.images.Image;
+import tech.blacksource.blacknectar.service.images.ImageRepository;
 import tech.blacksource.blacknectar.service.operations.SearchStoresOperation.QueryKeys;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
@@ -48,21 +51,20 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static sir.wellington.alchemy.collections.sets.Sets.toSet;
+import static tech.blacksource.blacknectar.service.BlackNectarGenerators.images;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.blacksource.blacknectar.service.JSON.collectArray;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.generator.GeolocationGenerators.latitudes;
 import static tech.sirwellington.alchemy.generator.GeolocationGenerators.longitudes;
-import static tech.sirwellington.alchemy.generator.NetworkGenerators.httpsUrls;
 import static tech.sirwellington.alchemy.generator.NetworkGenerators.ip4Addresses;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
-import static tech.sirwellington.alchemy.test.junit.runners.GenerateInteger.Type.POSITIVE;
+import static tech.sirwellington.alchemy.test.junit.runners.GenerateInteger.Type.RANGE;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.ALPHANUMERIC;
 
 /**
@@ -77,17 +79,14 @@ public class SearchStoresOperationTest
     private Aroma aroma;
 
     @Mock
-    private StoreRepository service;
+    private StoreRepository storesRepository;
 
     @Mock
-    private ImageLoader secondaryImageLoader;
-
-    @Mock
-    private ImageLoader primaryImageLoader;
+    private ImageRepository imageRepository;
 
     private List<Store> stores;
 
-    private Map<Store, URL> images;
+    private Map<Store, Image> images;
 
     @Mock
     private Request request;
@@ -108,7 +107,7 @@ public class SearchStoresOperationTest
     @GenerateString
     private String searchTerm;
 
-    @GenerateInteger(POSITIVE)
+    @GenerateInteger(value = RANGE, min = 10, max = 1_000)
     private Integer radius;
 
     @GenerateInteger
@@ -125,13 +124,13 @@ public class SearchStoresOperationTest
         setupData();
         setupMocks();
 
-        instance = new SearchStoresOperation(aroma, service, primaryImageLoader, secondaryImageLoader);
+        instance = new SearchStoresOperation(aroma, storesRepository, imageRepository);
     }
 
     private void setupData() throws Exception
     {
         stores = listOf(stores());
-        
+
         ip = one(ip4Addresses());
         latitude = one(latitudes());
         longitude = one(longitudes());
@@ -151,14 +150,14 @@ public class SearchStoresOperationTest
         when(request.queryMap()).thenReturn(queryParams);
         when(request.queryParams()).thenReturn(QueryKeys.KEYS);
 
-        when(service.searchForStores(expectedSearchRequest)).thenReturn(stores);
+        when(storesRepository.searchForStores(expectedSearchRequest)).thenReturn(stores);
 
         stores.stream().forEach((store) ->
         {
-            URL url = one(httpsUrls());
-            images.put(store, url);
+            Image image = images().get();
+            images.put(store, image);
 
-            when(primaryImageLoader.getImageFor(store)).thenReturn(url);
+            when(imageRepository.getImagesForStore(store)).thenReturn(Lists.createFrom(image));
         });
 
     }
@@ -167,14 +166,13 @@ public class SearchStoresOperationTest
     @Test
     public void testConstructor()
     {
-        assertThrows(() -> new SearchStoresOperation(null, service, primaryImageLoader, secondaryImageLoader));
-        assertThrows(() -> new SearchStoresOperation(aroma, null, primaryImageLoader, secondaryImageLoader));
-        assertThrows(() -> new SearchStoresOperation(aroma, service, null, secondaryImageLoader));
-        assertThrows(() -> new SearchStoresOperation(aroma, service, primaryImageLoader, null));
+        assertThrows(() -> new SearchStoresOperation(null, storesRepository, imageRepository));
+        assertThrows(() -> new SearchStoresOperation(aroma, null, imageRepository));
+        assertThrows(() -> new SearchStoresOperation(aroma, storesRepository, null));
     }
 
     @Test
-    public void testHandleWhenPrimaryHasImage() throws Exception
+    public void testHandleWhenHasImage() throws Exception
     {
         JsonArray array = instance.handle(request, response);
 
@@ -184,15 +182,13 @@ public class SearchStoresOperationTest
             .collect(JSON.collectArray());
 
         assertThat(array, is(expected));
-
-        stores.forEach(s -> verify(secondaryImageLoader, never()).getImageFor(s));
     }
 
     @Test
-    public void testWhenPrimaryAndSecondaryHaveNoImage() throws Exception
+    public void testWhenHaveNoImage() throws Exception
     {
-        when(primaryImageLoader.getImageFor(any())).thenReturn(null);
-        when(secondaryImageLoader.getImageFor(any())).thenReturn(null);
+        when(imageRepository.getImagesForStore(any(Store.class)))
+            .thenReturn(Lists.emptyList());
 
         JsonArray expectedResponse = stores.stream()
             .map(Store::asJSON)
@@ -202,34 +198,10 @@ public class SearchStoresOperationTest
 
         assertThat(jsonResponse, is(expectedResponse));
 
-        stores.forEach(s -> verify(primaryImageLoader).getImageFor(s));
-        stores.forEach(s -> verify(secondaryImageLoader).getImageFor(s));
+        stores.forEach(s -> verify(imageRepository).getImagesForStore(s));
 
     }
-    
-    @Test
-    public void testWhenPrimaryImageLoaderHasNoImage() throws Exception
-    {
-        //Expect that the secondary will be asked for an image
-        when(primaryImageLoader.getImageFor(any())).thenReturn(null);
-        images.forEach((store, url) ->
-        {
-            when(secondaryImageLoader.getImageFor(store)).thenReturn(url);
-        });
-        
-        JsonArray expectedResponse = stores.stream()
-            .map(this::storeWithImage)
-            .map(Store::asJSON)
-            .collect(collectArray());
-        
-        JsonArray result = instance.handle(request, response);
-        
-        assertThat(result, is(expectedResponse));
-        
-        stores.forEach(s -> verify(primaryImageLoader).getImageFor(s));
-        stores.forEach(s -> verify(secondaryImageLoader).getImageFor(s));
-    }
-    
+
     @DontRepeat
     @Test
     public void testHandleWithBadArguments() throws Exception
@@ -247,6 +219,17 @@ public class SearchStoresOperationTest
 
         assertThrows(() -> instance.handle(request, response))
             .isInstanceOf(BadArgumentException.class);
+    }
+    
+    @DontRepeat
+    @Test
+    public void testWhenImageRepositoryFails() throws Exception
+    {
+        when(imageRepository.getImagesForStore(any(Store.class)))
+            .thenThrow(new OperationFailedException());
+        
+        assertThrows(() -> instance.handle(request, response))
+            .isInstanceOf(BlackNectarAPIException.class);
     }
 
     private BlackNectarSearchRequest createExpectedRequest()
@@ -282,10 +265,10 @@ public class SearchStoresOperationTest
 
     private Store storeWithImage(Store store)
     {
-        URL url = images.get(store);
+        Image image = images.get(store);
 
         return Store.Builder.fromStore(store)
-            .withMainImageURL(url.toString())
+            .withMainImageURL(image.getUrl().toString())
             .build();
     }
 

@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS Store_Images
 		content_type TEXT,
 		-- JPG, PNG, etc
 		image_type TEXT,
-		source TEXT,
+		source TEXT DEFAULT 'Unknown',
 		url TEXT,
 
 		PRIMARY KEY (store_id, image_id)

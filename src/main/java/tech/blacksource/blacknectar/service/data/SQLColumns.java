@@ -48,12 +48,12 @@ public final class SQLColumns
     {
         public static final String IMAGE_ID = "image_id";
         public static final String STORE_ID = "store_Id";
-        public static final String IMAGE_TYPE = "image_type";
         public static final String IMAGE_BINARY = "image_binary";
         public static final String HEIGHT = "height";
         public static final String WIDTH = "width";
         public static final String SIZE_IN_BYTES = "size_in_bytes";
-        public static final String FILE_TYPE = "file_type";
+        public static final String CONTENT_TYPE = "content_type";
+        public static final String IMAGE_TYPE = "image_type";
         public static final String SOURCE = "source";
         public static final String URL = "url";
     }

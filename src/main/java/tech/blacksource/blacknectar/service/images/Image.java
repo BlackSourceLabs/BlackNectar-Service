@@ -71,9 +71,9 @@ public final class Image
           String source,
           URL url)
     {
-        checkThat(storeId, imageId)
-            .are(notNull());
-
+        checkThat(storeId).is(notNull());
+        checkThat(imageId).is(nonEmptyString());
+        
         this.storeId = storeId;
         this.imageId = imageId;
         this.imageData = imageData;
@@ -388,13 +388,13 @@ public final class Image
             return this;
         }
         
-        public Builder unsetURL()
+        public Builder withoutURL()
         {
             this.url = null;
             return this;
         }
         
-        public Builder unsetImageData()
+        public Builder withoutImageData()
         {
             this.imageData = null;
             return this;

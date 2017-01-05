@@ -51,26 +51,38 @@ public interface ImageRepository
     void addImage(@Required Image image) throws BlackNectarAPIException;
 
     /**
-     * Get an Image from the repository with the given ID. This function does not return null, but instead
+     * Get an Image from the repository with the given Store and Image ID. This function does not return null, but instead
      *
+     * @param storeId
      * @param imageId
      * @return
      * @throws BlackNectarAPIException
      */
-    Image getImage(@NonEmpty String imageId) throws DoesNotExistException, BlackNectarAPIException;
+    Image getImage(@Required UUID storeId, @NonEmpty String imageId) throws DoesNotExistException, BlackNectarAPIException;
 
+    default Image getImage(@NonEmpty String storeId, @NonEmpty String imageId) throws DoesNotExistException, BlackNectarAPIException
+    {
+        checkThat(storeId)
+            .throwing(BadArgumentException.class)
+            .usingMessage("storeId is invalid")
+            .is(validUUID());
+        
+        return this.getImage(UUID.fromString(storeId), imageId);
+    }
+    
     /**
      * Like {@link #getImage(java.lang.String) }, but it returns only the Image information, without the
      * {@linkplain Image#imageData data}.
      *
+     * @param storeId
      * @param imageId
      * @return
      * @throws BlackNectarAPIException
      * @throws DoesNotExistException   If the image is not found.
      */
-    default Image getImageWithoutData(@NonEmpty String imageId) throws DoesNotExistException, BlackNectarAPIException
+    default Image getImageWithoutData(@NonEmpty UUID storeId, @NonEmpty String imageId) throws DoesNotExistException, BlackNectarAPIException
     {
-        Image image = this.getImage(imageId);
+        Image image = this.getImage(storeId, imageId);
 
         return Image.Builder.fromImage(image)
             .withoutImageData()
@@ -161,10 +173,12 @@ public interface ImageRepository
 
     default void deleteImage(@Required Image image) throws BlackNectarAPIException
     {
+        UUID storeId = image.getStoreId();
         String imageId = image.getImageId();
-        deleteImage(imageId);
+        
+        deleteImage(storeId, imageId);
     }
 
-    void deleteImage(@Required String imageId) throws BlackNectarAPIException;
+    void deleteImage(@Required UUID storeId, @NonEmpty String imageId) throws BlackNectarAPIException;
 
 }

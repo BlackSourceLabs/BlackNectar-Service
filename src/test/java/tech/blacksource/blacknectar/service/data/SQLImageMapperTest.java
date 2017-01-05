@@ -17,6 +17,7 @@
 package tech.blacksource.blacknectar.service.data;
 
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.UUID;
 import org.junit.Before;
@@ -30,6 +31,8 @@ import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Answers.RETURNS_MOCKS;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.when;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.images;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
@@ -40,25 +43,28 @@ import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
  */
 @Repeat(25)
 @RunWith(AlchemyTestRunner.class)
-public class SQLImageMapperTest 
+public class SQLImageMapperTest
 {
 
+    @Mock(answer = RETURNS_MOCKS)
+    private ResultSetMetaData metadata;
+    
     @Mock
     private ResultSet results;
-    
+
     private Image image;
-    
+
     private SQLImageMapper instance;
-    
+
     @Before
     public void setUp() throws Exception
     {
-        
+
         setupData();
         setupMocks();
+        
         instance = new SQLImageMapper.Impl();
     }
-
 
     private void setupData() throws Exception
     {
@@ -68,6 +74,10 @@ public class SQLImageMapperTest
     private void setupMocks() throws Exception
     {
         setupResultsWithImage(results, image);
+        
+        when(results.getMetaData()).thenReturn(metadata);
+        when(metadata.getColumnCount()).thenReturn(10);
+        when(metadata.getColumnLabel(anyInt())).thenReturn(SQLColumns.Images.IMAGE_BINARY);
     }
 
     @Test
@@ -77,29 +87,30 @@ public class SQLImageMapperTest
         assertThat(result, notNullValue());
         assertThat(result, is(image));
     }
-    
+
     @Test
     public void testWhenImageDataNotPresent() throws Exception
     {
         when(results.getBytes(SQLColumns.Images.IMAGE_BINARY)).thenReturn(null);
-        
+
         Image expected = Image.Builder.fromImage(image).withoutImageData().build();
         Image result = instance.mapRow(results, 0);
-        
+
         assertThat(result, is(expected));
     }
-    
+
     @Test
     public void testWhenURLNotPresent() throws Exception
     {
         when(results.getString(SQLColumns.Images.URL)).thenReturn(null);
-        
+
         Image expected = Image.Builder.fromImage(image).withoutURL().build();
         Image result = instance.mapRow(results, 0);
-        
+
         assertThat(result, is(expected));
     }
 
+    @SuppressWarnings("unchecked")
     private void setupResultsWithImage(ResultSet results, Image image) throws SQLException
     {
         when(results.getObject(SQLColumns.Images.STORE_ID, UUID.class)).thenReturn(image.getStoreId());
@@ -108,12 +119,19 @@ public class SQLImageMapperTest
         when(results.getString(SQLColumns.Images.IMAGE_TYPE)).thenReturn(image.getImageType());
         when(results.getString(SQLColumns.Images.SOURCE)).thenReturn(image.getSource());
         when(results.getString(SQLColumns.Images.URL)).thenReturn(image.getUrl().toString());
-        
+
         when(results.getInt(SQLColumns.Images.HEIGHT)).thenReturn(image.getHeight());
         when(results.getInt(SQLColumns.Images.WIDTH)).thenReturn(image.getWidth());
         when(results.getInt(SQLColumns.Images.SIZE_IN_BYTES)).thenReturn(image.getSizeInBytes());
-        
-        when(results.getBytes(SQLColumns.Images.IMAGE_BINARY)).thenReturn(image.getImageData());
+
+        if (image.hasImageData())
+        {
+            when(results.getBytes(SQLColumns.Images.IMAGE_BINARY)).thenReturn(image.getImageData());
+        }
+        else
+        {
+            when(results.getBytes(SQLColumns.Images.IMAGE_BINARY)).thenThrow(SQLException.class);
+        }
     }
 
 }

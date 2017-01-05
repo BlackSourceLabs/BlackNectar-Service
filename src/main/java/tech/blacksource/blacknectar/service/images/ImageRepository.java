@@ -71,7 +71,7 @@ public interface ImageRepository
     }
     
     /**
-     * Like {@link #getImage(java.lang.String) }, but it returns only the Image information, without the
+     * Like {@link #getImage(java.lang.String, java.lang.String) }, but it returns only the Image information, without the
      * {@linkplain Image#imageData data}.
      *
      * @param storeId

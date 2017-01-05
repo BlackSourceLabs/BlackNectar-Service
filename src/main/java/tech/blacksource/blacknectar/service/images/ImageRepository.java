@@ -16,11 +16,13 @@
 
 package tech.blacksource.blacknectar.service.images;
 
+import com.google.inject.ImplementedBy;
 import java.util.List;
 import java.util.UUID;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
+import tech.blacksource.blacknectar.service.exceptions.DoesNotExistException;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
@@ -36,14 +38,37 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.v
  *
  * @author SirWellington
  */
+@ImplementedBy(MemoryImageRepository.class)
 public interface ImageRepository
 {
 
+    /**
+     * Adds an Image to the repository.
+     *
+     * @param image
+     * @throws BlackNectarAPIException
+     */
     void addImage(@Required Image image) throws BlackNectarAPIException;
 
-    Image getImage(@NonEmpty String imageId) throws BlackNectarAPIException;
+    /**
+     * Get an Image from the repository with the given ID. This function does not return null, but instead
+     *
+     * @param imageId
+     * @return
+     * @throws BlackNectarAPIException
+     */
+    Image getImage(@NonEmpty String imageId) throws DoesNotExistException, BlackNectarAPIException;
 
-    default Image getImageWithoutData(@NonEmpty String imageId) throws BlackNectarAPIException
+    /**
+     * Like {@link #getImage(java.lang.String) }, but it returns only the Image information, without the
+     * {@linkplain Image#imageData data}.
+     *
+     * @param imageId
+     * @return
+     * @throws BlackNectarAPIException
+     * @throws DoesNotExistException   If the image is not found.
+     */
+    default Image getImageWithoutData(@NonEmpty String imageId) throws DoesNotExistException, BlackNectarAPIException
     {
         Image image = this.getImage(imageId);
 
@@ -52,6 +77,15 @@ public interface ImageRepository
             .build();
     }
 
+    /**
+     * Returns all of the images for a store.
+     * <p>
+     * If no images are found, and empty list is returned.
+     *
+     * @param storeId The {@linkplain Store#storeId ID of the Store} to search for.
+     * @return
+     * @throws BlackNectarAPIException
+     */
     default List<Image> getImagesForStore(@NonEmpty String storeId) throws BlackNectarAPIException
     {
         checkThat(storeId)
@@ -62,6 +96,13 @@ public interface ImageRepository
         return getImagesForStore(UUID.fromString(storeId));
     }
 
+    /**
+     * Conveniences function for {@link #getImagesForStore(java.util.UUID) }.
+     * 
+     * @param store
+     * @return
+     * @throws BlackNectarAPIException 
+     */
     default List<Image> getImagesForStore(@Required Store store) throws BlackNectarAPIException
     {
         checkThat(store)
@@ -71,8 +112,24 @@ public interface ImageRepository
         return this.getImagesForStore(store.getStoreId());
     }
 
+    /**
+     * Convenience function for {@link #getImagesForStore(java.lang.String) }.
+     * 
+     * @param storeId
+     * @return
+     * @throws BlackNectarAPIException 
+     */
     List<Image> getImagesForStore(@NonEmpty UUID storeId) throws BlackNectarAPIException;
-    
+
+    /**
+     * Get all of the images for a store, without the {@linkplain Image#imageData image data}.
+     * <p>
+     * This is suitable if you want to query for images without downloaded the image.
+     * 
+     * @param storeId
+     * @return
+     * @throws BlackNectarAPIException 
+     */
     default List<Image> getImagesForStoreWithouData(@NonEmpty UUID storeId) throws BlackNectarAPIException
     {
         return this.getImagesForStore(storeId).stream()
@@ -80,6 +137,12 @@ public interface ImageRepository
             .collect(toList());
     }
 
+    /**
+     * Checks whether the store has any pictures.
+     * @param storeId
+     * @return
+     * @throws BlackNectarAPIException 
+     */
     default boolean hasImages(@Required UUID storeId) throws BlackNectarAPIException
     {
         List<Image> images = getImagesForStore(storeId);

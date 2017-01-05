@@ -50,7 +50,7 @@ public final class SQLQueries
     public static final String COUNT_IMAGES_FOR_STORE = loadQuery("count_images_for_store.sql");
 
     //Deletes
-    public static final String DELETE_IMAGES = loadQuery("delete_image.sql");
+    public static final String DELETE_IMAGE = loadQuery("delete_image.sql");
     public static final String DELETE_IMAGES_FOR_STORE = loadQuery("delete_store_images.sql");
 
     //Insert Statements

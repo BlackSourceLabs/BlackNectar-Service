@@ -18,8 +18,10 @@ package tech.blacksource.blacknectar.service.data;
 
 import java.util.List;
 import java.util.UUID;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
@@ -43,11 +45,22 @@ final class SQLImageRepository implements ImageRepository
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(SQLImageRepository.class);
-
-    private Aroma aroma;
-    private JdbcTemplate database;
-    private SQLImageMapper imageMapper;
-
+    
+    private final Aroma aroma;
+    private final JdbcTemplate database;
+    private final SQLImageMapper imageMapper;
+    
+    @Inject
+    SQLImageRepository(Aroma aroma, JdbcTemplate database, SQLImageMapper imageMapper)
+    {
+        checkThat(aroma, database, imageMapper)
+            .are(notNull());
+        
+        this.aroma = aroma;
+        this.database = database;
+        this.imageMapper = imageMapper;
+    }
+    
     @Override
     public void addImage(Image image) throws BlackNectarAPIException
     {
@@ -55,7 +68,7 @@ final class SQLImageRepository implements ImageRepository
 
         try
         {
-            saveImage(image);
+            _addImage(image);
         }
         catch (Exception ex)
         {
@@ -72,7 +85,11 @@ final class SQLImageRepository implements ImageRepository
 
         try
         {
-            return getImageWithIds(storeId, imageId);
+            return _getImage(storeId, imageId);
+        }
+        catch(EmptyResultDataAccessException ex)
+        {
+            throw new DoesNotExistException(ex);
         }
         catch (Exception ex)
         {
@@ -89,7 +106,7 @@ final class SQLImageRepository implements ImageRepository
 
         try
         {
-            return getImageWithoutDataWithIds(storeId, imageId);
+            return _getImageWithoutData(storeId, imageId);
         }
         catch (Exception ex)
         {
@@ -174,7 +191,7 @@ final class SQLImageRepository implements ImageRepository
             .send();
     }
 
-    private void saveImage(Image image)
+    private void _addImage(Image image)
     {
         String insertStatement = SQLQueries.INSERT_STORE_IMAGE;
 
@@ -188,10 +205,10 @@ final class SQLImageRepository implements ImageRepository
                         image.getContentType(),
                         image.getImageType(),
                         image.getSource(),
-                        image.getUrl());
+                        image.getUrl().toString());
     }
 
-    private Image getImageWithIds(UUID storeId, String imageId)
+    private Image _getImage(UUID storeId, String imageId)
     {
         String query = SQLQueries.QUERY_IMAGE;
 
@@ -201,7 +218,7 @@ final class SQLImageRepository implements ImageRepository
         return result;
     }
 
-    private Image getImageWithoutDataWithIds(UUID storeId, String imageId)
+    private Image _getImageWithoutData(UUID storeId, String imageId)
     {
         String query = SQLQueries.QUERY_IMAGE_WITHOUT_DATA;
 

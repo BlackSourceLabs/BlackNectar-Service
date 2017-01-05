@@ -16,9 +16,11 @@
 
 package tech.blacksource.blacknectar.service.data;
 
+import com.google.common.base.Objects;
 import com.google.inject.ImplementedBy;
 import java.net.MalformedURLException;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLDataException;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -40,7 +42,7 @@ public interface SQLImageMapper extends RowMapper<Image>
 {
 
     /**
-     * Creates an {@link Image} object from the {@link ResulSet}.
+     * Creates an {@link Image} object from the {@link ResultSet}.
      *
      * @param results
      * @param rowNum
@@ -121,15 +123,37 @@ public interface SQLImageMapper extends RowMapper<Image>
                 }
             }
             
-            byte[] binary = results.getBytes(SQLColumns.Images.IMAGE_BINARY);
-            
-            if (binary != null)
+            if (hasColumn(results, SQLColumns.Images.IMAGE_BINARY))
             {
-                builder = builder.withImageData(binary);
+                byte[] binary = results.getBytes(SQLColumns.Images.IMAGE_BINARY);
+
+                if (binary != null)
+                {
+                    builder = builder.withImageData(binary);
+                }
             }
 
             return builder.build();
         }
+
+        private boolean hasColumn(ResultSet results, String expectedColumn) throws SQLException
+        {
+            ResultSetMetaData metadata = results.getMetaData();
+            
+            for (int i = 1; i <= metadata.getColumnCount(); ++i)
+            {
+                String columnName = metadata.getColumnLabel(i);
+                
+                if (Objects.equal(columnName, expectedColumn))
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
+        
 
     }
 

@@ -25,6 +25,7 @@ import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
+import static java.util.stream.Collectors.toList;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
@@ -47,7 +48,7 @@ public interface ImageRepository
         Image image = this.getImage(imageId);
 
         return Image.Builder.fromImage(image)
-            .unsetImageData()
+            .withoutImageData()
             .build();
     }
 
@@ -71,6 +72,13 @@ public interface ImageRepository
     }
 
     List<Image> getImagesForStore(@NonEmpty UUID storeId) throws BlackNectarAPIException;
+    
+    default List<Image> getImagesForStoreWithouData(@NonEmpty UUID storeId) throws BlackNectarAPIException
+    {
+        return this.getImagesForStore(storeId).stream()
+            .map(img -> Image.Builder.fromImage(img).withoutImageData().build())
+            .collect(toList());
+    }
 
     default boolean hasImages(@Required UUID storeId) throws BlackNectarAPIException
     {

@@ -142,7 +142,7 @@ public interface ImageRepository
      * @return
      * @throws BlackNectarAPIException 
      */
-    default List<Image> getImagesForStoreWithouData(@NonEmpty UUID storeId) throws BlackNectarAPIException
+    default List<Image> getImagesForStoreWithoutData(@NonEmpty UUID storeId) throws BlackNectarAPIException
     {
         return this.getImagesForStore(storeId).stream()
             .map(img -> Image.Builder.fromImage(img).withoutImageData().build())
@@ -150,7 +150,7 @@ public interface ImageRepository
     }
     
     /**
-     * Convenience method for {@link #getImagesForStoreWithouData(java.util.UUID) }.
+     * Convenience method for {@link #getImagesForStoreWithoutData(java.util.UUID) }.
      * 
      * @param store
      * @return
@@ -170,7 +170,7 @@ public interface ImageRepository
             .is(nonEmptyString())
             .is(validUUID());
         
-        return this.getImagesForStoreWithouData(UUID.fromString(storeId));
+        return this.getImagesForStoreWithoutData(UUID.fromString(storeId));
     }
 
     /**

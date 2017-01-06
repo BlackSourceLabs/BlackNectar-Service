@@ -168,7 +168,7 @@ public class SQLImageRepositoryIT
             .map(img -> Image.Builder.fromImage(img).withoutImageData().build())
             .collect(toList());
 
-        List<Image> results = instance.getImagesForStoreWithouData(storeId);
+        List<Image> results = instance.getImagesForStoreWithoutData(storeId);
 
         assertTrue(Sets.containTheSameElements(results, expected));
     }

@@ -245,7 +245,9 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
     {
         String source = args.source;
         String message = "Found image from {} for Store. {}/{} successful. {}/{} done. \n\nStore: {}";
+        
         LOG.info(message, source, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores, store);
+        
         aroma.begin().titled("Image Saved")
             .text(message, source, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores, store)
             .withUrgency(Urgency.LOW)
@@ -258,7 +260,9 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         String source = args.source;
 
         String message = "Successfully saved Image [{}: {}] for store: {}";
+        
         LOG.debug(message, source, imageUrl, store);
+        
         aroma.begin().titled("Image Saved")
             .text(message, source, imageUrl, store)
             .withUrgency(Urgency.LOW)
@@ -271,6 +275,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         String message = "Failed to find an image from {} for store: {}";
 
         LOG.error(message, source, store, ex);
+        
         aroma.begin().titled("Image Load Failed")
             .text(message, source, store, ex)
             .withUrgency(Urgency.HIGH)
@@ -280,7 +285,9 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
     private void makeNoteThatSleepInterrupted(InterruptedException ex)
     {
         String message = "Thread Sleep Interrupted";
+       
         LOG.error(message, ex);
+        
         aroma.begin().titled("Script Interrupted")
             .text(message, ex)
             .withUrgency(Urgency.MEDIUM)
@@ -295,7 +302,9 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
     {
         String source = args.source;
         String message = "{}/{} - Failed to process image from {} for store: {}";
+        
         LOG.error(message, totalStoresProcessed, totalStores, source, store);
+        
         aroma.begin().titled("Store Image Load Failed")
             .text(message, totalStoresProcessed, totalStores, source, store)
             .withUrgency(Urgency.MEDIUM)
@@ -307,6 +316,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
     {
         String message = "Script[{}] completed in {} hours, with {}/{} successful and {}/{} processed";
         String source = args.source;
+       
         LOG.info(message, source, runtimeHours, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores);
 
         aroma.begin().titled("Script Finished")

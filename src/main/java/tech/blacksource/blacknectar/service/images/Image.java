@@ -73,6 +73,7 @@ public final class Image
     {
         checkThat(storeId).is(notNull());
         checkThat(imageId).is(nonEmptyString());
+        checkThat(width, height).are(positiveInteger());
         
         this.storeId = storeId;
         this.imageId = imageId;
@@ -272,6 +273,7 @@ public final class Image
             checkThat(image).is(notNull());
 
             Builder builder = newInstance();
+            
             builder.storeId = image.storeId;
             builder.imageId = image.imageId;
             builder.imageData = image.imageData;

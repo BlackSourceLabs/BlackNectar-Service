@@ -43,6 +43,7 @@ public final class RunSearchGoogleImages implements Callable<Void>
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(RunSearchGoogleImages.class);
+    
     private final Aroma aroma;
     private final ImageLoader googleImageLoader;
     private final String source = "Google";

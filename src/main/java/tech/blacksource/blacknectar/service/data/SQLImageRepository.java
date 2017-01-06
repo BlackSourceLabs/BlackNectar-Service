@@ -132,7 +132,7 @@ final class SQLImageRepository implements ImageRepository
     }
 
     @Override
-    public List<Image> getImagesForStoreWithouData(UUID storeId) throws BlackNectarAPIException
+    public List<Image> getImagesForStoreWithoutData(UUID storeId) throws BlackNectarAPIException
     {
         checkNotNull(storeId);
 
@@ -185,6 +185,7 @@ final class SQLImageRepository implements ImageRepository
     {
         String message = "Failed to save Image: {}";
         LOG.error(message, image, ex);
+        
         aroma.begin().titled("SQL Image Save Failed")
             .text(message, image, ex)
             .withUrgency(Urgency.MEDIUM)
@@ -271,6 +272,7 @@ final class SQLImageRepository implements ImageRepository
     {
         String message = "Failed to get image: StoreID[{}] | ImageID[{}]";
         LOG.error(message, storeId, imageId, ex);
+        
         aroma.begin().titled("SQL Image Get Failed")
             .text(message, storeId, imageId, ex)
             .withUrgency(Urgency.MEDIUM)
@@ -291,6 +293,7 @@ final class SQLImageRepository implements ImageRepository
     {
         String message = "Failed to check if store has images: [{}]";
         LOG.error(message, storeId, ex);
+       
         aroma.begin().titled("SQL Store Image Check Failed")
             .text(message, storeId, ex)
             .withUrgency(Urgency.MEDIUM)
@@ -301,6 +304,7 @@ final class SQLImageRepository implements ImageRepository
     {
         String message = "Failed to delete Image. Store: [{}] | Image ID: [{}]";
         LOG.error(message, storeId, imageId, ex);
+       
         aroma.begin().titled("SQL Image Delete Failed")
             .text(message, storeId, imageId, ex)
             .withUrgency(Urgency.MEDIUM)

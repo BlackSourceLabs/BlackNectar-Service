@@ -49,6 +49,7 @@ import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Answers.RETURNS_MOCKS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -76,6 +77,7 @@ import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.
 public class SearchStoresOperationTest
 {
 
+    @Mock(answer = RETURNS_MOCKS)
     private Aroma aroma;
 
     @Mock
@@ -141,7 +143,6 @@ public class SearchStoresOperationTest
 
     private void setupMocks() throws Exception
     {
-        aroma = Aroma.create();
 
         queryParams = createQueryParams();
 

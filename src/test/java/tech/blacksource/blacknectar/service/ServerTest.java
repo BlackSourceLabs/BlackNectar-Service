@@ -27,6 +27,7 @@ import tech.blacksource.blacknectar.service.operations.SayHelloOperation;
 import tech.blacksource.blacknectar.service.operations.SearchStoresOperation;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
+import static org.mockito.Answers.RETURNS_MOCKS;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
@@ -36,7 +37,7 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
 @RunWith(AlchemyTestRunner.class)
 public class ServerTest
 {
-    
+    @Mock(answer = RETURNS_MOCKS)
     private Aroma aroma;
     
     @Mock
@@ -69,7 +70,6 @@ public class ServerTest
 
     private void setupMocks() throws Exception
     {
-        aroma = Aroma.create();
     }
 
     @Test

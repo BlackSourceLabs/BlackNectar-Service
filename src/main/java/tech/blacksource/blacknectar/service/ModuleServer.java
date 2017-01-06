@@ -38,6 +38,7 @@ import tech.redroma.yelp.YelpAPI;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 import tech.sirwellington.alchemy.arguments.FailedAssertionException;
+import tech.sirwellington.alchemy.http.AlchemyHttp;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 
@@ -57,6 +58,7 @@ final class ModuleServer extends AbstractModule
         install(new ModuleOperations());
         install(new ModuleBlackNectarService());
 
+        bind(AlchemyHttp.class).toInstance(AlchemyHttp.newDefaultInstance());
         bind(ExceptionHandler.class).to(BlackNectarExceptionHandler.class);
         bind(Server.class);
     }

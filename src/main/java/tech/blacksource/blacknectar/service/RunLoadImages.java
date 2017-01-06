@@ -17,13 +17,13 @@
 package tech.blacksource.blacknectar.service;
 
 import com.google.common.collect.Queues;
-import com.google.common.io.Resources;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.UUID;
@@ -44,14 +44,15 @@ import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 import tech.sirwellington.alchemy.annotations.arguments.Positive;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 import tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern;
+import tech.sirwellington.alchemy.http.AlchemyHttp;
 
 import static java.util.Objects.isNull;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern.Role.CLIENT;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.CollectionAssertions.nonEmptyCollection;
-import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.positiveInteger;
-import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.positiveLong;
+import static tech.sirwellington.alchemy.arguments.assertions.CollectionAssertions.nonEmptyList;
+import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThanOrEqualTo;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
@@ -68,15 +69,17 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
 
     private final static Logger LOG = LoggerFactory.getLogger(RunLoadImages.class);
 
+    private final AlchemyHttp http;
     private final Aroma aroma;
     private final JdbcTemplate database;
 
     @Inject
-    RunLoadImages(Aroma aroma, JdbcTemplate database)
+    RunLoadImages(AlchemyHttp http, Aroma aroma, JdbcTemplate database)
     {
-        checkThat(aroma, database)
+        checkThat(http, aroma, database)
             .are(notNull());
         
+        this.http = http;
         this.aroma = aroma;
         this.database = database;
     }
@@ -167,7 +170,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
             .usingMessage("No Image found for Store: " + store)
             .is(notNull());
         
-        byte[] imageData = Resources.toByteArray(imageUrl);
+        byte[] imageData = http.go().download(imageUrl);
 
         BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageData));
         int height = image.getHeight();
@@ -342,8 +345,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
                 .usingMessage("stores cannot be empty")
                 .is(nonEmptyCollection());
 
-            checkThat(sleepTimeMillis)
-                .is(positiveLong());
+            checkThat(sleepTimeMillis).is(greaterThanOrEqualTo(0L));
 
             this.sleepTimeMillis = sleepTimeMillis;
             this.source = source;
@@ -423,8 +425,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
 
             Builder withSleepTime(@Positive int sleepTime, @Required TimeUnit timeUnit)
             {
-                checkThat(sleepTime)
-                    .is(positiveInteger());
+                checkThat(sleepTime).is(greaterThanOrEqualTo(0));
                 
                 checkThat(timeUnit).is(notNull());
                 
@@ -453,6 +454,14 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
                 checkThat((Collection<Store>) stores)
                     .is(nonEmptyCollection());
 
+                this.stores = Queues.newArrayDeque(stores);
+                return this;
+            }
+            
+            Builder withStores(@NonEmpty List<Store> stores)
+            {
+                checkThat(stores).is(nonEmptyList());
+                
                 this.stores = Queues.newArrayDeque(stores);
                 return this;
             }

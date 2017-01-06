@@ -51,6 +51,7 @@ import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.CollectionAssertions.nonEmptyCollection;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.positiveInteger;
+import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.positiveLong;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
@@ -86,7 +87,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         checkThat(args).is(notNull());
 
         long startTime = System.currentTimeMillis();
-        long sleepTime = args.timeUnit.toMillis(args.frequency);
+        long sleepTimeMillis = args.sleepTimeMillis;
         int totalStores = args.stores.size();
         int totalStoresProcessed = 0;
         int totalSuccesses = 0;
@@ -114,7 +115,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
                 makeNoteThatOperationToProcessStoreFailed(nextStore, args, totalSuccesses, totalStoresProcessed, totalStores);
             }
 
-            tryToSleepFor(sleepTime);
+            tryToSleepFor(sleepTimeMillis);
         }
 
         long endTime = System.currentTimeMillis();
@@ -126,6 +127,11 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
 
     private void tryToSleepFor(long sleepTime)
     {
+        if (sleepTime <= 0)
+        {
+            return;
+        }
+        
         try
         {
             Thread.sleep(sleepTime);
@@ -312,26 +318,24 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
     static class Arguments
     {
 
-        private final TimeUnit timeUnit;
-        private final int frequency;
+        private final long sleepTimeMillis;
         private final String source;
         private final ImageLoader imageLoader;
         private final Queue<Store> stores;
 
-        Arguments(TimeUnit timeUnit, int frequency, String source, ImageLoader imageLoader, Queue<Store> stores)
+        Arguments(long sleepTimeMillis, String source, ImageLoader imageLoader, Queue<Store> stores)
         {
-            checkThat(timeUnit, source, imageLoader, stores)
+            checkThat(source, imageLoader, stores)
                 .are(notNull());
 
             checkThat((Collection<Store>) stores)
                 .usingMessage("stores cannot be empty")
                 .is(nonEmptyCollection());
 
-            checkThat(frequency)
-                .is(positiveInteger());
+            checkThat(sleepTimeMillis)
+                .is(positiveLong());
 
-            this.timeUnit = timeUnit;
-            this.frequency = frequency;
+            this.sleepTimeMillis = sleepTimeMillis;
             this.source = source;
             this.imageLoader = imageLoader;
             this.stores = stores;
@@ -340,12 +344,11 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         @Override
         public int hashCode()
         {
-            int hash = 7;
-            hash = 29 * hash + Objects.hashCode(this.timeUnit);
-            hash = 29 * hash + this.frequency;
-            hash = 29 * hash + Objects.hashCode(this.source);
-            hash = 29 * hash + Objects.hashCode(this.imageLoader);
-            hash = 29 * hash + Objects.hashCode(this.stores);
+            int hash = 5;
+            hash = 83 * hash + (int) (this.sleepTimeMillis ^ (this.sleepTimeMillis >>> 32));
+            hash = 83 * hash + Objects.hashCode(this.source);
+            hash = 83 * hash + Objects.hashCode(this.imageLoader);
+            hash = 83 * hash + Objects.hashCode(this.stores);
             return hash;
         }
 
@@ -365,15 +368,11 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
                 return false;
             }
             final Arguments other = (Arguments) obj;
-            if (this.frequency != other.frequency)
+            if (this.sleepTimeMillis != other.sleepTimeMillis)
             {
                 return false;
             }
             if (!Objects.equals(this.source, other.source))
-            {
-                return false;
-            }
-            if (this.timeUnit != other.timeUnit)
             {
                 return false;
             }
@@ -391,14 +390,13 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         @Override
         public String toString()
         {
-            return "Arguments{" + "timeUnit=" + timeUnit + ", frequency=" + frequency + ", source=" + source + ", imageLoader=" + imageLoader + ", stores=" + stores + '}';
+            return "Arguments{" + "sleepTimeMillis=" + sleepTimeMillis + ", source=" + source + ", imageLoader=" + imageLoader + ", stores=" + stores + '}';
         }
 
         static class Builder
         {
 
-            private TimeUnit timeUnit = TimeUnit.MILLISECONDS;
-            private int frequency = 500;
+            private long sleepTimeMillis = 500;
             private String source;
             private ImageLoader imageLoader;
             private Queue<Store> stores = Queues.newArrayDeque();
@@ -413,20 +411,14 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
 
             }
 
-            Builder withTimeUnit(@Required TimeUnit timeUnit)
+            Builder withSleepTime(@Positive int sleepTime, @Required TimeUnit timeUnit)
             {
-                checkThat(timeUnit).is(notNull());
-
-                this.timeUnit = timeUnit;
-                return this;
-            }
-
-            Builder withFrequency(@Positive int frequency)
-            {
-                checkThat(frequency)
+                checkThat(sleepTime)
                     .is(positiveInteger());
-
-                this.frequency = frequency;
+                
+                checkThat(timeUnit).is(notNull());
+                
+                this.sleepTimeMillis = timeUnit.toMillis(sleepTime);
                 return this;
             }
 
@@ -468,7 +460,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
                 checkThat((Collection<Store>) stores)
                     .is(nonEmptyCollection());
 
-                return new Arguments(timeUnit, frequency, source, imageLoader, stores);
+                return new Arguments(sleepTimeMillis, source, imageLoader, stores);
             }
 
         }

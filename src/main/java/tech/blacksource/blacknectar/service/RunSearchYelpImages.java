@@ -82,8 +82,7 @@ public final class RunSearchYelpImages implements Callable<Void>
         Queue<Store> queue = Queues.newLinkedBlockingQueue(stores);
 
         RunLoadImages.Arguments args = RunLoadImages.Arguments.Builder.newInstance()
-            .withFrequency(400)
-            .withTimeUnit(TimeUnit.MILLISECONDS)
+            .withSleepTime(400, TimeUnit.MILLISECONDS)
             .withSource(source)
             .withImageLoader(yelpImageLoader)
             .withStores(queue)

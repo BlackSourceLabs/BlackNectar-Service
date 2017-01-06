@@ -81,8 +81,7 @@ public final class RunSearchGoogleImages implements Callable<Void>
         Queue<Store> queue = Queues.newLinkedBlockingQueue(stores);
 
         RunLoadImages.Arguments args = RunLoadImages.Arguments.Builder.newInstance()
-            .withFrequency(200)
-            .withTimeUnit(TimeUnit.MILLISECONDS)
+            .withSleepTime(200, TimeUnit.MILLISECONDS)
             .withSource(source)
             .withImageLoader(googleImageLoader)
             .withStores(queue)

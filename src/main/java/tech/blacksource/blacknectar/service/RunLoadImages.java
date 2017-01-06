@@ -155,26 +155,26 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
     {
         ImageLoader imageLoader = args.imageLoader;
 
-        URL imageURL = imageLoader.getImageFor(store);
+        URL imageUrl = imageLoader.getImageFor(store);
         
-        checkThat(imageURL)
+        checkThat(imageUrl)
             .usingMessage("No Image found for Store: " + store)
             .is(notNull());
         
-        byte[] imageData = Resources.toByteArray(imageURL);
+        byte[] imageData = Resources.toByteArray(imageUrl);
 
         BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageData));
         int height = image.getHeight();
         int width = image.getWidth();
         int size = imageData.length;
 
-        String contentType = getContentTypeFor(imageURL);
+        String contentType = getContentTypeFor(imageUrl);
         String imageType = getImageTypeFrom(contentType);
         String source = args.source;
 
-        saveImageInfoFor(store, imageURL, width, height, imageData, size, contentType, imageType, source);
+        saveImageInfoFor(store, imageUrl, width, height, imageData, size, contentType, imageType, source);
 
-        makeNoteThatImageSavedForStore(imageURL, store, args);
+        makeNoteThatImageSavedForStore(imageUrl, store, args);
     }
 
     private String getImageTypeFrom(String contentType) throws IOException
@@ -198,7 +198,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
     }
 
     private void saveImageInfoFor(Store store,
-                                  URL imageURL,
+                                  URL imageUrl,
                                   int width,
                                   int height,
                                   byte[] binary,
@@ -211,7 +211,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         String statementToInsertImage = SQLQueries.INSERT_STORE_IMAGE;
 
         UUID storeId = UUID.fromString(store.getStoreId());
-        String imageLink = imageURL.toString();
+        String imageLink = imageUrl.toString();
         String imageId = imageLink;
 
         database.update(statementToInsertImage,
@@ -227,9 +227,9 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
                         imageLink);
     }
 
-    private String getContentTypeFor(URL imageURL) throws IOException
+    private String getContentTypeFor(URL imageUrl) throws IOException
     {
-        URLConnection connection = imageURL.openConnection();
+        URLConnection connection = imageUrl.openConnection();
         String contentType = connection.getContentType();
 
         return contentType;
@@ -247,14 +247,14 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
 
     }
 
-    private void makeNoteThatImageSavedForStore(URL imageURL, Store store, Arguments args)
+    private void makeNoteThatImageSavedForStore(URL imageUrl, Store store, Arguments args)
     {
         String source = args.source;
 
         String message = "Successfully saved Image [{}: {}] for store: {}";
-        LOG.debug(message, source, imageURL, store);
+        LOG.debug(message, source, imageUrl, store);
         aroma.begin().titled("Image Saved")
-            .text(message, source, imageURL, store)
+            .text(message, source, imageUrl, store)
             .withUrgency(Urgency.LOW)
             .send();
     }

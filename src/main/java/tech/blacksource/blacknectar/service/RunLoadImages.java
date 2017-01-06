@@ -73,6 +73,9 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
     @Inject
     RunLoadImages(Aroma aroma, JdbcTemplate database)
     {
+        checkThat(aroma, database)
+            .are(notNull());
+        
         this.aroma = aroma;
         this.database = database;
     }

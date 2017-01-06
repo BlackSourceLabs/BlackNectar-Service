@@ -83,7 +83,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
     @Override
     public void accept(RunLoadImages.Arguments args)
     {
-        checkThat(args);
+        checkThat(args).is(notNull());
 
         long startTime = System.currentTimeMillis();
         long sleepTime = args.timeUnit.toMillis(args.frequency);

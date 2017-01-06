@@ -54,7 +54,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.p
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
- * Designed to load the Store Images database with images obtained from the corresponding {@link ImageLoader}.
+ * Designed to find images for a store and load them into "Store Images" Database.
  * <p>
  * To use this class, create {@linkplain Arguments Arguments} using
  * {@linkplain Arguments.Builder#newInstance() an argument builder}.

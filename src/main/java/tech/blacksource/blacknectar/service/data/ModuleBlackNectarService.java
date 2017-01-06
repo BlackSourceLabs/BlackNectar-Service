@@ -21,6 +21,7 @@ package tech.blacksource.blacknectar.service.data;
 import com.google.inject.AbstractModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.blacksource.blacknectar.service.images.ImageRepository;
 import tech.blacksource.blacknectar.service.stores.StoreDataSource;
 
 /**
@@ -34,6 +35,7 @@ public final class ModuleBlackNectarService extends AbstractModule
     @Override
     protected void configure()
     {
+        bind(ImageRepository.class).to(SQLImageRepository.class).asEagerSingleton();
         bind(StoreRepository.class).to(SQLStoreRepository.class).asEagerSingleton();
         bind(SQLStoreMapper.class).asEagerSingleton();
         bind(GeoCalculator.class).toInstance(GeoCalculator.HARVESINE);

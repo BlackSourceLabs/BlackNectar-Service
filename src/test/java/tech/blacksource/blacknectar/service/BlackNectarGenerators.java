@@ -21,6 +21,7 @@ package tech.blacksource.blacknectar.service;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.blacksource.blacknectar.service.images.Image;
 import tech.blacksource.blacknectar.service.stores.Address;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
@@ -28,9 +29,14 @@ import tech.sirwellington.alchemy.generator.AlchemyGenerator;
 import tech.sirwellington.alchemy.generator.StringGenerators;
 
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.BinaryGenerators.binary;
+import static tech.sirwellington.alchemy.generator.NetworkGenerators.httpUrls;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.doubles;
+import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
+import static tech.sirwellington.alchemy.generator.NumberGenerators.positiveIntegers;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphanumericString;
+import static tech.sirwellington.alchemy.generator.StringGenerators.hexadecimalString;
 import static tech.sirwellington.alchemy.generator.StringGenerators.uuids;
 
 /**
@@ -81,6 +87,24 @@ public class BlackNectarGenerators
                 .withLocation(locations().get())
                 .withName(one(alphabeticString()))
                 .build(); 
+        };
+    }
+
+    public static AlchemyGenerator<Image> images()
+    {
+        return () ->
+        {
+            return Image.Builder.newInstance()
+                .withStoreID(UUID.randomUUID())
+                .withImageID(one(hexadecimalString(20)))
+                .withImageData(one(binary(100)))
+                .withSizeInBytes(one(integers(100, 1_000)))
+                .withSource(one(alphabeticString()))
+                .withURL(one(httpUrls()))
+                .withWidthAndHeight(one(positiveIntegers()), one(positiveIntegers()))
+                .withContentType(one(alphabeticString()))
+                .withImageType(one(alphabeticString()))
+                .build();
         };
     }
 }

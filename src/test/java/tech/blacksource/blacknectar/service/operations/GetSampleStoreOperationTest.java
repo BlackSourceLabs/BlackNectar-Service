@@ -36,6 +36,7 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Answers.RETURNS_MOCKS;
 import static org.mockito.Mockito.when;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
@@ -48,7 +49,8 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
 @RunWith(AlchemyTestRunner.class)
 public class GetSampleStoreOperationTest 
 {
-
+    
+    @Mock(answer = RETURNS_MOCKS)
     private Aroma aroma;
 
     @Mock
@@ -79,7 +81,6 @@ public class GetSampleStoreOperationTest
     private void setupMocks() throws Exception
     {
         when(request.ip()).thenReturn(ip);
-        aroma = Aroma.create();
     }
     
     @DontRepeat

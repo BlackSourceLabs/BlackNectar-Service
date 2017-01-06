@@ -14,15 +14,23 @@
  * limitations under the License.
  */
 
- 
 package tech.blacksource.blacknectar.service.data;
+
+import tech.sirwellington.alchemy.annotations.access.NonInstantiable;
 
 /**
  *
  * @author SirWellington
  */
-class SQLColumns 
+@NonInstantiable
+public final class SQLColumns
 {
+    
+    SQLColumns() throws IllegalAccessException
+    {
+        throw new IllegalAccessException("cannot instantiate");
+    }
+    
     static final String STORE_ID = "store_id";
     static final String STORE_NAME = "store_name";
     static final String LATITUDE = "latitude";
@@ -34,5 +42,19 @@ class SQLColumns
     static final String COUNTY = "county";
     static final String ZIP_CODE = "zip_code";
     static final String LOCAL_ZIP_CODE = "local_zip_code";
-
+    
+    
+    public static class Images 
+    {
+        public static final String IMAGE_ID = "image_id";
+        public static final String STORE_ID = "store_Id";
+        public static final String IMAGE_BINARY = "image_binary";
+        public static final String HEIGHT = "height";
+        public static final String WIDTH = "width";
+        public static final String SIZE_IN_BYTES = "size_in_bytes";
+        public static final String CONTENT_TYPE = "content_type";
+        public static final String IMAGE_TYPE = "image_type";
+        public static final String SOURCE = "source";
+        public static final String URL = "url";
+    }
 }

@@ -50,10 +50,23 @@ public class SQLQueriesTest
     {
         assertThat(SQLQueries.CREATE_ADDRESS_TABLE, not(isEmptyOrNullString()));
         assertThat(SQLQueries.CREATE_STORES_TABLE, not(isEmptyOrNullString()));
+        
+        assertThat(SQLQueries.COUNT_IMAGES_FOR_STORE, not(isEmptyOrNullString()));
+        
+        assertThat(SQLQueries.DELETE_IMAGE, not(isEmptyOrNullString()));
+        assertThat(SQLQueries.DELETE_IMAGES_FOR_STORE, not(isEmptyOrNullString()));
+        
         assertThat(SQLQueries.INSERT_STORE, not(isEmptyOrNullString()));
+        assertThat(SQLQueries.INSERT_STORE_IMAGE, not(isEmptyOrNullString()));
+        assertThat(SQLQueries.INSERT_IMAGE, not(isEmptyOrNullString()));
+        
         assertThat(SQLQueries.QUERY_STORES_WITH_LOCATION, not(isEmptyOrNullString()));
         assertThat(SQLQueries.QUERY_STORES_WITH_NAME, not(isEmptyOrNullString()));
         assertThat(SQLQueries.QUERY_STORES_WITH_NAME_AND_LOCATION, not(isEmptyOrNullString()));
+        assertThat(SQLQueries.QUERY_IMAGES_FOR_STORE, not(isEmptyOrNullString()));
+        assertThat(SQLQueries.QUERY_IMAGE, not(isEmptyOrNullString()));
+        assertThat(SQLQueries.QUERY_IMAGE_WITHOUT_DATA, not(isEmptyOrNullString()));
+        assertThat(SQLQueries.QUERY_IMAGES_FOR_STORE_WITHOUT_DATA, not(isEmptyOrNullString()));
     }
 
 

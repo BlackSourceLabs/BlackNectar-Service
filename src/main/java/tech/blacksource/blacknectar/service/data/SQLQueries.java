@@ -31,12 +31,12 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
 
 /**
  * Loads SQL queries into memory.
- * 
+ *
  * @author SirWellington
  */
 @Internal
 @NonInstantiable
-final class SQLQueries
+public final class SQLQueries
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(SQLQueries.class);
@@ -45,12 +45,27 @@ final class SQLQueries
 
     public static final String CREATE_ADDRESS_TABLE = loadQuery("create_addresses.sql");
     public static final String CREATE_STORES_TABLE = loadQuery("create_stores.sql");
+
+    //Counts
+    public static final String COUNT_IMAGES_FOR_STORE = loadQuery("count_images_for_store.sql");
+
+    //Deletes
+    public static final String DELETE_IMAGE = loadQuery("delete_image.sql");
+    public static final String DELETE_IMAGES_FOR_STORE = loadQuery("delete_store_images.sql");
+
+    //Insert Statements
     public static final String INSERT_STORE = loadQuery("insert_store.sql");
-    
+    public static final String INSERT_STORE_IMAGE = loadQuery("insert_store_image.sql");
+    public static final String INSERT_IMAGE = loadQuery("insert_image.sql");
+
     //Queries
     public static final String QUERY_STORES_WITH_LOCATION = loadQuery("query_stores_with_location.sql");
     public static final String QUERY_STORES_WITH_NAME = loadQuery("query_stores_with_name.sql");
     public static final String QUERY_STORES_WITH_NAME_AND_LOCATION = loadQuery("query_stores_with_name_and_location.sql");
+    public static final String QUERY_IMAGE = loadQuery("query_image.sql");
+    public static final String QUERY_IMAGE_WITHOUT_DATA = loadQuery("query_image_without_data.sql");
+    public static final String QUERY_IMAGES_FOR_STORE = loadQuery("query_images_for_store.sql");
+    public static final String QUERY_IMAGES_FOR_STORE_WITHOUT_DATA = loadQuery("query_images_for_store_without_data.sql");
 
     SQLQueries() throws IllegalAccessException
     {

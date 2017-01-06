@@ -24,6 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import tech.aroma.client.Aroma;
+import tech.blacksource.blacknectar.service.data.SQLImageMapper;
+import tech.blacksource.blacknectar.service.data.StoreRepository;
 
 /**
  *
@@ -48,6 +50,16 @@ public class TestingResources
     public static Aroma getAroma()
     {
         return INJECTOR.getInstance(Aroma.class);
+    }
+
+    public static SQLImageMapper getImageMapper()
+    {
+        return new SQLImageMapper.Impl();
+    }
+
+    public static StoreRepository getStoreRepository()
+    {
+        return INJECTOR.getInstance(StoreRepository.class);
     }
     
 }

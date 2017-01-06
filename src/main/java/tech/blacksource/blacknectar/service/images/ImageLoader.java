@@ -18,6 +18,7 @@
 package tech.blacksource.blacknectar.service.images;
 
 import java.net.URL;
+import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
@@ -28,5 +29,13 @@ import tech.sirwellington.alchemy.annotations.arguments.Required;
  */
 public interface ImageLoader 
 {
-    URL getImageFor(@Required Store store);
+    /**
+     * Tries to find an image pertaining to the store online.
+     * 
+     * @param store The store to search for.
+     * @return A URL pointing to a relevant image, null is one cannot be found.
+     * 
+     * @throws BlackNectarAPIException 
+     */
+    URL getImageFor(@Required Store store) throws BlackNectarAPIException;
 }

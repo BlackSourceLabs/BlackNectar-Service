@@ -35,7 +35,7 @@
     <inceptionYear>2016</inceptionYear>
     
     <organization>
-        <name>BlackSourceLabs</name>
+        <name>BlackSource, LLC</name>
         <url>http://BlackSource.tech/</url>
     </organization>
 
@@ -145,6 +145,12 @@
             <version>1.7-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+            <groupId>tech.sirwellington.alchemy</groupId>
+            <artifactId>alchemy-http</artifactId>
+            <version>1.4-SNAPSHOT</version>
+        </dependency>
+
         <!--=======================-->
         <!--AROMA-->
         <!--=======================-->
@@ -236,7 +242,7 @@
         <dependency>
             <groupId>tech.redroma.yelp</groupId>
             <artifactId>yelp-api</artifactId>
-            <version>1.0</version>
+            <version>1.1-SNAPSHOT</version>
         </dependency>
         
         

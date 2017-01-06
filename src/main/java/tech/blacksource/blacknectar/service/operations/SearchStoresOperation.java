@@ -19,11 +19,11 @@ package tech.blacksource.blacknectar.service.operations;
 import com.google.gson.JsonArray;
 import java.net.URL;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sir.wellington.alchemy.collections.lists.Lists;
 import sir.wellington.alchemy.collections.sets.Sets;
 import spark.QueryParamsMap;
 import spark.Request;
@@ -36,9 +36,8 @@ import tech.blacksource.blacknectar.service.data.BlackNectarSearchRequest;
 import tech.blacksource.blacknectar.service.data.StoreRepository;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
-import tech.blacksource.blacknectar.service.images.Google;
-import tech.blacksource.blacknectar.service.images.ImageLoader;
-import tech.blacksource.blacknectar.service.images.Yelp;
+import tech.blacksource.blacknectar.service.images.Image;
+import tech.blacksource.blacknectar.service.images.ImageRepository;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
@@ -51,6 +50,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.CollectionAssertio
 import static tech.sirwellington.alchemy.arguments.assertions.GeolocationAssertions.validLatitude;
 import static tech.sirwellington.alchemy.arguments.assertions.GeolocationAssertions.validLongitude;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThanOrEqualTo;
+import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.lessThanOrEqualTo;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.decimalString;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.integerString;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
@@ -71,24 +71,24 @@ public class SearchStoresOperation implements Route
      */
     private final static int DEFAULT_LIMIT = 250;
 
+    /**
+     * The Maximum
+     */
+    private final static double MAX_RADIUS_METERS = 100_000;
+
     private final Aroma aroma;
-    private final StoreRepository service;
-    private final ImageLoader primaryImageLoader;
-    private final ImageLoader secondaryImageLoader;
-
+    private final StoreRepository stores;
+    private final ImageRepository images;
+    
     @Inject
-    public SearchStoresOperation(Aroma aroma,
-                                 StoreRepository service,
-                                 @Google ImageLoader primaryImageLoader,
-                                 @Yelp ImageLoader secondaryImageLoader)
+    SearchStoresOperation(Aroma aroma, StoreRepository stores, ImageRepository images)
     {
-        checkThat(aroma, service, primaryImageLoader, secondaryImageLoader)
+        checkThat(aroma, stores, images)
             .are(notNull());
-
+        
         this.aroma = aroma;
-        this.service = service;
-        this.primaryImageLoader = primaryImageLoader;
-        this.secondaryImageLoader = secondaryImageLoader;
+        this.stores = stores;
+        this.images = images;
     }
 
     @Override
@@ -129,7 +129,7 @@ public class SearchStoresOperation implements Route
 
         try
         {
-            return service.searchForStores(searchRequest);
+            return stores.searchForStores(searchRequest);
         }
         catch (Exception ex)
         {
@@ -200,7 +200,9 @@ public class SearchStoresOperation implements Route
         checkThat(radius)
             .throwing(BadArgumentException.class)
             .usingMessage("radius must be > 0")
-            .is(greaterThanOrEqualTo(0.0));
+            .is(greaterThanOrEqualTo(0.0))
+            .usingMessage("radius must be <= " + MAX_RADIUS_METERS)
+            .is(lessThanOrEqualTo(MAX_RADIUS_METERS));
 
         request.withRadius(radius);
     }
@@ -239,6 +241,7 @@ public class SearchStoresOperation implements Route
         }
 
         String searchTerm = queryParameters.value(QueryKeys.SEARCH_TERM);
+
         checkThat(searchTerm)
             .throwing(BadArgumentException.class)
             .usingMessage("search term cannot be empty")
@@ -275,7 +278,7 @@ public class SearchStoresOperation implements Route
         return request ->
         {
             Set<String> queryParams = request.queryParams();
-            
+
             for (String key : queryParams)
             {
                 checkThat(key)
@@ -284,7 +287,7 @@ public class SearchStoresOperation implements Route
                     .usingMessage("Unrecognized Query Parameter: " + key)
                     .is(elementInCollection(QueryKeys.KEYS));
             }
-            
+
             if (!queryParams.contains(QueryKeys.SEARCH_TERM))
             {
                 checkThat(queryParams)
@@ -298,21 +301,32 @@ public class SearchStoresOperation implements Route
 
     private Store tryToEnrichStoreWithImage(Store store)
     {
-        URL url = primaryImageLoader.getImageFor(store);
-        
-        if (Objects.isNull(url))
+        List<Image> storeImages = images.getImagesForStoreWithoutData(store);
+
+        if (Lists.isEmpty(storeImages))
         {
-            url = secondaryImageLoader.getImageFor(store);
+            return store;
         }
 
-        if (Objects.nonNull(url))
-        {
-            return Store.Builder.fromStore(store)
-                .withMainImageURL(url.toString())
-                .build();
-        }
+        Store enrichedStore = enrichStoreWithAnImageFrom(store, storeImages);
 
-        return store;
+        return enrichedStore;
+    }
+
+    private Store enrichStoreWithAnImageFrom(Store store, List<Image> storeImages)
+    {
+        Image selectedImage = Lists.oneOf(storeImages);
+
+        URL url = selectedImage.getUrl();
+
+        return insertURLIntoStore(url, store);
+    }
+
+    private Store insertURLIntoStore(URL url, Store store)
+    {
+        return Store.Builder.fromStore(store)
+            .withMainImageURL(url.toString())
+            .build();
     }
 
     private void makeNoteOfRequestReceived(Request request)

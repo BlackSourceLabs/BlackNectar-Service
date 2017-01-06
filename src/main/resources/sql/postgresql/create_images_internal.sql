@@ -2,12 +2,16 @@
 -- Typically these are images that have been uploaded by our users.
 -- ===========================================================================
 
-CREATE TABLE IF NOT EXISTS Images_Internal
+CREATE TABLE IF NOT EXISTS Images
 (
-		url TEXT PRIMARY KEY,
-		binary BYTEA,
+		image_id text PRIMARY KEY DEFAULT gen_random_uuid(),
+		-- This is otherwise known as the image blob
+		image_binary BYTEA,
 		height INT,
 		width INT,
 		size_in_bytes INT,
-		file_type TEXT
+		content_type TEXT,
+		image_type TEXT,
+		source TEXT,
+		url TEXT
 );

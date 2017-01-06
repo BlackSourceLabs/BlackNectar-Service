@@ -46,7 +46,7 @@ public final class Server
     //STATIC VARIABLES
     private final static Logger LOG = LoggerFactory.getLogger(Server.class);
     
-    public final static Aroma AROMA = Aroma.create("ec07e6fe-7203-4f18-abf4-f33b48ec904d");
+    public static Aroma AROMA;
     
     //INSTANCE VARIABLES
     private final Aroma aroma;
@@ -83,6 +83,7 @@ public final class Server
         {
             injector = Guice.createInjector(new ModuleServer());
             server = injector.getInstance(Server.class);
+            AROMA = injector.getInstance(Aroma.class);
         }
         catch (RuntimeException ex)
         {

@@ -43,6 +43,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Answers.RETURNS_MOCKS;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -66,6 +67,8 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
 @RunWith(AlchemyTestRunner.class)
 public class SQLStoreRepositoryTest
 {
+    @Mock(answer = RETURNS_MOCKS)
+    private Aroma aroma;
 
     @Mock
     private JdbcTemplate database;
@@ -79,7 +82,6 @@ public class SQLStoreRepositoryTest
     private List<Store> stores;
     private Store store;
 
-    private Aroma aroma;
 
     private BlackNectarSearchRequest request;
     private SQLStoreRepository instance;
@@ -108,8 +110,6 @@ public class SQLStoreRepositoryTest
 
     private void setupMocks() throws Exception
     {
-        aroma = Aroma.create();
-
         setupSQLInsertForStore();
     }
 
@@ -182,7 +182,7 @@ public class SQLStoreRepositoryTest
     @Test
     public void testSearchForStores()
     {
-        when(database.query(anyString(), eq(storeMapper)))
+        when(database.query(anyString(), eq(storeMapper), Mockito.<Object>anyVararg()))
             .thenReturn(stores);
         
         List<Store> results = instance.searchForStores(request);

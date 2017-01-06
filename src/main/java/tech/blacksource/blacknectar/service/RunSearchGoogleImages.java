@@ -32,6 +32,9 @@ import tech.blacksource.blacknectar.service.images.Google;
 import tech.blacksource.blacknectar.service.images.ImageLoader;
 import tech.blacksource.blacknectar.service.stores.Store;
 
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+
 /**
  *
  * @author SirWellington
@@ -52,6 +55,9 @@ public final class RunSearchGoogleImages implements Callable<Void>
                           RunLoadImages runner,
                           StoreRepository storeRepository)
     {
+        checkThat(aroma, googleImageLoader, runner, storeRepository)
+            .are(notNull());
+        
         this.aroma = aroma;
         this.googleImageLoader = googleImageLoader;
         this.runner = runner;

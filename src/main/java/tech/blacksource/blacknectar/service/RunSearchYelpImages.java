@@ -32,6 +32,9 @@ import tech.blacksource.blacknectar.service.images.ImageLoader;
 import tech.blacksource.blacknectar.service.images.Yelp;
 import tech.blacksource.blacknectar.service.stores.Store;
 
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+
 /**
  *
  * @author SirWellington
@@ -53,6 +56,9 @@ public final class RunSearchYelpImages implements Callable<Void>
                         RunLoadImages runner,
                         StoreRepository storeRepository)
     {
+        checkThat(aroma, yelpImageLoader, runner, storeRepository)
+            .are(notNull());
+        
         this.aroma = aroma;
         this.yelpImageLoader = yelpImageLoader;
         this.runner = runner;

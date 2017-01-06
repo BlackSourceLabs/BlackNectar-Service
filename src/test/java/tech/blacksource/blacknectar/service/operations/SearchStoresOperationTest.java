@@ -157,7 +157,8 @@ public class SearchStoresOperationTest
             Image image = images().get();
             images.put(store, image);
 
-            when(imageRepository.getImagesForStore(store)).thenReturn(Lists.createFrom(image));
+            when(imageRepository.getImagesForStoreWithoutData(store))
+                .thenReturn(Lists.createFrom(image));
         });
 
     }
@@ -182,12 +183,17 @@ public class SearchStoresOperationTest
             .collect(JSON.collectArray());
 
         assertThat(array, is(expected));
+        
+        stores.forEach(s -> verify(imageRepository).getImagesForStoreWithoutData(s));
     }
 
     @Test
     public void testWhenHaveNoImage() throws Exception
     {
         when(imageRepository.getImagesForStore(any(Store.class)))
+            .thenReturn(Lists.emptyList());
+        
+        when(imageRepository.getImagesForStoreWithoutData(any(Store.class)))
             .thenReturn(Lists.emptyList());
 
         JsonArray expectedResponse = stores.stream()
@@ -198,7 +204,7 @@ public class SearchStoresOperationTest
 
         assertThat(jsonResponse, is(expectedResponse));
 
-        stores.forEach(s -> verify(imageRepository).getImagesForStore(s));
+        stores.forEach(s -> verify(imageRepository).getImagesForStoreWithoutData(s));
 
     }
 
@@ -225,7 +231,7 @@ public class SearchStoresOperationTest
     @Test
     public void testWhenImageRepositoryFails() throws Exception
     {
-        when(imageRepository.getImagesForStore(any(Store.class)))
+        when(imageRepository.getImagesForStoreWithoutData(any(Store.class)))
             .thenThrow(new OperationFailedException());
         
         assertThrows(() -> instance.handle(request, response))

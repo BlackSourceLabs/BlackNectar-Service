@@ -148,6 +148,30 @@ public interface ImageRepository
             .map(img -> Image.Builder.fromImage(img).withoutImageData().build())
             .collect(toList());
     }
+    
+    /**
+     * Convenience method for {@link #getImagesForStoreWithouData(java.util.UUID) }.
+     * 
+     * @param store
+     * @return
+     * @throws BlackNectarAPIException
+     * @throws IllegalArgumentException 
+     */
+    default List<Image> getImagesForStoreWithoutData(@Required Store store) throws BlackNectarAPIException, IllegalArgumentException
+    {
+        checkThat(store)
+            .throwing(BadArgumentException.class)
+            .is(notNull());
+        
+        String storeId = store.getStoreId();
+        checkThat(storeId)
+            .throwing(BadArgumentException.class)
+            .usingMessage("store is missing storeId")
+            .is(nonEmptyString())
+            .is(validUUID());
+        
+        return this.getImagesForStoreWithouData(UUID.fromString(storeId));
+    }
 
     /**
      * Checks whether the store has any pictures.

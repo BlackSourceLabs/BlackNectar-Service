@@ -81,6 +81,7 @@ public class SQLStoreRepositoryTest
 
     private List<Store> stores;
     private Store store;
+    private UUID storeUuid;
 
 
     private BlackNectarSearchRequest request;
@@ -100,6 +101,7 @@ public class SQLStoreRepositoryTest
     {
         stores = listOf(stores());
         store = Lists.oneOf(stores);
+        storeUuid = UUID.fromString(store.getStoreId());
 
         Location center = one(locations());
         request = new BlackNectarSearchRequest()
@@ -204,7 +206,6 @@ public class SQLStoreRepositoryTest
 
     private void assertUpdateWasAgainstStore(JdbcTemplate database, Store store) throws Exception
     {
-        UUID storeId = UUID.fromString(store.getStoreId());
         String expectedQuery = SQLQueries.INSERT_STORE;
 
         Address address = store.getAddress();
@@ -212,7 +213,7 @@ public class SQLStoreRepositoryTest
         double lon = store.getLocation().getLongitude();
 
         verify(database).update(expectedQuery,
-                                storeId,
+                                storeUuid,
                                 store.getName(),
                                 lat,
                                 lon,
@@ -233,6 +234,32 @@ public class SQLStoreRepositoryTest
 
         when(database.update(eq(insert), Mockito.<Object>anyVararg()))
             .thenReturn(1);
+    }
+
+    @Test
+    public void testDeleteStore()
+    {
+        String expectedQuery = SQLQueries.DELETE_STORE;
+        
+        when(database.update(expectedQuery, storeUuid))
+            .thenReturn(1);
+        
+        instance.deleteStore(store.getStoreId());
+        
+        verify(database).update(expectedQuery, storeUuid);
+    }
+
+    @DontRepeat
+    @Test
+    public void testDeleteStoreWithBadArgs() throws Exception
+    {
+        assertThrows(() -> instance.deleteStore(""))
+            .isInstanceOf(BadArgumentException.class);
+
+        String badId = one(alphabeticString());
+        assertThrows(() -> instance.deleteStore(badId))
+            .isInstanceOf(BadArgumentException.class);
+
     }
 
 }

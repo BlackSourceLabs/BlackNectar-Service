@@ -37,6 +37,7 @@ import static tech.blacksource.blacknectar.service.stores.Store.validStore;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThanOrEqualTo;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.validUUID;
 
 /**
  * Uses an SQL Connection to interact with Store Data.
@@ -152,6 +153,23 @@ final class SQLStoreRepository implements StoreRepository
         return stores;
     }
 
+    @Override
+    public void deleteStore(String storeId) throws BlackNectarAPIException
+    {
+        checkThat(storeId)
+            .throwing(BadArgumentException.class)
+            .is(validUUID());
+
+        try
+        {
+            _deleteStore(storeId);
+        }
+        catch (Exception ex)
+        {
+            makeNoteThatFailedToDeleteStore(storeId, ex);
+        }
+    }
+
     private int addStoreToDatabase(Store store, JdbcTemplate database) throws DataAccessException
     {
         String insertStatement = SQLQueries.INSERT_STORE;
@@ -191,29 +209,9 @@ final class SQLStoreRepository implements StoreRepository
         }
     }
 
-    private void makeNoteThatStoresSearched(BlackNectarSearchRequest request, List<Store> stores)
-    {
-        String message = "Found {} stores for Search Request {}";
-        LOG.debug(message, stores.size(), request);
-        aroma.begin().titled("SQL Complete")
-            .text(message, stores.size(), request)
-            .withUrgency(Urgency.LOW)
-            .send();
-    }
-
-    private void makeNoteOfSQLError(String message, Object... args)
-    {
-        aroma.begin().titled("SQL Failed")
-            .text(message, args)
-            .withUrgency(Urgency.HIGH)
-            .send();
-
-        LOG.error(message, args);
-    }
-
     private List<Store> findStoresBasedOfRequest(BlackNectarSearchRequest request)
     {
-        
+
         String query = createSQLQueryFor(request);
 
         if (request.hasSearchTerm() && request.hasCenter())
@@ -245,7 +243,7 @@ final class SQLStoreRepository implements StoreRepository
         {
             return database.query(query, storeMapper, toSQLSearchTerm(request.searchTerm));
         }
-        else 
+        else
         {
             return Lists.emptyList();
         }
@@ -255,7 +253,7 @@ final class SQLStoreRepository implements StoreRepository
     private String createSQLQueryFor(BlackNectarSearchRequest request)
     {
         String query = "";
-        
+
         if (request.hasSearchTerm() && request.hasCenter())
         {
             query = SQLQueries.QUERY_STORES_WITH_NAME_AND_LOCATION;
@@ -268,18 +266,60 @@ final class SQLStoreRepository implements StoreRepository
         {
             query = SQLQueries.QUERY_STORES_WITH_NAME;
         }
-        
+
         if (request.hasLimit())
         {
             query += " LIMIT " + request.limit;
         }
-        
+
         return query;
     }
-    
+
     private String toSQLSearchTerm(String searchTerm)
     {
         return String.format("%%%s%%", searchTerm);
+    }
+
+    private void _deleteStore(String storeId)
+    {
+        String deleteStatement = SQLQueries.DELETE_STORE;
+        
+        UUID storeUuid = UUID.fromString(storeId);
+        int rowsAffected = database.update(deleteStatement, storeUuid);
+        
+        LOG.debug("Delete Store with ID [{}] resulted in {} rows affected", storeId, rowsAffected);
+    }
+
+    private void makeNoteThatFailedToDeleteStore(String storeId, Exception ex)
+    {
+        String message = "Failed to delete store with ID: [{}]";
+
+        LOG.error(message, storeId, ex);
+
+        aroma.begin().titled("SQL Delete Store Failed")
+            .text(message, storeId, ex)
+            .withUrgency(Urgency.HIGH)
+            .send();
+    }
+
+    private void makeNoteThatStoresSearched(BlackNectarSearchRequest request, List<Store> stores)
+    {
+        String message = "Found {} stores for Search Request {}";
+        LOG.debug(message, stores.size(), request);
+        aroma.begin().titled("SQL Complete")
+            .text(message, stores.size(), request)
+            .withUrgency(Urgency.LOW)
+            .send();
+    }
+
+    private void makeNoteOfSQLError(String message, Object... args)
+    {
+        aroma.begin().titled("SQL Failed")
+            .text(message, args)
+            .withUrgency(Urgency.HIGH)
+            .send();
+
+        LOG.error(message, args);
     }
 
 }

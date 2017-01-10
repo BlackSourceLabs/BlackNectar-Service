@@ -26,7 +26,13 @@ import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.blacksource.blacknectar.service.stores.StoreDataSource;
+import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
+
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.validUUID;
 
 
 /**
@@ -83,6 +89,38 @@ public interface StoreRepository
      */
     List<Store> searchForStores(@Required BlackNectarSearchRequest request) throws BlackNectarAPIException;
     
+    /**
+     * Deletes a Store from the repository. This is a convenience method for {@link #deleteStore(java.lang.String) }.
+     *
+     * @param store
+     * @throws BlackNectarAPIException
+     */
+    default void deleteStore(@Required Store store) throws BlackNectarAPIException
+    {
+        checkThat(store)
+            .throwing(BadArgumentException.class)
+            .is(notNull());
+
+        String storeId = store.getStoreId();
+
+        checkThat(storeId)
+            .throwing(BadArgumentException.class)
+            .usingMessage("missing storeId")
+            .is(nonEmptyString())
+            .usingMessage("invalid storeId")
+            .is(validUUID());
+
+        this.deleteStore(storeId);
+    }
+
+    /**
+     * Permanently deletes a Store from the repository.
+     *
+     * @param storeId The ID of the Store to delete.
+     * @throws BlackNectarAPIException
+     */
+    void deleteStore(@NonEmpty String storeId) throws BlackNectarAPIException;
+
     /**
      * Creates a new in-memory service that performs all operations in-memory.
      * 

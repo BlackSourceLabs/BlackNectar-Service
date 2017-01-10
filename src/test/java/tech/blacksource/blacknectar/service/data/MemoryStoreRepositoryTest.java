@@ -22,9 +22,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.blacksource.blacknectar.service.BlackNectarGenerators;
+import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
+import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateDouble;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateInteger;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
@@ -43,6 +45,7 @@ import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.ALPHABETIC;
 
 /**
@@ -172,6 +175,37 @@ public class MemoryStoreRepositoryTest
         assertThat(results.size(), is(limit));
         
     }
+
+    @Test
+    public void testDeleteStore()
+    {
+        Store storeToDelete = Lists.oneOf(stores);
+            
+        List<Store> results = instance.getAllStores();
+        assertThat(results, hasItem(storeToDelete));
+        
+        instance.deleteStore(storeToDelete);
+
+        results = instance.getAllStores();
+        assertThat(results, not(hasItem(storeToDelete)));
+
+    }
+
+    @DontRepeat
+    @Test
+    public void testDeleteStoreWithBadArgs() throws Exception
+    {
+        assertThrows(() -> instance.deleteStore((Store) null)).isInstanceOf(BadArgumentException.class);
+        assertThrows(() -> instance.deleteStore((String) null)).isInstanceOf(BadArgumentException.class);
+        assertThrows(() -> instance.deleteStore("")).isInstanceOf(BadArgumentException.class);
+    }
     
-    
+    @DontRepeat
+    @Test
+    public void testDeleteStoreWhenStoreDoesNotExist() throws Exception
+    {
+        Store newStore = one(stores());
+        instance.deleteStore(newStore);
+    }
+
 }

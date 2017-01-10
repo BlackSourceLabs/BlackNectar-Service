@@ -80,6 +80,13 @@ public class SQLStoreMapperTest
         when(sqlTools.hasColumn(results, SQLColumns.Images.URL))
             .thenReturn(true);
     }
+    
+    @DontRepeat
+    @Test
+    public void testConstructor() throws Exception
+    {
+        assertThrows(() -> new SQLStoreMapper.Impl(null)).isInstanceOf(IllegalArgumentException.class);
+    }
 
     @Test
     public void testMapToStore() throws Exception

@@ -30,6 +30,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import spark.ExceptionHandler;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
+import tech.blacksource.blacknectar.service.algorithms.ModuleAlgorithms;
 import tech.blacksource.blacknectar.service.data.ModuleBlackNectarService;
 import tech.blacksource.blacknectar.service.exceptions.BlackNectarExceptionHandler;
 import tech.blacksource.blacknectar.service.operations.ModuleOperations;
@@ -57,6 +58,7 @@ final class ModuleServer extends AbstractModule
     {
         install(new ModuleOperations());
         install(new ModuleBlackNectarService());
+        install(new ModuleAlgorithms());
 
         bind(AlchemyHttp.class).toInstance(AlchemyHttp.newDefaultInstance());
         bind(ExceptionHandler.class).to(BlackNectarExceptionHandler.class);

@@ -25,8 +25,8 @@ import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
+import tech.blacksource.blacknectar.service.algorithms.StoreMatchingAlgorithm;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
-import tech.blacksource.blacknectar.service.stores.Address;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.redroma.google.places.GooglePlacesAPI;
 import tech.redroma.google.places.data.Location;
@@ -36,7 +36,6 @@ import tech.redroma.google.places.exceptions.GooglePlacesException;
 import tech.redroma.google.places.requests.GetPhotoRequest;
 import tech.redroma.google.places.requests.NearbySearchRequest;
 import tech.sirwellington.alchemy.annotations.access.Internal;
-import tech.sirwellington.alchemy.arguments.Checks;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
@@ -54,14 +53,17 @@ final class GoogleImageLoader implements ImageLoader
 
     private final Aroma aroma;
     private final GooglePlacesAPI google;
+    private final StoreMatchingAlgorithm<Place> matchingAlgorithm;
 
     @Inject
-    GoogleImageLoader(Aroma aroma, GooglePlacesAPI google)
+    GoogleImageLoader(Aroma aroma, GooglePlacesAPI google, StoreMatchingAlgorithm<Place> matchingAlgorithm)
     {
-        checkThat(aroma, google).are(notNull());
+        checkThat(aroma, google, matchingAlgorithm)
+            .are(notNull());
 
         this.aroma = aroma;
         this.google = google;
+        this.matchingAlgorithm = matchingAlgorithm;
     }
 
     @Override
@@ -137,27 +139,10 @@ final class GoogleImageLoader implements ImageLoader
 
     private Place tryToFindMatchingPlaceFor(Store store, List<Place> places)
     {
-        if (Lists.isEmpty(places))
-        {
-            return null;
-        }
-
-        for (Place place : places)
-        {
-            if (namesMatch(place.name, store.getName()))
-            {
-                makeNoteThatNamesMatch(place, store);
-                return place;
-            }
-
-            if (addressesMatch(place, store))
-            {
-                makeNoteThatAddressesMatch(place, store);
-                return place;
-            }
-        }
-
-        return null;
+        return places.stream()
+            .filter(place -> matchingAlgorithm.matchesStore(place, store))
+            .findFirst()
+            .orElse(null);
     }
 
     private void makeNoteThatGoogleSearchFailed(GooglePlacesException ex, NearbySearchRequest request, Store store)
@@ -198,39 +183,6 @@ final class GoogleImageLoader implements ImageLoader
             .withUrgency(Urgency.HIGH);
     }
 
-    private boolean namesMatch(String first, String second)
-    {
-        if (Checks.anyAreNullOrEmpty(first, second))
-        {
-            return false;
-        }
-        
-        first = first.toLowerCase();
-        second = second.toLowerCase();
-        
-        return first.contains(second) || second.contains(first);
-    }
-
-    private boolean addressesMatch(Place place, Store store)
-    {
-        if (!place.hasFormattedAddress() && !place.hasVicinity())
-        {
-            return false;
-        }
-
-        Address address = store.getAddress();
-        
-        if (namesMatch(place.vicinity, address.getAddressLineOne()))
-        {
-            return true;
-        }
-
-        return namesMatch(place.formattedAddress, address.getAddressLineOne()) &&
-               namesMatch(place.formattedAddress, address.getCity()) &&
-               namesMatch(place.formattedAddress, address.getState()) &&
-               namesMatch(place.formattedAddress, address.getZipCode());
-    }
-
     private void makeNoteThatNoPlacesFoundFor(Store store, NearbySearchRequest request)
     {
         LOG.warn("No matches found for store: [{}]", store);
@@ -238,26 +190,6 @@ final class GoogleImageLoader implements ImageLoader
         aroma.begin().titled("No Places Found")
             .text("No Google Places found for Store:\n\n{}\n\nFor Request:\n{}", store, request)
             .withUrgency(Urgency.MEDIUM)
-            .send();
-    }
-
-    private void makeNoteThatNamesMatch(Place place, Store store)
-    {
-        LOG.debug("Place matches store by name: {}", place);
-
-        aroma.begin().titled("Matched By Name")
-            .text("Google Place matches store by name.\n\nStore:\n{}\n\nPlace:\n{}", store, place)
-            .withUrgency(Urgency.LOW)
-            .send();
-    }
-
-    private void makeNoteThatAddressesMatch(Place place, Store store)
-    {
-        LOG.debug("Place matches store by address: {}", place);
-
-        aroma.begin().titled("Matched By Address")
-            .text("Google Place matches store by address.\n\nStore:\n{}\n\nPlace:\n{}", store, place)
-            .withUrgency(Urgency.LOW)
             .send();
     }
 

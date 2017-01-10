@@ -69,9 +69,9 @@ public class SQLStoreRepositoryIT
     @Before
     public void setUp() throws Exception
     {
-        
         setupData();
         setupMocks();
+        
         instance = new SQLStoreRepository(aroma, database, storeMapper);
     }
 
@@ -87,7 +87,6 @@ public class SQLStoreRepositoryIT
         aroma = TestingResources.getAroma();
         database = TestingResources.createDatabaseConnection();
         storeMapper = SQLStoreMapper.INSTANCE;
-        
     }
 
     @Test

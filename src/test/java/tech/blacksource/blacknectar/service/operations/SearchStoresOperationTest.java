@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -47,12 +48,12 @@ import tech.sirwellington.alchemy.test.junit.runners.GenerateInteger;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_MOCKS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static sir.wellington.alchemy.collections.sets.Sets.toSet;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.images;
@@ -87,6 +88,8 @@ public class SearchStoresOperationTest
     private ImageRepository imageRepository;
 
     private List<Store> stores;
+    
+    private List<Store> storesWithoutImages;
 
     private Map<Store, Image> images;
 
@@ -132,6 +135,7 @@ public class SearchStoresOperationTest
     private void setupData() throws Exception
     {
         stores = listOf(stores());
+        storesWithoutImages = withoutImages(stores);
 
         ip = one(ip4Addresses());
         latitude = one(latitudes());
@@ -179,33 +183,26 @@ public class SearchStoresOperationTest
         JsonArray array = instance.handle(request, response);
 
         JsonArray expected = stores.stream()
-            .map(this::storeWithImage)
             .map(Store::asJSON)
             .collect(JSON.collectArray());
 
         assertThat(array, is(expected));
         
-        stores.forEach(s -> verify(imageRepository).getImagesForStoreWithoutData(s));
     }
 
     @Test
     public void testWhenHaveNoImage() throws Exception
     {
-        when(imageRepository.getImagesForStore(any(Store.class)))
-            .thenReturn(Lists.emptyList());
+        when(storesRepository.searchForStores(expectedSearchRequest))
+            .thenReturn(storesWithoutImages);
         
-        when(imageRepository.getImagesForStoreWithoutData(any(Store.class)))
-            .thenReturn(Lists.emptyList());
-
-        JsonArray expectedResponse = stores.stream()
+        JsonArray expectedResponse = storesWithoutImages.stream()
             .map(Store::asJSON)
             .collect(collectArray());
 
         JsonArray jsonResponse = instance.handle(request, response);
 
         assertThat(jsonResponse, is(expectedResponse));
-
-        stores.forEach(s -> verify(imageRepository).getImagesForStoreWithoutData(s));
 
     }
 
@@ -228,6 +225,7 @@ public class SearchStoresOperationTest
             .isInstanceOf(BadArgumentException.class);
     }
     
+    @Ignore
     @DontRepeat
     @Test
     public void testWhenImageRepositoryFails() throws Exception
@@ -277,6 +275,13 @@ public class SearchStoresOperationTest
         return Store.Builder.fromStore(store)
             .withMainImageURL(image.getUrl().toString())
             .build();
+    }
+
+    private List<Store> withoutImages(List<Store> stores)
+    {
+        return stores.stream()
+            .map(s -> Store.Builder.fromStore(s).withoutMainImageURL().build())
+            .collect(toList());
     }
 
 }

@@ -109,8 +109,7 @@ public class SearchStoresOperation implements Route
 
         List<Store> stores = findStores(request);
 
-        JsonArray json = stores.parallelStream()
-            .map(this::tryToEnrichStoreWithImage)
+        JsonArray json = stores.stream()
             .map(Store::asJSON)
             .collect(JSON.collectArray());
 

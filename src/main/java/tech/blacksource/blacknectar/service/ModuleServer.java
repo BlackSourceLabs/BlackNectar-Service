@@ -95,7 +95,7 @@ final class ModuleServer extends AbstractModule
 
         //Configure with pooling settings
         dataSource.setMinPoolSize(3);
-        dataSource.setMaxPoolSize(30);
+        dataSource.setMaxPoolSize(10);
         dataSource.setAcquireIncrement(3);
         dataSource.setTestConnectionOnCheckin(true);
         

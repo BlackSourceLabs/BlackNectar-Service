@@ -100,7 +100,7 @@ public class SQLStoreMapperTest
     }
 
     @Test
-    public void testMapToStoreWithoutImageLink() throws Exception
+    public void testMapToStoreWhenStoreHasNoImage() throws Exception
     {
         when(sqlTools.hasColumn(results, SQLColumns.Images.URL))
             .thenReturn(false);
@@ -130,6 +130,20 @@ public class SQLStoreMapperTest
         when(results.getDouble(SQLColumns.LATITUDE)).thenReturn(store.getLocation().getLatitude());
         when(results.getDouble(SQLColumns.LONGITUDE)).thenReturn(store.getLocation().getLongitude());
         when(results.getString(SQLColumns.Images.URL)).thenReturn(store.getMainImageURL());
+    }
+
+    @Test
+    public void testMapRow() throws Exception
+    {
+    }
+
+    public class SQLStoreMapperImpl implements SQLStoreMapper
+    {
+
+        public Store mapRow(ResultSet results, int rowNum) throws SQLException
+        {
+            return null;
+        }
     }
 
 }

@@ -16,7 +16,6 @@
 
 package tech.blacksource.blacknectar.service.images;
 
-import com.google.common.base.Strings;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -27,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
+import tech.blacksource.blacknectar.service.algorithms.StoreMatchingAlgorithm;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.redroma.yelp.Coordinate;
@@ -47,25 +47,24 @@ final class YelpImageLoader implements ImageLoader
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(YelpImageLoader.class);
-
-    /**
-     * In the event that queries do not include a limit, this one is injected.
-     */
-    private final static int DEFAULT_LIMIT = 250;
+    
     /**
      * The default limit to use when searching for Yelp Stores.
      */
-    final static int DEFAULT_YELP_LIMIT = 5;
+    final static int DEFAULT_YELP_LIMIT = 15;
 
     private final Aroma aroma;
+    private final StoreMatchingAlgorithm<YelpBusiness> matchingAlgorithm;
     private final YelpAPI yelp;
 
     @Inject
-    YelpImageLoader(Aroma aroma, YelpAPI yelp)
+    YelpImageLoader(Aroma aroma, StoreMatchingAlgorithm<YelpBusiness> matchingAlgorithm, YelpAPI yelp)
     {
-        checkThat(aroma, yelp).are(notNull());
+        checkThat(aroma, matchingAlgorithm, yelp)
+            .are(notNull());
 
         this.aroma = aroma;
+        this.matchingAlgorithm = matchingAlgorithm;
         this.yelp = yelp;
     }
 
@@ -93,7 +92,7 @@ final class YelpImageLoader implements ImageLoader
                     .text("Could not parse URL: [{}]", url, ex)
                     .withUrgency(Urgency.LOW)
                     .send();
-                
+
                 return null;
             }
         }
@@ -153,16 +152,6 @@ final class YelpImageLoader implements ImageLoader
         return Coordinate.of(location.getLatitude(), location.getLongitude());
     }
 
-    private void makeNoteOfYelpRequest(YelpSearchRequest request, List<YelpBusiness> results, Store store)
-    {
-        String message = "Yelp request {} \n\nResulted in {} results \n\nFor Store [{}]:\n\n{}";
-        LOG.debug(message, request, results.size(), store);
-        aroma.begin().titled("Yelp Request Complete")
-            .text(message, request, results.size(), store, results)
-            .withUrgency(Urgency.LOW)
-            .send();
-    }
-
     private YelpBusiness tryToFindMatchingBusiness(List<YelpBusiness> results, Store store)
     {
 
@@ -170,12 +159,7 @@ final class YelpImageLoader implements ImageLoader
         {
             if (areSimilar(business, store))
             {
-                aroma.begin().titled("Store Picked")
-                    .text("Business: {}\n\n For Store: \n\n{}", business, store)
-                    .withUrgency(Urgency.LOW)
-                    .send();
-
-                LOG.debug("Picked Business [{}] for Store [{}]", business, store);
+                makeNoteThatBusinessPickedForStore(business, store);
 
                 return business;
             }
@@ -188,87 +172,17 @@ final class YelpImageLoader implements ImageLoader
 
     private boolean areSimilar(YelpBusiness business, Store store)
     {
-        if (haveTheSameName(business, store))
-        {
-            aroma.begin().titled("Yelp Match")
-                .text("Businessess have the same name. \n\nYelp:\n{}\n\nBlackNectar:\n{}", business, store)
-                .withUrgency(Urgency.LOW)
-                .send();
-
-            return true;
-        }
-
-        if (haveTheSameAddressLine(business, store))
-        {
-            aroma.begin().titled("Yelp Match")
-                .text("Businessess have the same address. \n\nYelp:\n{}\n\nBlackNectar:\n{}", business, store)
-                .withUrgency(Urgency.LOW)
-                .send();
-
-            return true;
-        }
-
-        if (haveDifferentCities(business, store) || haveDifferentZipCodes(business, store))
-        {
-            return false;
-        }
-
-        return false;
+        return matchingAlgorithm.matchesStore(business, store);
     }
 
-    private boolean haveTheSameName(YelpBusiness business, Store store)
+    private void makeNoteOfYelpRequest(YelpSearchRequest request, List<YelpBusiness> results, Store store)
     {
-        if (!Objects.isNull(business.name) && !Objects.isNull(store.getName()))
-        {
-            String yelpName = business.name.toLowerCase();
-            String blackNectarName = store.getName().toLowerCase();
-
-            if (yelpName.contains(blackNectarName) || blackNectarName.contains(yelpName))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private boolean haveTheSameAddressLine(YelpBusiness business, Store store)
-    {
-        if (Objects.isNull(business.location) || Objects.isNull(store.getAddress()))
-        {
-            return false;
-        }
-
-        String yelpAddress = Strings.nullToEmpty(business.location.address1).toUpperCase();
-        String blackNectarAddress = Strings.nullToEmpty(store.getAddress().getAddressLineOne()).toUpperCase();
-
-        return Objects.equals(yelpAddress, blackNectarAddress);
-    }
-
-    private boolean haveDifferentCities(YelpBusiness business, Store store)
-    {
-        if (Objects.isNull(business.location) || Objects.isNull(store.getAddress()))
-        {
-            return true;
-        }
-
-        String yelpCity = Strings.nullToEmpty(business.location.city).toUpperCase();
-        String blackNectarCity = Strings.nullToEmpty(store.getAddress().getCity()).toUpperCase();
-
-        return Objects.equals(yelpCity, blackNectarCity);
-    }
-
-    private boolean haveDifferentZipCodes(YelpBusiness business, Store store)
-    {
-        if (Objects.isNull(business.location) || Objects.isNull(store.getAddress()))
-        {
-            return true;
-        }
-
-        String yelpZipCode = Strings.nullToEmpty(business.location.zipCode);
-        String blackNectarZipCode = Strings.nullToEmpty(store.getAddress().getZipCode());
-
-        return Objects.equals(yelpZipCode, blackNectarZipCode);
+        String message = "Yelp request {} \n\nResulted in {} results \n\nFor Store [{}]:\n\n{}";
+        LOG.debug(message, request, results.size(), store);
+        aroma.begin().titled("Yelp Request Complete")
+            .text(message, request, results.size(), store, results)
+            .withUrgency(Urgency.LOW)
+            .send();
     }
 
     private void makeNotThatYelpMatchFailedFor(Store store)
@@ -277,6 +191,18 @@ final class YelpImageLoader implements ImageLoader
         LOG.debug(message, store);
         aroma.begin().titled("Yelp Match Failed")
             .text(message, store)
+            .withUrgency(Urgency.LOW)
+            .send();
+    }
+
+    private void makeNoteThatBusinessPickedForStore(YelpBusiness business, Store store)
+    {
+        String message = "Picked Yelp Business [{}] for Store [{}]";
+
+        LOG.debug(message, business, store);
+
+        aroma.begin().titled("Store Picked")
+            .text("Business: {}\n\n For Store: \n\n{}", business, store)
             .withUrgency(Urgency.LOW)
             .send();
     }

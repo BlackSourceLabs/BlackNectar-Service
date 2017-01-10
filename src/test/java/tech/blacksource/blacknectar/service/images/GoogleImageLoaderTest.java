@@ -24,6 +24,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
+import tech.blacksource.blacknectar.service.algorithms.StoreMatchingAlgorithm;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.redroma.google.places.GooglePlacesAPI;
 import tech.redroma.google.places.data.Location;
@@ -39,6 +40,7 @@ import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_MOCKS;
 import static org.mockito.Mockito.when;
@@ -60,20 +62,23 @@ public class GoogleImageLoaderTest
 
     @GenerateList(Place.class)
     private List<Place> places;
-    
+
     private Place matchingPlace;
     private Photo photo;
-    
+
     @GenerateURL(protocol = "https")
     private URL expectedURL;
 
     private NearbySearchRequest expectedRequest;
-    
+
     @Mock
     private GooglePlacesAPI google;
-    
+
     @Mock(answer = RETURNS_MOCKS)
     private Aroma aroma;
+
+    @Mock
+    private StoreMatchingAlgorithm<Place> matchingAlgorithm;
 
     private GoogleImageLoader instance;
 
@@ -83,8 +88,8 @@ public class GoogleImageLoaderTest
 
         setupData();
         setupMocks();
-        
-        instance = new GoogleImageLoader(aroma, google);
+
+        instance = new GoogleImageLoader(aroma, google, matchingAlgorithm);
     }
 
     private void setupData() throws Exception
@@ -100,31 +105,48 @@ public class GoogleImageLoaderTest
     private void setupMocks() throws Exception
     {
         GetPhotoRequest photoRequest = createExpectedPhotoRequestFor(photo);
-        
+
         when(google.getPhoto(photoRequest)).thenReturn(expectedURL);
-        
+
         when(google.simpleSearchNearbyPlaces(expectedRequest))
             .thenReturn(places);
+
+        when(matchingAlgorithm.matchesStore(matchingPlace, store))
+            .thenReturn(true);
     }
 
     @DontRepeat
     @Test
     public void testConstructor() throws Exception
     {
-        assertThrows(() -> new GoogleImageLoader(null, google))
+        assertThrows(() -> new GoogleImageLoader(null, google, matchingAlgorithm))
             .isInstanceOf(IllegalArgumentException.class);
-        
-        assertThrows(() -> new GoogleImageLoader(aroma, null))
+
+        assertThrows(() -> new GoogleImageLoader(aroma, null, matchingAlgorithm))
             .isInstanceOf(IllegalArgumentException.class);
-        
+
+        assertThrows(() -> new GoogleImageLoader(aroma, google, null))
+            .isInstanceOf(IllegalArgumentException.class);
+
     }
-    
+
     @Test
     public void testGetImageFor()
     {
         URL result = instance.getImageFor(store);
         assertThat(result, notNullValue());
         assertThat(result, is(expectedURL));
+    }
+
+    @DontRepeat
+    @Test
+    public void testGetImageForWhenNoMatch() throws Exception
+    {
+        when(matchingAlgorithm.matchesStore(matchingPlace, store))
+            .thenReturn(false);
+
+        URL result = instance.getImageFor(store);
+        assertThat(result, nullValue());
     }
 
     private NearbySearchRequest createExpectedRequestFor(Store store)

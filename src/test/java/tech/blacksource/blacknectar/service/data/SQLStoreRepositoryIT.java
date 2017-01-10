@@ -176,5 +176,16 @@ public class SQLStoreRepositoryIT
         }
 
     }
+    
+    @Test
+    public void testDeleteStore() throws Exception
+    {
+        Store newStore = one(stores());
+        String storeId = newStore.getStoreId();
+        
+        instance.addStore(newStore);
+        
+        instance.deleteStore(storeId);
+    }
 
 }

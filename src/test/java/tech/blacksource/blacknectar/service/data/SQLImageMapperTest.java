@@ -26,6 +26,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import tech.blacksource.blacknectar.service.images.Image;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
+import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.is;
@@ -36,6 +37,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.when;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.images;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
  *
@@ -85,6 +87,13 @@ public class SQLImageMapperTest
         when(metadata.getColumnLabel(anyInt())).thenReturn(SQLColumns.Images.IMAGE_BINARY);
         
         when(sqlTools.hasColumn(results, SQLColumns.Images.IMAGE_BINARY)).thenReturn(true);
+    }
+    
+    @DontRepeat
+    @Test
+    public void testConstructor() throws Exception
+    {
+        assertThrows(() -> new SQLImageMapper.Impl(null)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test

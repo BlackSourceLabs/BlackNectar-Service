@@ -51,7 +51,7 @@ final class YelpImageLoader implements ImageLoader
     /**
      * The default limit to use when searching for Yelp Stores.
      */
-    final static int DEFAULT_YELP_LIMIT = 20;
+    final static int DEFAULT_YELP_LIMIT = 15;
 
     private final Aroma aroma;
     private final StoreMatchingAlgorithm<YelpBusiness> matchingAlgorithm;

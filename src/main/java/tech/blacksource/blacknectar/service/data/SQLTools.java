@@ -26,6 +26,10 @@ import org.slf4j.LoggerFactory;
 import tech.blacksource.blacknectar.service.data.SQLImageMapper.Impl;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
+
 /**
  * Tools used in conjunction with JDBC.
  *
@@ -54,6 +58,9 @@ interface SQLTools
         @Override
         public boolean hasColumn(ResultSet results, String expectedColumn) throws SQLException
         {
+            checkThat(results).is(notNull());
+            checkThat(expectedColumn).is(nonEmptyString());
+            
             ResultSetMetaData metadata = results.getMetaData();
 
             for (int i = 1; i <= metadata.getColumnCount(); ++i)

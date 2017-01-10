@@ -25,14 +25,18 @@ import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.redroma.yelp.YelpBusiness;
+import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 
+import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.CONCRETE_BEHAVIOR;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
- *
+ * This class matches Stores with businesses on Yelp.
+ * 
  * @author SirWellington
  */
+@StrategyPattern(role = CONCRETE_BEHAVIOR)
 final class YelpMatchingAlgorithm implements StoreMatchingAlgorithm<YelpBusiness>
 {
 

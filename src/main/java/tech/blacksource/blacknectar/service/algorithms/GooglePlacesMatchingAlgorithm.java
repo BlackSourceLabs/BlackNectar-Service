@@ -33,7 +33,7 @@ import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
- * Defines the algorithm used to match {@linkplain Place Google Places} with {@linkplain Store EBT Stores}.
+ * This class matches {@linkplain Place Google Places} with {@linkplain Store EBT Stores}.
  *
  * @author SirWellington
  */

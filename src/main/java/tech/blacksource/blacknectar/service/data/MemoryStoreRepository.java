@@ -17,6 +17,7 @@
 package tech.blacksource.blacknectar.service.data;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import javax.inject.Inject;
@@ -24,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
+import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
@@ -35,6 +37,8 @@ import static tech.blacksource.blacknectar.service.stores.Store.validStore;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThanOrEqualTo;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.validUUID;
 
 /**
  *
@@ -121,7 +125,19 @@ final class MemoryStoreRepository implements StoreRepository
 
         return stream.collect(toList());
     }
-    
+
+    @Override
+    public void deleteStore(String storeId) throws BlackNectarAPIException
+    {
+        checkThat(storeId)
+            .throwing(BadArgumentException.class)
+            .is(nonEmptyString())
+            .is(validUUID());
+        
+        this.stores.removeIf(s -> Objects.equals(s.getStoreId(), storeId));
+    }
+
+
     private Predicate<Store> nearby(Location center, double radius)
     {
         return store ->

@@ -49,6 +49,7 @@ public final class RunSearchGoogleImages implements Callable<Void>
     private final String source = "Google";
     private final RunLoadImages runner;
     private final StoreRepository storeRepository;
+    private final int startNumber = 0;
 
     @Inject
     RunSearchGoogleImages(Aroma aroma,
@@ -79,10 +80,12 @@ public final class RunSearchGoogleImages implements Callable<Void>
         LOG.debug("Beginning script.");
 
         List<Store> stores = storeRepository.getAllStores();
+        stores = stores.subList(startNumber, stores.size());
+        
         Queue<Store> queue = Queues.newLinkedBlockingQueue(stores);
 
         RunLoadImages.Arguments args = RunLoadImages.Arguments.Builder.newInstance()
-            .withSleepTime(200, TimeUnit.MILLISECONDS)
+            .withSleepTime(100, TimeUnit.MILLISECONDS)
             .withSource(source)
             .withImageLoader(googleImageLoader)
             .withStores(queue)

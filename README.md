@@ -12,4 +12,4 @@ This is the REST API for **BlackNectar**.
 
 BlackNectar helps people on EBT (food stamps) find places to shop.
 
-### [API Documentation](apiary.apib)
+### [API Documentation](http://docs.blacknectarapi.apiary.io/#)

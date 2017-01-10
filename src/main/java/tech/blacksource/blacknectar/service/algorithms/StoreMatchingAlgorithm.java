@@ -41,8 +41,8 @@ public interface StoreMatchingAlgorithm<Candidate>
     /**
      * Returns true of the Candidate matches the Store.
      * 
-     * @param candidate
-     * @param store
+     * @param candidate The candidate algorithm to test.
+     * @param store The store to test against.
      * 
      * @return True if the candidate matches the store, false otherwise.
      */

@@ -3,7 +3,9 @@
 -- ===========================================================================
 
 SELECT
-	*
+	Stores.*,
+	Store_Images.url
 FROM Stores
+LEFT JOIN Store_Images USING(store_id)
 WHERE store_name LIKE ?
 ORDER BY store_name

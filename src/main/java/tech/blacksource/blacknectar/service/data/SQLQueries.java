@@ -52,6 +52,7 @@ public final class SQLQueries
     //Deletes
     public static final String DELETE_IMAGE = loadQuery("delete_image.sql");
     public static final String DELETE_IMAGES_FOR_STORE = loadQuery("delete_store_images.sql");
+    public static final String DELETE_STORE = loadQuery("delete_store.sql");
 
     //Insert Statements
     public static final String INSERT_STORE = loadQuery("insert_store.sql");

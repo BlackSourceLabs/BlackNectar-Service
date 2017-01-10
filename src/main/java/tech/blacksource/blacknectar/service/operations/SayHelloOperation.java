@@ -18,7 +18,6 @@
 package tech.blacksource.blacknectar.service.operations;
 
 
-import com.google.common.base.Strings;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +67,7 @@ public class SayHelloOperation implements Route
         
         response.status(200);
         //U+1F573
-        return Strings.repeat("🌑", 1000);
+        return "We are BlackSource 🌑";
     }
 
 }

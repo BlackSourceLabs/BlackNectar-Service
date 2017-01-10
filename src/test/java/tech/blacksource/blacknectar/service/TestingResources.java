@@ -51,10 +51,10 @@ public class TestingResources
     {
         return INJECTOR.getInstance(Aroma.class);
     }
-
+    
     public static SQLImageMapper getImageMapper()
     {
-        return new SQLImageMapper.Impl();
+        return INJECTOR.getInstance(SQLImageMapper.class);
     }
 
     public static StoreRepository getStoreRepository()

@@ -158,11 +158,11 @@ public interface StoreRepository
      * @param database The {@linkplain JdbcTemplate JDBC connection} , must be open.
      * 
      * @return
-     * 
-     * @throws SQLException 
+     *
+     * @throws SQLException
      */
     static StoreRepository newSQLService(@Required Aroma aroma,
-                                            @Required JdbcTemplate database) throws SQLException
+                                         @Required JdbcTemplate database) throws SQLException
     {
         return new SQLStoreRepository(aroma, database, SQLStoreMapper.INSTANCE);
     }

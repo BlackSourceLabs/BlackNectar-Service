@@ -86,6 +86,7 @@ public class BlackNectarGenerators
                 .withAddress(addresses().get())
                 .withLocation(locations().get())
                 .withName(one(alphabeticString()))
+                .withMainImageURL(one(httpUrls()).toString())
                 .build(); 
         };
     }

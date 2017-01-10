@@ -51,8 +51,12 @@ public class SQLImageMapperTest
     
     @Mock
     private ResultSet results;
+    
+    @Mock
+    private SQLTools sqlTools;
 
     private Image image;
+    private Image imageWithoutData;
 
     private SQLImageMapper instance;
 
@@ -63,12 +67,13 @@ public class SQLImageMapperTest
         setupData();
         setupMocks();
         
-        instance = new SQLImageMapper.Impl();
+        instance = new SQLImageMapper.Impl(sqlTools);
     }
 
     private void setupData() throws Exception
     {
         image = one(images());
+        imageWithoutData = Image.Builder.fromImage(image).withoutImageData().build();
     }
 
     private void setupMocks() throws Exception
@@ -78,6 +83,8 @@ public class SQLImageMapperTest
         when(results.getMetaData()).thenReturn(metadata);
         when(metadata.getColumnCount()).thenReturn(10);
         when(metadata.getColumnLabel(anyInt())).thenReturn(SQLColumns.Images.IMAGE_BINARY);
+        
+        when(sqlTools.hasColumn(results, SQLColumns.Images.IMAGE_BINARY)).thenReturn(true);
     }
 
     @Test
@@ -87,16 +94,24 @@ public class SQLImageMapperTest
         assertThat(result, notNullValue());
         assertThat(result, is(image));
     }
+    
+    @Test
+    public void testWhenImageDataNotInColumn() throws Exception
+    {
+        when(sqlTools.hasColumn(results, SQLColumns.Images.IMAGE_BINARY))
+            .thenReturn(false);
+        
+        Image result = instance.mapRow(results, 0);
+        assertThat(result, is(imageWithoutData));
+    }
 
     @Test
     public void testWhenImageDataNotPresent() throws Exception
     {
         when(results.getBytes(SQLColumns.Images.IMAGE_BINARY)).thenReturn(null);
 
-        Image expected = Image.Builder.fromImage(image).withoutImageData().build();
         Image result = instance.mapRow(results, 0);
-
-        assertThat(result, is(expected));
+        assertThat(result, is(imageWithoutData));
     }
 
     @Test

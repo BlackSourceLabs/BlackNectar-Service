@@ -17,47 +17,58 @@
 package tech.blacksource.blacknectar.service.data;
 
 import com.google.common.base.Objects;
+import com.google.inject.ImplementedBy;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.blacksource.blacknectar.service.data.SQLImageMapper.Impl;
 import tech.sirwellington.alchemy.annotations.access.Internal;
-import tech.sirwellington.alchemy.annotations.access.NonInstantiable;
 
 /**
+ * Tools used in conjunction with JDBC.
  *
  * @author SirWellington
  */
 @Internal
-@NonInstantiable
-final class SQL
+@ImplementedBy(Impl.class)
+interface SQLTools
 {
-
-    private final static Logger LOG = LoggerFactory.getLogger(SQL.class);
 
     /**
      * Determines whether a {@link ResultSet} has a column present.
-     * 
+     *
      * @param results
      * @param expectedColumn
      * @return
-     * @throws SQLException 
+     * @throws SQLException
      */
-    static boolean hasColumn(ResultSet results, String expectedColumn) throws SQLException
+    boolean hasColumn(ResultSet results, String expectedColumn) throws SQLException;
+
+    class Impl implements SQLTools
     {
-        ResultSetMetaData metadata = results.getMetaData();
 
-        for (int i = 1; i <= metadata.getColumnCount(); ++i)
+        private final static Logger LOG = LoggerFactory.getLogger(Impl.class);
+
+        @Override
+        public boolean hasColumn(ResultSet results, String expectedColumn) throws SQLException
         {
-            String columnName = metadata.getColumnLabel(i);
+            ResultSetMetaData metadata = results.getMetaData();
 
-            if (Objects.equal(columnName, expectedColumn))
+            for (int i = 1; i <= metadata.getColumnCount(); ++i)
             {
-                return true;
+                String columnName = metadata.getColumnLabel(i);
+
+                if (Objects.equal(columnName, expectedColumn))
+                {
+                    return true;
+                }
             }
+
+            return false;
         }
 
-        return false;
     }
+
 }

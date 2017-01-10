@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLDataException;
 import java.sql.SQLException;
 import java.util.UUID;
+import javax.inject.Inject;
 import org.springframework.jdbc.core.RowMapper;
 import tech.blacksource.blacknectar.service.images.Image;
 
@@ -52,6 +53,16 @@ public interface SQLImageMapper extends RowMapper<Image>
 
     static class Impl implements SQLImageMapper
     {
+
+        private final SQLTools sqlTools;
+
+        @Inject
+        Impl(SQLTools sqlTools)
+        {
+            checkThat(sqlTools).is(notNull());
+            
+            this.sqlTools = sqlTools;
+        }
 
         @Override
         public Image mapRow(ResultSet results, int rowNum) throws SQLException
@@ -120,8 +131,8 @@ public interface SQLImageMapper extends RowMapper<Image>
                     throw new SQLDataException("could not convert to URL: " + url, ex);
                 }
             }
-            
-            if (SQL.hasColumn(results, SQLColumns.Images.IMAGE_BINARY))
+
+            if (sqlTools.hasColumn(results, SQLColumns.Images.IMAGE_BINARY))
             {
                 byte[] binary = results.getBytes(SQLColumns.Images.IMAGE_BINARY);
 
@@ -133,7 +144,6 @@ public interface SQLImageMapper extends RowMapper<Image>
 
             return builder.build();
         }
-        
 
     }
 

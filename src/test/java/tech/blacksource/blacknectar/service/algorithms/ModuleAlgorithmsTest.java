@@ -22,6 +22,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import tech.aroma.client.Aroma;
 import tech.redroma.google.places.data.Place;
+import tech.redroma.yelp.YelpBusiness;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
 import static org.hamcrest.Matchers.notNullValue;
@@ -72,5 +73,12 @@ public class ModuleAlgorithmsTest
         StoreMatchingAlgorithm<Place> result = instance.provideGooglePlacesMatchingAlgorithm(aroma);
         assertThat(result, notNullValue());
     }
-
+    
+    @Test
+    public void testProvideYelpBusinessesMatchingAlgoirhtm()
+    {
+        StoreMatchingAlgorithm<YelpBusiness> result = instance.provideYelpBusinessesMatchingAlgoirhtm(aroma);
+        assertThat(result, notNullValue());
+    }
+    
 }

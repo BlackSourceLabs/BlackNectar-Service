@@ -24,6 +24,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
+import tech.blacksource.blacknectar.service.algorithms.StoreMatchingAlgorithm;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.redroma.yelp.Address;
@@ -39,6 +40,8 @@ import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.core.AnyOf.anyOf;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_MOCKS;
 import static org.mockito.Mockito.when;
@@ -66,6 +69,9 @@ public class YelpImageLoaderTest
     private Aroma aroma;
 
     @Mock
+    private StoreMatchingAlgorithm<YelpBusiness> matchingAlgorithm;
+
+    @Mock
     private YelpAPI yelpAPI;
 
     private YelpImageLoader instance;
@@ -76,7 +82,8 @@ public class YelpImageLoaderTest
 
         setupData();
         setupMocks();
-        instance = new YelpImageLoader(aroma, yelpAPI);
+
+        instance = new YelpImageLoader(aroma, matchingAlgorithm, yelpAPI);
     }
 
     private void setupData() throws Exception
@@ -96,9 +103,6 @@ public class YelpImageLoaderTest
         }
 
         matchingBusiness = Lists.oneOf(yelpBusinesses);
-        //Ensure the store and the name match up, otherwise the algorithm will ignore it
-        matchingBusiness.name = store.getName();
-
     }
 
     private void setupMocks() throws Exception
@@ -107,16 +111,21 @@ public class YelpImageLoaderTest
         YelpSearchRequest expectedRequest = createExpectedYelpRequestFor(store);
 
         when(yelpAPI.searchForBusinesses(expectedRequest)).thenReturn(yelpBusinesses);
+
+        when(matchingAlgorithm.matchesStore(matchingBusiness, store)).thenReturn(true);
     }
 
     @DontRepeat
     @Test
     public void testConstructor() throws Exception
     {
-        assertThrows(() -> new YelpImageLoader(null, yelpAPI))
+        assertThrows(() -> new YelpImageLoader(null, matchingAlgorithm, yelpAPI))
             .isInstanceOf(IllegalArgumentException.class);
 
-        assertThrows(() -> new YelpImageLoader(aroma, null))
+        assertThrows(() -> new YelpImageLoader(aroma, null, yelpAPI))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        assertThrows(() -> new YelpImageLoader(aroma, matchingAlgorithm, null))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -124,11 +133,36 @@ public class YelpImageLoaderTest
     public void testGetImageFor() throws Exception
     {
         URL result = instance.getImageFor(store);
-        
+
         assertThat(result, notNullValue());
-        
+
         URL expected = new URL(matchingBusiness.imageURL);
         assertThat(result, is(expected));
+    }
+
+    @DontRepeat
+    @Test
+    public void testGetImageForWhenNoMatchesFound() throws Exception
+    {
+        when(matchingAlgorithm.matchesStore(matchingBusiness, store))
+            .thenReturn(false);
+
+        URL result = instance.getImageFor(store);
+        assertThat(result, nullValue());
+    }
+
+    @Test
+    public void testGetImageWhenMultipleBusinessesMatch() throws Exception
+    {
+        YelpBusiness secondBusinesses = Lists.oneOf(yelpBusinesses);
+
+        when(matchingAlgorithm.matchesStore(secondBusinesses, store))
+            .thenReturn(true);
+        
+        URL result = instance.getImageFor(store);
+        
+        assertThat(result, notNullValue());
+        assertThat(result.toString(), anyOf(is(matchingBusiness.imageURL), is(secondBusinesses.imageURL)));
     }
 
     private YelpSearchRequest createExpectedYelpRequestFor(Store store)

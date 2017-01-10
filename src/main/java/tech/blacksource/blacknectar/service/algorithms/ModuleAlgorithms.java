@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.client.Aroma;
 import tech.redroma.google.places.data.Place;
+import tech.redroma.yelp.YelpBusiness;
 
 /**
  *
@@ -44,4 +45,9 @@ public final class ModuleAlgorithms extends AbstractModule
         return new GooglePlacesMatchingAlgorithm(aroma);
     }
 
+    @Provides
+    StoreMatchingAlgorithm<YelpBusiness> provideYelpBusinessesMatchingAlgoirhtm(Aroma aroma)
+    {
+        return new YelpMatchingAlgorithm(aroma);
+    }
 }

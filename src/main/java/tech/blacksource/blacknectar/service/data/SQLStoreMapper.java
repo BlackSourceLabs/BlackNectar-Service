@@ -20,6 +20,7 @@ import com.google.inject.ImplementedBy;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
+import javax.inject.Inject;
 import org.springframework.jdbc.core.RowMapper;
 import tech.blacksource.blacknectar.service.stores.Address;
 import tech.blacksource.blacknectar.service.stores.Location;
@@ -43,7 +44,7 @@ interface SQLStoreMapper extends RowMapper<Store>
     /**
      * Takes a JDBC {@link ResultSet} and converts it into a {@link Store}.
      *
-     * @param results The SQL Row to read.
+     * @param results The SQLTools Row to read.
      * @param rowNum
      * @return A {@link Store} representation of the data, or null if it could not be extracted properly.
      *
@@ -51,12 +52,22 @@ interface SQLStoreMapper extends RowMapper<Store>
      */
     @Override
     Store mapRow(ResultSet results, int rowNum) throws SQLException;
-
-    static SQLStoreMapper INSTANCE = new Impl();
-
+    
+    static SQLStoreMapper INSTANCE = new Impl(new SQLTools.Impl());
+    
     static class Impl implements SQLStoreMapper
     {
-
+        
+        private final SQLTools sqlTools;
+        
+        @Inject
+        Impl(SQLTools sqlTools)
+        {
+            checkThat(sqlTools).is(notNull());
+            
+            this.sqlTools = sqlTools;
+        }
+        
         @Override
         public Store mapRow(ResultSet results, int rowNum) throws SQLException
         {
@@ -69,13 +80,13 @@ interface SQLStoreMapper extends RowMapper<Store>
             {
                 latitude = null;
             }
-
+            
             Double longitude = results.getDouble(SQLColumns.LONGITUDE);
             if (results.wasNull())
             {
                 longitude = null;
             }
-
+            
             UUID storeId = results.getObject(SQLColumns.STORE_ID, UUID.class);
             String address = results.getString(SQLColumns.ADDRESS_LINE_ONE);
             String addressTwo = results.getString(SQLColumns.ADDRESS_LINE_TWO);
@@ -91,36 +102,46 @@ interface SQLStoreMapper extends RowMapper<Store>
                 .withCity(city)
                 .withState(state)
                 .withZipCode(zipCode);
-
+            
             if (!isNullOrEmpty(county))
             {
                 addressBuilder.withCounty(county);
             }
-
+            
             if (!isNullOrEmpty(addressTwo))
             {
                 addressBuilder.withAddressLineTwo(addressTwo);
             }
-
+            
             if (!isNullOrEmpty(localZip))
             {
                 addressBuilder.withLocalZipCode(localZip);
             }
-
+            
             Store.Builder storeBuilder = Store.Builder.newInstance()
                 .withStoreID(storeId)
                 .withAddress(addressBuilder.build())
                 .withName(name);
-
+            
             if (latitude != null && longitude != null)
             {
                 Location location = Location.with(latitude, longitude);
                 storeBuilder.withLocation(location);
             }
-
+            
+            if (sqlTools.hasColumn(results, SQLColumns.Images.URL))
+            {
+                String url = results.getString(SQLColumns.Images.URL);
+                
+                if (!isNullOrEmpty(url))
+                {
+                    storeBuilder.withMainImageURL(url);
+                }
+            }
+            
             return storeBuilder.build();
         }
-
+        
     }
-
+    
 }

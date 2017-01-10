@@ -374,6 +374,12 @@ public class Store implements JSONRepresentable
             this.mainImageURL = imageURL;
             return this;
         }
+        
+        public Builder withoutMainImageURL() 
+        {
+            this.mainImageURL = null;
+            return this;
+        }
 
         public Store build() throws IllegalStateException
         {

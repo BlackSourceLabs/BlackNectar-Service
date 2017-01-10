@@ -23,7 +23,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.blacksource.blacknectar.service.data.SQLImageMapper.Impl;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
@@ -36,7 +35,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
  * @author SirWellington
  */
 @Internal
-@ImplementedBy(Impl.class)
+@ImplementedBy(SQLTools.Impl.class)
 interface SQLTools
 {
 

@@ -68,6 +68,9 @@ public final class SQLQueries
     public static final String QUERY_IMAGE_WITHOUT_DATA = loadQuery("query_image_without_data.sql");
     public static final String QUERY_IMAGES_FOR_STORE = loadQuery("query_images_for_store.sql");
     public static final String QUERY_IMAGES_FOR_STORE_WITHOUT_DATA = loadQuery("query_images_for_store_without_data.sql");
+    
+    //Updates
+    public static final String UPDATE_STORE = loadQuery("update_store.sql");
 
     SQLQueries() throws IllegalAccessException
     {

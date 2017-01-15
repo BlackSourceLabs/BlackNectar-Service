@@ -17,6 +17,7 @@
 package tech.blacksource.blacknectar.service.data;
 
 import java.util.List;
+import java.util.Objects;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,6 +48,7 @@ import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
+import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
 import static tech.sirwellington.alchemy.generator.StringGenerators.uuids;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.ALPHABETIC;
@@ -232,6 +234,26 @@ public class MemoryStoreRepositoryTest
     {
         Store newStore = one(stores());
         instance.deleteStore(newStore);
+    }
+    
+    @Test
+    public void testUpdateStore()
+    {
+        String newName = one(alphabeticString());
+        
+        Store updatedStore = Store.Builder.fromStore(store)
+            .withName(newName)
+            .build();
+        
+        instance.updateStore(updatedStore);
+        
+        Store result = instance.getAllStores()
+            .stream()
+            .filter(s -> Objects.equals(s.getStoreId(), store.getStoreId()))
+            .findFirst().get();
+        
+        assertThat(result, is(updatedStore));
+             
     }
 
 }

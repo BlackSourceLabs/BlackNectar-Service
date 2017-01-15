@@ -21,11 +21,22 @@ package tech.blacksource.blacknectar.service.data.cleanup
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Callable;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.aroma.client.Aroma;
+import tech.aroma.client.Urgency;
+import tech.blacksource.blacknectar.service.ModuleProductionDatabase;
 import tech.blacksource.blacknectar.service.ModuleServer;
 import tech.blacksource.blacknectar.service.data.StoreRepository;
+import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
+import tech.blacksource.blacknectar.service.stores.Store;
+
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
  *
@@ -35,18 +46,111 @@ public class RemoveStoreNumbers implements Callable<Void>
 {
     private final static Logger LOG = LoggerFactory.getLogger(RemoveStoreNumbers.class);
     
-    private StoreRepository storeRepository;
+    private final Aroma aroma;
+    private final StoreRepository storeRepository;
+    private final ExtractStoreCodeTransformation transformation;
 
-    public static void main(String[] args)
+    @Inject
+    RemoveStoreNumbers(Aroma aroma, StoreRepository storeRepository, ExtractStoreCodeTransformation transformation)
     {
-        Injector injector = Guice.createInjector(new ModuleServer());
+        checkThat(aroma, storeRepository, transformation)
+            .are(notNull());
         
+        this.aroma = aroma;
+        this.storeRepository = storeRepository;
+        this.transformation = transformation;
+    }
+
+    public static void main(String[] args) throws Exception
+    {
+        Injector injector = Guice.createInjector(new ModuleServer(), new ModuleProductionDatabase());
+        
+        RemoveStoreNumbers instance = injector.getInstance(RemoveStoreNumbers.class);
+        
+        instance.call();
     }
 
     @Override
     public Void call() throws Exception
     {
-        
+        try
+        {
+            execute();
+        }
+        catch (Exception ex)
+        {
+            makeNoteThatProcessFailed(ex);
+            throw ex;
+        }
         return null;
+
+    }
+
+    private  void execute() throws Exception
+    {
+        List<Store> stores = storeRepository.getAllStores();
+
+        for (Store store : stores)
+        {
+            Store updatedStore = transformation.apply(store);
+
+            if (areDifferent(updatedStore, store))
+            {
+                makeNoteThatUpdatingStore(store, updatedStore);
+                tryToUpdateStore(updatedStore);
+            }
+        }
+        
+    }
+
+    private void makeNoteThatProcessFailed(Exception ex)
+    {
+        String message = "Failed to run scrip to remove and strip store data";
+        LOG.error(message, ex);
+        
+        aroma.begin().titled("Data Cleanup Failed")
+            .text(message, ex)
+            .withUrgency(Urgency.HIGH)
+            .send();
+    }
+
+    private boolean areDifferent(Store oldStore, Store updatedStore)
+    {
+        return !Objects.equals(oldStore, updatedStore);
+    }
+
+    private void makeNoteThatUpdatingStore(Store store, Store updatedStore)
+    {
+        String message = "Updating Store [{}] with [{]]";
+        LOG.debug(message, store, updatedStore);
+        
+        aroma.begin().titled("Updating Store")
+            .text("Old Store:\n{}\n\nNew Store:\n{}", store, updatedStore)
+            .withUrgency(Urgency.LOW)
+            .send();
+    }
+
+    private void tryToUpdateStore(Store updatedStore)
+    {
+        try
+        {
+            storeRepository.updateStore(updatedStore);
+        }
+        catch(BlackNectarAPIException ex)
+        {
+            makeNoteThatUpdateFailed(updatedStore, ex);
+        }
+    }
+
+    private void makeNoteThatUpdateFailed(Store updatedStore, BlackNectarAPIException ex)
+    {
+        String message = "Failed to update store: [{}]";
+        LOG.error(message, updatedStore, ex);
+        
+        aroma.begin().titled("Store Update Failed")
+            .text("Failed to update store:\n{}\n\n{}", updatedStore, ex)
+            .withUrgency(Urgency.HIGH)
+            .send();
+            
     }
 }

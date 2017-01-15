@@ -74,6 +74,18 @@ final class MemoryStoreRepository implements StoreRepository
         stores.add(store);
         LOG.debug("Successfully saved store: {}", store);
     }
+
+    @Override
+    public boolean containsStore(String storeId) throws BlackNectarAPIException
+    {
+        checkThat(storeId)
+            .throwing(BadArgumentException.class)
+            .is(validUUID());
+        
+        return stores
+            .stream()
+            .anyMatch(store -> Objects.equals(storeId, store.getStoreId()));
+    }
     
     @Override
     public List<Store> getAllStores(int limit)

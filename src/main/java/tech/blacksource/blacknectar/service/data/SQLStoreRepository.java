@@ -37,6 +37,7 @@ import static tech.blacksource.blacknectar.service.stores.Store.validStore;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThanOrEqualTo;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.validUUID;
 
 /**
@@ -91,6 +92,26 @@ final class SQLStoreRepository implements StoreRepository
             .text("Inserted {} store: \n\n{}", inserted, store)
             .send();
         LOG.debug("Successfully inserted {} store", inserted);
+    }
+
+    @Override
+    public boolean containsStore(String storeId) throws BlackNectarAPIException
+    {
+        checkThat(storeId)
+            .throwing(BadArgumentException.class)
+            .is(nonEmptyString())
+            .is(validUUID());
+        
+        try 
+        {
+            return _containsStore(storeId);
+        }
+        catch(Exception ex)
+        {
+            String message = "Failed to check whether store Exists: [{}]";
+            makeNoteOfSQLError(message, storeId, ex);
+            throw new OperationFailedException(message, ex);
+        }
     }
 
     @Override
@@ -320,6 +341,16 @@ final class SQLStoreRepository implements StoreRepository
             .send();
 
         LOG.error(message, args);
+    }
+
+    private boolean _containsStore(String storeId)
+    {
+        String sql = SQLQueries.CONTAINS_STORE;
+        
+        UUID storeUuid = UUID.fromString(storeId);
+        Integer count = database.queryForObject(sql, Integer.class, storeUuid);
+        
+        return count > 0;
     }
 
 }

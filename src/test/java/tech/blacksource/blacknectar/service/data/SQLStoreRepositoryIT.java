@@ -22,6 +22,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.jdbc.core.JdbcTemplate;
+import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.service.TestingResources;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
@@ -37,12 +38,15 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.doubles;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
+import static tech.sirwellington.alchemy.generator.StringGenerators.uuids;
 
 /**
  *
@@ -87,6 +91,22 @@ public class SQLStoreRepositoryIT
         aroma = TestingResources.getAroma();
         database = TestingResources.createDatabaseConnection();
         storeMapper = SQLStoreMapper.INSTANCE;
+    }
+    
+    @Test
+    public void testContainsStoreWhenNotContains() throws Exception
+    {
+        String randomId = one(uuids);
+        assertFalse(instance.containsStore(randomId));
+    }
+    
+    @Test
+    public void testContainsStoreWhenContains() throws Exception
+    {
+        Store store = Lists.oneOf(stores);
+        instance.addStore(store);
+
+        assertTrue(instance.containsStore(store.getStoreId()));
     }
 
     @Test

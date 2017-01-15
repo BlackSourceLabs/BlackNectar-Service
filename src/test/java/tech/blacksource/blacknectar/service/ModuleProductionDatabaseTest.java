@@ -16,14 +16,12 @@
 
 package tech.blacksource.blacknectar.service;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import javax.sql.DataSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import tech.aroma.client.Aroma;
-import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
 import static org.hamcrest.Matchers.*;
@@ -34,54 +32,46 @@ import static org.mockito.Answers.RETURNS_MOCKS;
  *
  * @author SirWellington
  */
-@IntegrationTest
 @RunWith(AlchemyTestRunner.class)
-public class ModuleServerIT
+public class ModuleProductionDatabaseTest 
 {
 
     @Mock(answer = RETURNS_MOCKS)
     private Aroma fakeAroma;
     
-    private ModuleServer instance;
-
+    private ModuleProductionDatabase instance;
+    
     @Before
     public void setUp() throws Exception
     {
-
+        
         setupData();
         setupMocks();
-        instance = new ModuleServer();
+        instance = new ModuleProductionDatabase();
     }
+
 
     private void setupData() throws Exception
     {
-
+        
     }
 
     private void setupMocks() throws Exception
     {
-
-    }
-
-    @Test
-    public void testBindings()
-    {
-        Injector injector = Guice.createInjector(instance);
-
-        Server server = injector.getInstance(Server.class);
-        assertThat(server, notNullValue());
-    }
-
-    @Test
-    public void testProvideAromaClient()
-    {
-        Aroma aroma = instance.provideAromaClient();
-        assertThat(aroma, notNullValue());
+        
     }
 
     @Test
     public void testConfigure()
     {
+        instance.configure();
+    }
+    
+    @Test
+    public void testProvideSQLConnection() throws Exception
+    {
+        DataSource connection = instance.provideSQLConnection(fakeAroma);
+        assertThat(connection, notNullValue());
     }
 
 }

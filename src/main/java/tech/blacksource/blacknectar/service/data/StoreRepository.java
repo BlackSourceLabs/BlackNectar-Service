@@ -99,6 +99,15 @@ public interface StoreRepository
     List<Store> searchForStores(@Required BlackNectarSearchRequest request) throws BlackNectarAPIException;
     
     /**
+     * Unlike {@link #addStore(tech.blacksource.blacknectar.service.stores.Store) }, this operation is for
+     * updating an existing {@link Store} with new information.
+     * 
+     * @param store Cannot be empty.
+     * @throws BlackNectarAPIException 
+     */
+    void updateStore(@Required Store store) throws BlackNectarAPIException;
+    
+    /**
      * Deletes a Store from the repository. This is a convenience method for {@link #deleteStore(java.lang.String) }.
      *
      * @param store

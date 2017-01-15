@@ -56,13 +56,6 @@ public class ModuleServerTest
     }
 
     @Test
-    public void testProvideSQLConnection() throws Exception
-    {
-        DataSource connection = instance.provideSQLConnection(fakeAroma);
-        assertThat(connection, notNullValue());
-    }
-
-    @Test
     public void testProvideAromaClient()
     {
         Aroma aroma = instance.provideAromaClient();

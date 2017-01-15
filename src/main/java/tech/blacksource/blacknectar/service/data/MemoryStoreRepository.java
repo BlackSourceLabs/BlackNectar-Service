@@ -139,6 +139,17 @@ final class MemoryStoreRepository implements StoreRepository
     }
 
     @Override
+    public void updateStore(Store store) throws BlackNectarAPIException
+    {
+        checkThat(store)
+            .throwing(BadArgumentException.class)
+            .is(notNull());
+        
+        stores.removeIf(s -> Objects.equals(s.getStoreId(), store.getStoreId()));
+        stores.add(store);
+    }
+
+    @Override
     public void deleteStore(String storeId) throws BlackNectarAPIException
     {
         checkThat(storeId)

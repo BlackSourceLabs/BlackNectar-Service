@@ -51,21 +51,20 @@ public final class ModuleTestingDatabase extends AbstractModule
     DataSource provideSQLConnection(Aroma aroma) throws SQLException
     {
         int port = 5432;
+        String database = "testing";
         String host = "database.blacksource.tech";
         String user = Files.readFile("./secrets/postgres-user.txt").trim();
         String password = Files.readFile("./secrets/postgres-password.txt").trim();
-        //Explicitly setting the schema seems to conflict with Postgis functions, so 
-        //ignoring for now.
-        String schema = "test";
+        
         String applicationName = "BlackNectar";
 
-        String url = String.format("jdbc:postgresql://%s:%d/postgres?user=%s&password=%s&ApplicationName=%s&currentSchema=%s",
+        String url = String.format("jdbc:postgresql://%s:%d/%s?user=%s&password=%s&ApplicationName=%s",
                                    host,
                                    port,
+                                   database,
                                    user,
                                    password,
-                                   applicationName,
-                                   schema);
+                                   applicationName);
 
 
         PGSimpleDataSource dataSource = new PGSimpleDataSource();

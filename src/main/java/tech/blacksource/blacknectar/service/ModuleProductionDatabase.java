@@ -77,11 +77,8 @@ public final class ModuleProductionDatabase extends AbstractModule
         dataSource.setAcquireIncrement(3);
         dataSource.setTestConnectionOnCheckin(true);
 
-        try
+        try(Connection connection = dataSource.getConnection();)
         {
-
-            Connection connection = dataSource.getConnection();
-
             checkThat(connection)
                 .throwing(SQLException.class)
                 .is(connected());

@@ -39,12 +39,15 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.locations;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
+import static tech.sirwellington.alchemy.generator.StringGenerators.uuids;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.ALPHABETIC;
 
@@ -124,11 +127,34 @@ public class MemoryStoreRepositoryTest
         assertThat(result, not(empty()));
         assertThat(result, contains(store));
     }
+
+    @Test
+    public void testContainsStoreWhenContains() throws Exception
+    {
+        Store store = Lists.oneOf(stores);
+        assertTrue(instance.containsStore(store.getStoreId()));
+    }
     
+    @Test
+    public void testContainsStoreWhenNotContains()
+    {
+        String randomId = one(uuids);
+        assertFalse(instance.containsStore(randomId));
+    }
+
+    @DontRepeat
+    @Test
+    public void testContainsStoreWithBadArgs() throws Exception
+    {
+        assertThrows(() -> instance.containsStore(null)).isInstanceOf(BadArgumentException.class);
+        assertThrows(() -> instance.containsStore("")).isInstanceOf(BadArgumentException.class);
+        assertThrows(() -> instance.containsStore(store.getName())).isInstanceOf(BadArgumentException.class);
+    }
+
     @Test
     public void testAddStore() throws Exception
     {
-        
+
         Store newStore = one(stores());
         
         List<Store> result = instance.getAllStores();

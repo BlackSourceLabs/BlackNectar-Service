@@ -47,6 +47,7 @@ public final class SQLQueries
     public static final String CREATE_STORES_TABLE = loadQuery("create_stores.sql");
 
     //Counts
+    public static final String CONTAINS_STORE = loadQuery("contains_store.sql");
     public static final String COUNT_IMAGES_FOR_STORE = loadQuery("count_images_for_store.sql");
 
     //Deletes

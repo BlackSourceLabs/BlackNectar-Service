@@ -51,6 +51,7 @@ public class SQLQueriesTest
         assertThat(SQLQueries.CREATE_ADDRESS_TABLE, not(isEmptyOrNullString()));
         assertThat(SQLQueries.CREATE_STORES_TABLE, not(isEmptyOrNullString()));
         
+        assertThat(SQLQueries.CONTAINS_STORE, not(isEmptyOrNullString()));
         assertThat(SQLQueries.COUNT_IMAGES_FOR_STORE, not(isEmptyOrNullString()));
         
         assertThat(SQLQueries.DELETE_IMAGE, not(isEmptyOrNullString()));

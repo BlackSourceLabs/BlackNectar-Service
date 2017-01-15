@@ -18,7 +18,6 @@ package tech.blacksource.blacknectar.service;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import com.mchange.v2.c3p0.ComboPooledDataSource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -37,11 +36,7 @@ import tech.blacksource.blacknectar.service.operations.ModuleOperations;
 import tech.redroma.google.places.GooglePlacesAPI;
 import tech.redroma.yelp.YelpAPI;
 import tech.sirwellington.alchemy.annotations.access.Internal;
-import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
-import tech.sirwellington.alchemy.arguments.FailedAssertionException;
 import tech.sirwellington.alchemy.http.AlchemyHttp;
-
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 
 /**
  *
@@ -72,60 +67,6 @@ final class ModuleServer extends AbstractModule
         return Aroma.create("82c636ca-eb6d-48c6-bdd4-ff9dedae8ac4");
     }
 
-    @Provides
-    @Singleton
-    DataSource provideSQLConnection(Aroma aroma) throws SQLException
-    {
-        int port = 5432;
-        String host = "database.blacksource.tech";
-        String user = Files.readFile("./secrets/postgres-user.txt").trim();
-        String password = Files.readFile("./secrets/postgres-password.txt").trim();
-        //Explicitly setting the schema seems to conflict with Postgis functions, so 
-        //ignoring for now.
-        String schema = "blacknectar";
-        String applicationName = "BlackNectar";
-
-        String url = String.format("jdbc:postgresql://%s:%d/postgres?user=%s&password=%s&ApplicationName=%s",
-                                   host, 
-                                   port, 
-                                   user,
-                                   password,
-                                   applicationName);
-        
-        ComboPooledDataSource  dataSource = new ComboPooledDataSource();
-        dataSource.setJdbcUrl(url);
-
-        //Configure with pooling settings
-        dataSource.setMinPoolSize(3);
-        dataSource.setMaxPoolSize(10);
-        dataSource.setAcquireIncrement(3);
-        dataSource.setTestConnectionOnCheckin(true);
-        
-        try
-        {
-            
-            Connection connection = dataSource.getConnection();
-            
-            checkThat(connection)
-                .throwing(SQLException.class)
-                .is(connected());
-            
-            connection.close();
-        }
-        catch (SQLException ex)
-        {
-            String message = "Failed to create connection to PostgreSQL. Defaulting to SQLite.";
-            LOG.error(message, ex);
-            aroma.begin().titled("SQL Connection Failed")
-                .text(message, ex)
-                .withUrgency(Urgency.HIGH)
-                .send();
-            
-            throw ex;
-        }
-        
-        return dataSource;
-    }
 
     @Singleton
     @Provides
@@ -191,23 +132,5 @@ final class ModuleServer extends AbstractModule
     {
         return DriverManager.getConnection("jdbc:sqlite::resource:Stores.db");
     }
-    
-    private AlchemyAssertion<Connection> connected()
-    {
-        return connection ->
-        {
-            try            
-            {
-                if (connection.isClosed())
-                {
-                    throw new FailedAssertionException("Database is not connected");
-                }
-                
-            }
-            catch (SQLException ex)
-            {
-                throw new FailedAssertionException("Could not check for connection", ex);
-            }
-        };
-    }
+   
 }

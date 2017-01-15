@@ -18,8 +18,6 @@ package tech.blacksource.blacknectar.service;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import java.sql.Connection;
-import javax.sql.DataSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -84,28 +82,6 @@ public class ModuleServerIT
     @Test
     public void testConfigure()
     {
-    }
-
-    @Test
-    public void testProvideSQLConnection() throws Exception
-    {
-        Aroma aroma = instance.provideAromaClient();
-        DataSource connection = instance.provideSQLConnection(aroma);
-        assertThat(connection, notNullValue());
-    }
-    
-    @Test
-    public void testSQLConnectionRefreshesOnClosure() throws Exception
-    {
-        DataSource dataSource = instance.provideSQLConnection(fakeAroma);
-        
-        Connection connection = dataSource.getConnection();
-        connection.close();
-        assertTrue(connection.isClosed());
-        
-        connection = dataSource.getConnection();
-        assertFalse(connection.isClosed());
-        
     }
 
 }

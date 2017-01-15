@@ -41,14 +41,17 @@ public final class ExtractStoreCodeTransformation implements StoreTransformation
         {
             return store;
         }
+        
         String storeName = store.getName();
         List<String> tokens = tokenize(storeName);
         String lastToken = Lists.last(tokens);
+       
         if (isStoreCode(lastToken))
         {
             List<String> storeNameTokens = Lists.copy(tokens);
             String storeCode = Lists.removeLast(storeNameTokens);
             String cleanedName = String.join(" ", storeNameTokens);
+            
             return Store.Builder.fromStore(store).withName(cleanedName).withStoreCode(storeCode).build();
         }
         else
@@ -61,10 +64,12 @@ public final class ExtractStoreCodeTransformation implements StoreTransformation
     {
         StringTokenizer tokenizer = new StringTokenizer(string, " ");
         List<String> tokens = Lists.create();
+        
         while (tokenizer.hasMoreTokens())
         {
             tokens.add(tokenizer.nextToken());
         }
+        
         return tokens;
     }
 

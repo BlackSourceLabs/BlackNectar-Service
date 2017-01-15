@@ -58,6 +58,9 @@ public class Store implements JSONRepresentable
     @SerializedName(Keys.NAME)
     private final String name;
 
+    @SerializedName(Keys.STORE_CODE)
+    private final String storeCode;
+
     @SerializedName(Keys.LOCATION)
     private final Location location;
 
@@ -69,8 +72,7 @@ public class Store implements JSONRepresentable
 
     private final JsonObject json;
 
-
-    public Store(String storeId, String name, Location location, Address address, String mainImageURL)
+    public Store(String storeId, String name, String storeCode, Location location, Address address, String mainImageURL)
     {
         checkThat(storeId).usingMessage("storeId must be a valid UUID").is(validUUID());
         checkThat(address).is(validAddress());
@@ -84,6 +86,7 @@ public class Store implements JSONRepresentable
 
         this.storeId = storeId;
         this.name = name;
+        this.storeCode = storeCode;
         this.location = location;
         this.address = address;
         this.mainImageURL = mainImageURL;
@@ -129,6 +132,11 @@ public class Store implements JSONRepresentable
         return !isNullOrEmpty(mainImageURL);
     }
 
+    public boolean hasStoreCode()
+    {
+        return !isNullOrEmpty(storeCode);
+    }
+
     public String getStoreId()
     {
         return storeId;
@@ -137,6 +145,11 @@ public class Store implements JSONRepresentable
     public String getName()
     {
         return name;
+    }
+
+    public String getStoreCode()
+    {
+        return storeCode;
     }
 
     public Location getLocation()
@@ -163,13 +176,14 @@ public class Store implements JSONRepresentable
     @Override
     public int hashCode()
     {
-        int hash = 7;
-        hash = 53 * hash + Objects.hashCode(this.storeId);
-        hash = 53 * hash + Objects.hashCode(this.name);
-        hash = 53 * hash + Objects.hashCode(this.location);
-        hash = 53 * hash + Objects.hashCode(this.address);
-        hash = 53 * hash + Objects.hashCode(this.mainImageURL);
-        hash = 53 * hash + Objects.hashCode(this.json);
+        int hash = 3;
+        hash = 83 * hash + Objects.hashCode(this.storeId);
+        hash = 83 * hash + Objects.hashCode(this.name);
+        hash = 83 * hash + Objects.hashCode(this.storeCode);
+        hash = 83 * hash + Objects.hashCode(this.location);
+        hash = 83 * hash + Objects.hashCode(this.address);
+        hash = 83 * hash + Objects.hashCode(this.mainImageURL);
+        hash = 83 * hash + Objects.hashCode(this.json);
         return hash;
     }
 
@@ -197,6 +211,10 @@ public class Store implements JSONRepresentable
         {
             return false;
         }
+        if (!Objects.equals(this.storeCode, other.storeCode))
+        {
+            return false;
+        }
         if (!Objects.equals(this.mainImageURL, other.mainImageURL))
         {
             return false;
@@ -219,17 +237,22 @@ public class Store implements JSONRepresentable
     @Override
     public String toString()
     {
-        return "Store{" + "storeId=" + storeId + ", name=" + name + ", location=" + location + ", address=" + address + ", mainImageURL=" + mainImageURL + ", json=" + json + '}';
+        return "Store{" + "storeId=" + storeId + ", name=" + name + ", storeCode=" + storeCode + ", location=" + location + ", address=" + address + ", mainImageURL=" + mainImageURL + ", json=" + json + '}';
     }
 
     private JsonObject createJSON()
     {
         JsonObject jsonObject = new JsonObject();
-        
+
         jsonObject.addProperty(Keys.STORE_ID, this.storeId);
         jsonObject.addProperty(Keys.NAME, this.name);
         jsonObject.add(Keys.LOCATION, location.asJSON());
         jsonObject.add(Keys.ADDRESS, this.address.asJSON());
+
+        if (hasStoreCode())
+        {
+            jsonObject.addProperty(Keys.STORE_CODE, this.storeCode);
+        }
         
         if (hasMainImage())
         {
@@ -247,6 +270,7 @@ public class Store implements JSONRepresentable
 
         static final String STORE_ID = "store_id";
         static final String NAME = "store_name";
+        static final String STORE_CODE = "store_code";
         static final String LOCATION = "location";
         static final String ADDRESS = "address";
         static final String MAIN_IMAGE = "main_image_url";
@@ -266,10 +290,10 @@ public class Store implements JSONRepresentable
                                       "CARVER",
                                       "55318",
                                       "2079");
-        
+
         String sampleImage = "https://s3-media3.fl.yelpcdn.com/bphoto/hzF7KhWb1B6cdGJ1y9E05A/o.jpg";
 
-        return new Store(storeId, name, location, address, sampleImage);
+        return new Store(storeId, name, null, location, address, sampleImage);
     }
 
     /**
@@ -289,7 +313,9 @@ public class Store implements JSONRepresentable
             checkThat(store).is(notNull());
 
             Builder builder = new Builder();
+            
             builder.storeId = store.storeId;
+            builder.storeCode = store.storeCode;
             builder.name = store.name;
             builder.location = store.location;
             builder.address = store.address;
@@ -300,6 +326,7 @@ public class Store implements JSONRepresentable
 
         private String storeId;
         private String name;
+        private String storeCode;
         private Location location;
         private Address address;
         private String mainImageURL;
@@ -308,27 +335,29 @@ public class Store implements JSONRepresentable
         {
 
         }
-        
+
         /**
          * Sets the Store ID.
+         *
          * @param storeId Must be a valid {@link UUID} String.
          * @return
-         * @throws IllegalArgumentException 
+         * @throws IllegalArgumentException
          */
         public Builder withStoreID(@NonEmpty UUID storeId) throws IllegalArgumentException
         {
             checkThat(storeId)
                 .is(notNull());
-            
+
             this.storeId = storeId.toString();
             return this;
         }
 
         /**
          * Sets the name of the store.
+         *
          * @param name
          * @return
-         * @throws IllegalArgumentException 
+         * @throws IllegalArgumentException
          */
         public Builder withName(@NonEmpty String name) throws IllegalArgumentException
         {
@@ -339,13 +368,43 @@ public class Store implements JSONRepresentable
             this.name = name;
             return this;
         }
+        
+        /**
+         * Sets the store code for the store. This is optional, and is used for Chain stores, where there is
+         * more than one store with the same name.
+         * <p>
+         * For example, with a store name of {@code Dollar Tree 736}, the Store's name is "Dollar Tree" and the
+         * Store Code is "736".
+         * 
+         * @param storeCode
+         * @return
+         * @throws IllegalArgumentException 
+         */
+        public Builder withStoreCode(@NonEmpty String storeCode) throws IllegalArgumentException
+        {
+            checkThat(storeCode)
+                .is(nonEmptyString());
+            
+            this.storeCode = storeCode;
+            return this;
+        }
+        
+        /**
+         * Unsets the Store Code.
+         * @return 
+         */
+        public Builder withoutStoreCode()
+        {
+            this.storeCode = null;
+            return this;
+        }
 
         /**
          * Sets the address of the store. This parameter is required.
-         * 
+         *
          * @param address
          * @return
-         * @throws IllegalArgumentException 
+         * @throws IllegalArgumentException
          */
         public Builder withAddress(@Required Address address) throws IllegalArgumentException
         {
@@ -374,8 +433,8 @@ public class Store implements JSONRepresentable
             this.mainImageURL = imageURL;
             return this;
         }
-        
-        public Builder withoutMainImageURL() 
+
+        public Builder withoutMainImageURL()
         {
             this.mainImageURL = null;
             return this;
@@ -383,11 +442,11 @@ public class Store implements JSONRepresentable
 
         public Store build() throws IllegalStateException
         {
-            
+
             checkThat(storeId)
                 .usingMessage("storeId is required")
                 .is(validUUID());
-            
+
             checkThat(location)
                 .usingMessage("Location is missing or invalid")
                 .is(validLocation());
@@ -400,7 +459,7 @@ public class Store implements JSONRepresentable
                 .usingMessage("Address is missing or invalid")
                 .is(validAddress());
 
-            return new Store(this.storeId, this.name, this.location, this.address, this.mainImageURL);
+            return new Store(this.storeId, this.name, this.storeCode, this.location, this.address, this.mainImageURL);
         }
     }
 

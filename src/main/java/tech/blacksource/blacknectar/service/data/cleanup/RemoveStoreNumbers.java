@@ -73,6 +73,8 @@ public class RemoveStoreNumbers implements Callable<Void>
     @Override
     public Void call() throws Exception
     {
+        long start = System.currentTimeMillis();
+        
         try
         {
             execute();
@@ -82,6 +84,14 @@ public class RemoveStoreNumbers implements Callable<Void>
             makeNoteThatProcessFailed(ex);
             throw ex;
         }
+        long end = System.currentTimeMillis();
+        
+        LOG.info("Script completed in {}ms", end - start);
+        aroma.begin().titled("Stores Updated")
+            .text("Successfully cleaned store numbers in {}ms", end - start)
+            .withUrgency(Urgency.MEDIUM)
+            .send();
+        
         return null;
 
     }

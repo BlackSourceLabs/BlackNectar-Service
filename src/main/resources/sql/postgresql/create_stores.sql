@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS Stores
 (
 		store_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     store_name TEXT,
+		store_code TEXT,
     latitude NUMERIC NOT NULL,
     longitude NUMERIC NOT NULL,
     location GEOGRAPHY,

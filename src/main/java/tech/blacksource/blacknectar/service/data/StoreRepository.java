@@ -58,6 +58,15 @@ public interface StoreRepository
      * @throws BadArgumentException If the argument is null or invalid.
      */
     public void addStore(@Required Store store) throws BlackNectarAPIException;
+    
+    /**
+     * Checks whether the repository contains a Store with the specified Store ID.
+     * 
+     * @param storeId The ID of the store to check. Must be a valid UUID.
+     * @return
+     * @throws BlackNectarAPIException 
+     */
+    public boolean containsStore(@NonEmpty String storeId) throws BlackNectarAPIException;
 
     /**
      * Get all of the EBT stores in the country.

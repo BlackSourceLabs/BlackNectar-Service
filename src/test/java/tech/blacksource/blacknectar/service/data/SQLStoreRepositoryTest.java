@@ -42,7 +42,9 @@ import static java.lang.String.format;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Answers.RETURNS_MOCKS;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -260,6 +262,33 @@ public class SQLStoreRepositoryTest
         assertThrows(() -> instance.deleteStore(badId))
             .isInstanceOf(BadArgumentException.class);
 
+    }
+
+    @Test
+    public void testContainsStoreWhenContainsStore()
+    {
+        String sql = SQLQueries.CONTAINS_STORE;
+        
+        String storeId = store.getStoreId();
+        UUID storeUuid = UUID.fromString(storeId);
+        when(database.queryForObject(sql, Integer.class, storeUuid))
+            .thenReturn(1);
+
+        assertTrue(instance.containsStore(storeId));
+    }
+    
+    @Test
+    public void testContainsStoreWhenNotContainsStore() throws Exception
+    {
+        String sql = SQLQueries.CONTAINS_STORE;
+        
+        String storeId = store.getStoreId();
+        UUID storeUuid = UUID.fromString(storeId);
+        
+        when(database.queryForObject(sql, Integer.class, storeUuid))
+            .thenReturn(0);
+        
+        assertFalse(instance.containsStore(storeId));
     }
 
 }

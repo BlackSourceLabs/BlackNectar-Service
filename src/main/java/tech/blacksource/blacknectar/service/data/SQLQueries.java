@@ -47,6 +47,7 @@ public final class SQLQueries
     public static final String CREATE_STORES_TABLE = loadQuery("create_stores.sql");
 
     //Counts
+    public static final String CONTAINS_STORE = loadQuery("contains_store.sql");
     public static final String COUNT_IMAGES_FOR_STORE = loadQuery("count_images_for_store.sql");
 
     //Deletes
@@ -67,6 +68,9 @@ public final class SQLQueries
     public static final String QUERY_IMAGE_WITHOUT_DATA = loadQuery("query_image_without_data.sql");
     public static final String QUERY_IMAGES_FOR_STORE = loadQuery("query_images_for_store.sql");
     public static final String QUERY_IMAGES_FOR_STORE_WITHOUT_DATA = loadQuery("query_images_for_store_without_data.sql");
+    
+    //Updates
+    public static final String UPDATE_STORE = loadQuery("update_store.sql");
 
     SQLQueries() throws IllegalAccessException
     {

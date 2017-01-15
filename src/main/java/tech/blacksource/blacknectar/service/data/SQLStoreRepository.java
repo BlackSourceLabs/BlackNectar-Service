@@ -37,6 +37,7 @@ import static tech.blacksource.blacknectar.service.stores.Store.validStore;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThanOrEqualTo;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.validUUID;
 
 /**
@@ -94,6 +95,26 @@ final class SQLStoreRepository implements StoreRepository
     }
 
     @Override
+    public boolean containsStore(String storeId) throws BlackNectarAPIException
+    {
+        checkThat(storeId)
+            .throwing(BadArgumentException.class)
+            .is(nonEmptyString())
+            .is(validUUID());
+        
+        try 
+        {
+            return _containsStore(storeId);
+        }
+        catch(Exception ex)
+        {
+            String message = "Failed to check whether store Exists: [{}]";
+            makeNoteOfSQLError(message, storeId, ex);
+            throw new OperationFailedException(message, ex);
+        }
+    }
+
+    @Override
     public List<Store> getAllStores(int limit) throws BlackNectarAPIException
     {
         checkThat(limit)
@@ -125,6 +146,30 @@ final class SQLStoreRepository implements StoreRepository
             .send();
 
         return stores;
+    }
+
+    @Override
+    public void updateStore(Store store) throws BlackNectarAPIException
+    {
+        checkThat(store)
+            .throwing(BadArgumentException.class)
+            .is(notNull());
+            
+        if (!containsStore(store.getStoreId()))
+        {
+            addStoreToDatabase(store, database);
+        }
+        
+        try 
+        {
+            _updateStore(store);
+        }
+        catch(Exception ex)
+        {
+            String message = "Failed to update Store: {}";
+            makeNoteOfSQLError(message, store, ex);
+            throw new OperationFailedException(message, ex);
+        }
     }
 
     @Override
@@ -195,7 +240,7 @@ final class SQLStoreRepository implements StoreRepository
                                store.getAddress().getLocalZipCode());
 
     }
-
+    
     private String createSQLToGetAllStores(int limit)
     {
         if (limit <= 0)
@@ -320,6 +365,42 @@ final class SQLStoreRepository implements StoreRepository
             .send();
 
         LOG.error(message, args);
+    }
+
+    private boolean _containsStore(String storeId)
+    {
+        String sql = SQLQueries.CONTAINS_STORE;
+        
+        UUID storeUuid = UUID.fromString(storeId);
+        Integer count = database.queryForObject(sql, Integer.class, storeUuid);
+        
+        return count > 0;
+    }
+
+    private void _updateStore(Store store)
+    {
+        String sql = SQLQueries.UPDATE_STORE;
+        UUID storeId = UUID.fromString(store.getStoreId());
+        
+        double latitude = store.getLocation().getLatitude();
+        double longitude = store.getLocation().getLongitude();
+        
+        database.update(sql, 
+                        storeId,
+                        store.getName(),
+                        latitude,
+                        longitude,
+                        //For the ST_Point function, parameters are longitude,latitude.
+                        longitude,
+                        latitude,
+                        store.getAddress().getAddressLineOne(),
+                        store.getAddress().getAddressLineTwo(),
+                        store.getAddress().getCity(),
+                        store.getAddress().getState(),
+                        store.getAddress().getCounty(),
+                        store.getAddress().getZipCode(),
+                        store.getAddress().getLocalZipCode(),
+                        storeId);
     }
 
 }

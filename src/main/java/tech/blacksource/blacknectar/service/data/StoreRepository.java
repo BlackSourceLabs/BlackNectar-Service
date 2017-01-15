@@ -58,6 +58,15 @@ public interface StoreRepository
      * @throws BadArgumentException If the argument is null or invalid.
      */
     public void addStore(@Required Store store) throws BlackNectarAPIException;
+    
+    /**
+     * Checks whether the repository contains a Store with the specified Store ID.
+     * 
+     * @param storeId The ID of the store to check. Must be a valid UUID.
+     * @return
+     * @throws BlackNectarAPIException 
+     */
+    public boolean containsStore(@NonEmpty String storeId) throws BlackNectarAPIException;
 
     /**
      * Get all of the EBT stores in the country.
@@ -88,6 +97,15 @@ public interface StoreRepository
      * @throws OperationFailedException 
      */
     List<Store> searchForStores(@Required BlackNectarSearchRequest request) throws BlackNectarAPIException;
+    
+    /**
+     * Unlike {@link #addStore(tech.blacksource.blacknectar.service.stores.Store) }, this operation is for
+     * updating an existing {@link Store} with new information.
+     * 
+     * @param store Cannot be empty.
+     * @throws BlackNectarAPIException 
+     */
+    void updateStore(@Required Store store) throws BlackNectarAPIException;
     
     /**
      * Deletes a Store from the repository. This is a convenience method for {@link #deleteStore(java.lang.String) }.

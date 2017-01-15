@@ -16,14 +16,19 @@
 
 package tech.blacksource.blacknectar.service.data;
 
+import com.google.common.base.Objects;
 import java.util.List;
+import java.util.Optional;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.jdbc.core.JdbcTemplate;
+import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.service.TestingResources;
+import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
@@ -34,15 +39,21 @@ import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.doubles;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
+import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
+import static tech.sirwellington.alchemy.generator.StringGenerators.uuids;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
  *
@@ -62,6 +73,8 @@ public class SQLStoreRepositoryIT
     private SQLStoreRepository instance;
     
     private List<Store> stores;
+    private Store store;
+    private String storeId;
     
     private List<Store> allStores;
 
@@ -74,11 +87,19 @@ public class SQLStoreRepositoryIT
         
         instance = new SQLStoreRepository(aroma, database, storeMapper);
     }
-
+    
+    @After
+    public void tearDown() throws Exception
+    {
+        stores.forEach(instance::deleteStore);
+        instance.deleteStore(store);
+    }
 
     private void setupData() throws Exception
     {
         stores = listOf(stores());
+        store = Lists.oneOf(stores);
+        storeId = store.getStoreId();
         allStores = StoreDataSource.FILE.getAllStores();
     }
 
@@ -88,10 +109,44 @@ public class SQLStoreRepositoryIT
         database = TestingResources.createDatabaseConnection();
         storeMapper = SQLStoreMapper.INSTANCE;
     }
+    
+    @Test
+    public void testAddStore() throws Exception
+    {
+        assertFalse(instance.containsStore(storeId));
+        instance.addStore(store);
+        assertTrue(instance.containsStore(storeId));
+    }
+    
+    @Test
+    public void testAddStoreWhenAlreadyExists() throws Exception
+    {
+        instance.addStore(store);
+        assertTrue(instance.containsStore(storeId));
+        
+        assertThrows(() -> instance.addStore(store)).isInstanceOf(BlackNectarAPIException.class);
+    }
+    
+    @Test
+    public void testContainsStoreWhenNotContains() throws Exception
+    {
+        String randomId = one(uuids);
+        assertFalse(instance.containsStore(randomId));
+    }
+    
+    @Test
+    public void testContainsStoreWhenContains() throws Exception
+    {
+        instance.addStore(store);
+
+        assertTrue(instance.containsStore(store.getStoreId()));
+    }
 
     @Test
     public void testGetAllStoresWithNoLimit()
     {
+        stores.forEach(instance::addStore);
+
         List<Store> result = instance.getAllStores();
         assertThat(result, not(empty()));
     }
@@ -99,6 +154,7 @@ public class SQLStoreRepositoryIT
     @Test
     public void testGetAllStoresWithLimit()
     {
+        stores.forEach(instance::addStore);
         int limit = one(integers(10, 1_000));
         
         List<Store> result = instance.getAllStores(limit);
@@ -118,11 +174,11 @@ public class SQLStoreRepositoryIT
         List<Store> results = instance.searchForStores(request);
         assertThat(results, not(empty()));
         
-        results.forEach(store -> assertThat(store.getName(), not(isEmptyOrNullString())));
+        results.forEach(s -> assertThat(s.getName(), not(isEmptyOrNullString())));
         
-        for (Store store : results)
+        for (Store result : results)
         {
-            assertThat(store.getName(), anyOf(containsString(name), containsString(name.toUpperCase())));
+            assertThat(result.getName(), anyOf(containsString(name), containsString(name.toUpperCase())));
         }
     }
     
@@ -153,12 +209,12 @@ public class SQLStoreRepositoryIT
         
         List<Store> results = instance.searchForStores(request);
         assertThat(results, not(empty()));
-        
-        results.forEach(store -> assertThat(store.getName(), 
-                                              anyOf(containsString(searchTerm),
-                                                    containsString(searchTerm.toUpperCase()))));
+
+        results.forEach(s -> assertThat(s.getName(),
+                                          anyOf(containsString(searchTerm),
+                                                containsString(searchTerm.toUpperCase()))));
     }
-    
+
     @Ignore
     @Test
     public void testAddAllStores()
@@ -179,12 +235,50 @@ public class SQLStoreRepositoryIT
     @Test
     public void testDeleteStore() throws Exception
     {
-        Store newStore = one(stores());
-        String storeId = newStore.getStoreId();
         
-        instance.addStore(newStore);
+        instance.addStore(store);
+        assertTrue(instance.containsStore(storeId));
         
         instance.deleteStore(storeId);
+        assertFalse(instance.containsStore(storeId));
+    }
+    
+    @Test
+    public void testUpdateStore() throws Exception
+    {
+        instance.addStore(store);
+        assertTrue(instance.containsStore(storeId));
+        
+        String newName = one(alphabeticString());
+        Store updatedStore = Store.Builder.fromStore(store).withName(newName).build();
+        
+        instance.updateStore(updatedStore);
+        
+        BlackNectarSearchRequest request = new BlackNectarSearchRequest()
+            .withSearchTerm(newName)
+            .withCenter(updatedStore.getLocation());
+        
+        List<Store> results = instance.searchForStores(request);
+        boolean anyMatch = results.stream().anyMatch(s -> Objects.equal(s.getStoreId(), storeId));
+        assertTrue(anyMatch);
+        
+        Optional<Store> match = results.stream()
+            .filter(s -> Objects.equal(s.getStoreId(), storeId))
+            .findFirst();
+        
+        assertTrue(match.isPresent());
+        
+        Store resultingStore = match.get();
+        assertThat(resultingStore.getName(), is(newName));
+        assertThat(resultingStore.getAddress(), is(store.getAddress()));
+    }
+    
+    @Test
+    public void testUpdateStoreWhenStoreDoesNotExist() throws Exception
+    {
+        instance.updateStore(store);
+        
+        assertTrue(instance.containsStore(storeId));
     }
 
 }

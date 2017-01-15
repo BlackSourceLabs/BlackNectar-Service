@@ -42,8 +42,11 @@ import static java.lang.String.format;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Answers.RETURNS_MOCKS;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -67,6 +70,7 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
 @RunWith(AlchemyTestRunner.class)
 public class SQLStoreRepositoryTest
 {
+
     @Mock(answer = RETURNS_MOCKS)
     private Aroma aroma;
 
@@ -82,7 +86,6 @@ public class SQLStoreRepositoryTest
     private List<Store> stores;
     private Store store;
     private UUID storeUuid;
-
 
     private BlackNectarSearchRequest request;
     private SQLStoreRepository instance;
@@ -113,6 +116,9 @@ public class SQLStoreRepositoryTest
     private void setupMocks() throws Exception
     {
         setupSQLInsertForStore();
+        
+        when(database.queryForObject(eq(SQLQueries.CONTAINS_STORE), eq(Integer.class), any(UUID.class)))
+            .thenReturn(0);
     }
 
     @DontRepeat
@@ -127,7 +133,6 @@ public class SQLStoreRepositoryTest
 
         assertThrows(() -> new SQLStoreRepository(aroma, database, null))
             .isInstanceOf(IllegalArgumentException.class);
-
     }
 
     @Test
@@ -167,18 +172,18 @@ public class SQLStoreRepositoryTest
         int limit = one(negativeIntegers());
         assertThrows(() -> instance.getAllStores(limit)).isInstanceOf(BadArgumentException.class);
     }
-    
+
     @Test
     public void testGetAllStoresWhenFails() throws Exception
     {
         DataAccessException ex = mock(DataAccessException.class);
-        
+
         when(database.query(anyString(), eq(storeMapper)))
             .thenThrow(ex);
-        
+
         assertThrows(() -> instance.getAllStores())
             .isInstanceOf(BlackNectarAPIException.class);
-        
+
     }
 
     @Test
@@ -186,7 +191,7 @@ public class SQLStoreRepositoryTest
     {
         when(database.query(anyString(), eq(storeMapper), Mockito.<Object>anyVararg()))
             .thenReturn(stores);
-        
+
         List<Store> results = instance.searchForStores(request);
 
         assertThat(results, not(empty()));
@@ -201,18 +206,106 @@ public class SQLStoreRepositoryTest
 
         instance.addStore(store);
 
-        assertUpdateWasAgainstStore(database, store);
+        assertStoreInsertedIntoDatabase(database, store);
     }
 
-    private void assertUpdateWasAgainstStore(JdbcTemplate database, Store store) throws Exception
+    private void setupSQLInsertForStore()
     {
-        String expectedQuery = SQLQueries.INSERT_STORE;
+        String insert = SQLQueries.INSERT_STORE;
 
+        when(database.update(eq(insert), Mockito.<Object>anyVararg()))
+            .thenReturn(1);
+    }
+
+    @Test
+    public void testDeleteStore()
+    {
+        String expectedQuery = SQLQueries.DELETE_STORE;
+
+        when(database.update(expectedQuery, storeUuid))
+            .thenReturn(1);
+
+        instance.deleteStore(store.getStoreId());
+
+        verify(database).update(expectedQuery, storeUuid);
+    }
+
+    @DontRepeat
+    @Test
+    public void testDeleteStoreWithBadArgs() throws Exception
+    {
+        assertThrows(() -> instance.deleteStore(""))
+            .isInstanceOf(BadArgumentException.class);
+
+        String badId = one(alphabeticString());
+        assertThrows(() -> instance.deleteStore(badId))
+            .isInstanceOf(BadArgumentException.class);
+
+    }
+
+    @Test
+    public void testContainsStoreWhenContainsStore()
+    {
+        String sql = SQLQueries.CONTAINS_STORE;
+
+        String storeId = store.getStoreId();
+        
+        when(database.queryForObject(sql, Integer.class, storeUuid))
+            .thenReturn(1);
+
+        assertTrue(instance.containsStore(storeId));
+    }
+
+    @Test
+    public void testContainsStoreWhenNotContainsStore() throws Exception
+    {
+        String sql = SQLQueries.CONTAINS_STORE;
+
+        String storeId = store.getStoreId();
+
+        when(database.queryForObject(sql, Integer.class, storeUuid))
+            .thenReturn(0);
+
+        assertFalse(instance.containsStore(storeId));
+    }
+
+    @Test
+    public void testUpdateStore() throws Exception
+    {
+        String newName = one(alphabeticString());
+
+        store = Store.Builder.fromStore(store).withName(newName).build();
+
+        instance.updateStore(store);
+        assertStoreUpdatedIntoDatabase(database, store);
+    }
+    
+    
+    @Test
+    public void testUpdateStoreWhenStoreDoesNotExist() throws Exception
+    {
+        Store newStore = one(stores());
+        instance.updateStore(newStore);
+        
+        assertStoreInsertedIntoDatabase(database, newStore);
+    }
+
+    @DontRepeat
+    @Test
+    public void testUpdatStoreWithBadArgs() throws Exception
+    {
+        assertThrows(() -> instance.updateStore(null)).isInstanceOf(BadArgumentException.class);
+    }
+
+    private void assertStoreInsertedIntoDatabase(JdbcTemplate database, Store store) throws Exception
+    {
+        String expectedStatement = SQLQueries.INSERT_STORE;
+        UUID storeUuid = UUID.fromString(store.getStoreId());
         Address address = store.getAddress();
         double lat = store.getLocation().getLatitude();
         double lon = store.getLocation().getLongitude();
 
-        verify(database).update(expectedQuery,
+        verify(database).update(expectedStatement,
                                 storeUuid,
                                 store.getName(),
                                 lat,
@@ -228,38 +321,29 @@ public class SQLStoreRepositoryTest
                                 address.getLocalZipCode());
     }
 
-    private void setupSQLInsertForStore()
+    private void assertStoreUpdatedIntoDatabase(JdbcTemplate database, Store store) throws Exception
     {
-        String insert = SQLQueries.INSERT_STORE;
+        String expectedStatement = SQLQueries.UPDATE_STORE;
+        UUID storeUuid = UUID.fromString(store.getStoreId());
+        Address address = store.getAddress();
+        double lat = store.getLocation().getLatitude();
+        double lon = store.getLocation().getLongitude();
 
-        when(database.update(eq(insert), Mockito.<Object>anyVararg()))
-            .thenReturn(1);
-    }
-
-    @Test
-    public void testDeleteStore()
-    {
-        String expectedQuery = SQLQueries.DELETE_STORE;
-        
-        when(database.update(expectedQuery, storeUuid))
-            .thenReturn(1);
-        
-        instance.deleteStore(store.getStoreId());
-        
-        verify(database).update(expectedQuery, storeUuid);
-    }
-
-    @DontRepeat
-    @Test
-    public void testDeleteStoreWithBadArgs() throws Exception
-    {
-        assertThrows(() -> instance.deleteStore(""))
-            .isInstanceOf(BadArgumentException.class);
-
-        String badId = one(alphabeticString());
-        assertThrows(() -> instance.deleteStore(badId))
-            .isInstanceOf(BadArgumentException.class);
-
+        verify(database).update(expectedStatement,
+                                storeUuid,
+                                store.getName(),
+                                lat,
+                                lon,
+                                lon,
+                                lat,
+                                address.getAddressLineOne(),
+                                address.getAddressLineTwo(),
+                                address.getCity(),
+                                address.getState(),
+                                address.getCounty(),
+                                address.getZipCode(),
+                                address.getLocalZipCode(),
+                                storeUuid);
     }
 
 }

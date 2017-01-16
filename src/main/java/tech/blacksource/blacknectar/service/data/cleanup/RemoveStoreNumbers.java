@@ -99,7 +99,7 @@ public class RemoveStoreNumbers implements Callable<Void>
         List<Store> stores = storeRepository.getAllStores();
 
         stores.parallelStream()
-            .filter(this::needUpdate)
+            .filter(this::updateNeeded)
             .forEach(store ->
             {
                 Store updatedStore = transformation.apply(store);
@@ -109,10 +109,19 @@ public class RemoveStoreNumbers implements Callable<Void>
 
     }
 
-    private boolean needUpdate(Store store)
+    private boolean updateNeeded(Store store)
     {
-        Store transformed = transformation.apply(store);
-        return areDifferent(transformed, store);
+        try
+        {
+            Store transformed = transformation.apply(store);
+
+            return areDifferent(transformed, store);
+        }
+        catch (RuntimeException ex)
+        {
+            makeNoteThatFailedToTransform(store, ex);
+            return false;
+        }
     }
 
     private boolean areDifferent(Store oldStore, Store updatedStore)
@@ -164,6 +173,16 @@ public class RemoveStoreNumbers implements Callable<Void>
             .withUrgency(Urgency.HIGH)
             .send();
 
+    }
+
+    private void makeNoteThatFailedToTransform(Store store, RuntimeException ex)
+    {
+        String message = "Failed to try to transform store: {}";
+        LOG.error(message, store, ex);
+        aroma.begin().titled("Script Operation Failed")
+            .text(message, store, ex)
+            .withUrgency(Urgency.HIGH)
+            .send();
     }
 
 }

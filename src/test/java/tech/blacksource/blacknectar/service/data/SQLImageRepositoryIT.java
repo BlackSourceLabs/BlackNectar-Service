@@ -128,16 +128,6 @@ public class SQLImageRepositoryIT
         assertThrows(() -> instance.getImage(storeId, imageId)).isInstanceOf(DoesNotExistException.class);
     }
 
-    @Test
-    public void testGetImageWithoutData()
-    {
-        instance.addImage(image);
-
-        Image expected = Image.Builder.fromImage(image).withoutImageData().build();
-        Image result = instance.getImageWithoutData(storeId, imageId);
-
-        assertThat(result, is(expected));
-    }
 
     @Test
     @SuppressWarnings("unchecked")
@@ -156,21 +146,6 @@ public class SQLImageRepositoryIT
         List<Image> results = instance.getImagesForStore(storeId);
         assertThat(results, notNullValue());
         assertThat(results, is(empty()));
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void testGetImagesForStoreWithouData()
-    {
-        images.forEach(instance::addImage);
-        
-        List<Image> expected = images.stream()
-            .map(img -> Image.Builder.fromImage(img).withoutImageData().build())
-            .collect(toList());
-
-        List<Image> results = instance.getImagesForStoreWithoutData(storeId);
-
-        assertTrue(Sets.containTheSameElements(results, expected));
     }
 
     @Test

@@ -300,7 +300,7 @@ public class SearchStoresOperation implements Route
 
     private Store tryToEnrichStoreWithImage(Store store)
     {
-        List<Image> storeImages = images.getImagesForStoreWithoutData(store);
+        List<Image> storeImages = images.getImagesForStore(store);
 
         if (Lists.isEmpty(storeImages))
         {

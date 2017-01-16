@@ -18,11 +18,13 @@ package tech.blacksource.blacknectar.service.images;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import sir.wellington.alchemy.collections.lists.Lists;
+import sir.wellington.alchemy.collections.maps.Maps;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.service.algorithms.StoreMatchingAlgorithm;
 import tech.blacksource.blacknectar.service.stores.Store;
@@ -35,18 +37,18 @@ import tech.redroma.google.places.requests.NearbySearchRequest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateList;
-import tech.sirwellington.alchemy.test.junit.runners.GenerateURL;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_MOCKS;
 import static org.mockito.Mockito.when;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.blacksource.blacknectar.service.images.GoogleImageLoader.DEFAULT_RADIUS;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.NetworkGenerators.httpUrls;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
@@ -64,10 +66,10 @@ public class GoogleImageLoaderTest
     private List<Place> places;
 
     private Place matchingPlace;
-    private Photo photo;
+    private List<Photo> photos;
 
-    @GenerateURL(protocol = "https")
-    private URL expectedURL;
+    private List<URL> urls;
+    private Map<Photo, URL> urlPairings;
 
     private NearbySearchRequest expectedRequest;
 
@@ -95,24 +97,40 @@ public class GoogleImageLoaderTest
     private void setupData() throws Exception
     {
         store = one(stores());
-        expectedRequest = createExpectedRequestFor(store);
         matchingPlace = Lists.oneOf(places);
         matchingPlace.name = store.getName();
-        photo = Lists.oneOf(matchingPlace.photos);
-        matchingPlace.photos = Lists.createFrom(photo);
+
+        photos = matchingPlace.photos;
+
+        urls = Lists.create();
+        urlPairings = Maps.create();
+        
+        for (Photo photo : photos)
+        {
+            URL url = one(httpUrls());
+            urls.add(url);
+            urlPairings.put(photo, url);
+        }
+        
     }
 
     private void setupMocks() throws Exception
     {
-        GetPhotoRequest photoRequest = createExpectedPhotoRequestFor(photo);
-
-        when(google.getPhoto(photoRequest)).thenReturn(expectedURL);
+        expectedRequest = createExpectedRequestFor(store);
 
         when(google.simpleSearchNearbyPlaces(expectedRequest))
             .thenReturn(places);
 
         when(matchingAlgorithm.matchesStore(matchingPlace, store))
             .thenReturn(true);
+
+        for (Photo photo : photos)
+        {
+            GetPhotoRequest photoRequest = createExpectedPhotoRequestFor(photo);
+
+            URL expectedURL = urlPairings.get(photo);
+            when(google.getPhoto(photoRequest)).thenReturn(expectedURL);
+        }
     }
 
     @DontRepeat
@@ -127,15 +145,15 @@ public class GoogleImageLoaderTest
 
         assertThrows(() -> new GoogleImageLoader(aroma, google, null))
             .isInstanceOf(IllegalArgumentException.class);
-
     }
 
     @Test
     public void testGetImageFor()
     {
-        URL result = instance.getImageFor(store);
+        List<URL> result = instance.getImagesFor(store);
+        
         assertThat(result, notNullValue());
-        assertThat(result, is(expectedURL));
+        assertThat(result, is(urls));
     }
 
     @DontRepeat
@@ -145,8 +163,9 @@ public class GoogleImageLoaderTest
         when(matchingAlgorithm.matchesStore(matchingPlace, store))
             .thenReturn(false);
 
-        URL result = instance.getImageFor(store);
-        assertThat(result, nullValue());
+        List<URL> result = instance.getImagesFor(store);
+        assertThat(result, notNullValue());
+        assertThat(result, is(empty()));
     }
 
     private NearbySearchRequest createExpectedRequestFor(Store store)

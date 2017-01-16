@@ -16,6 +16,7 @@
 
 package tech.blacksource.blacknectar.service.images;
 
+import com.google.common.base.Objects;
 import java.net.URL;
 import java.util.List;
 import org.junit.Before;
@@ -38,10 +39,11 @@ import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateList;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.core.AnyOf.anyOf;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_MOCKS;
 import static org.mockito.Mockito.when;
@@ -132,12 +134,12 @@ public class YelpImageLoaderTest
     @Test
     public void testGetImageFor() throws Exception
     {
-        URL result = instance.getImageFor(store);
+        List<URL> result = instance.getImagesFor(store);
 
         assertThat(result, notNullValue());
 
         URL expected = new URL(matchingBusiness.imageURL);
-        assertThat(result, is(expected));
+        assertThat(result, hasItem(expected));
     }
 
     @DontRepeat
@@ -147,8 +149,9 @@ public class YelpImageLoaderTest
         when(matchingAlgorithm.matchesStore(matchingBusiness, store))
             .thenReturn(false);
 
-        URL result = instance.getImageFor(store);
-        assertThat(result, nullValue());
+        List<URL> result = instance.getImagesFor(store);
+        assertThat(result, notNullValue());
+        assertThat(result, is(empty()));
     }
 
     @Test
@@ -159,10 +162,17 @@ public class YelpImageLoaderTest
         when(matchingAlgorithm.matchesStore(secondBusinesses, store))
             .thenReturn(true);
         
-        URL result = instance.getImageFor(store);
+        List<URL> result = instance.getImagesFor(store);
         
         assertThat(result, notNullValue());
-        assertThat(result.toString(), anyOf(is(matchingBusiness.imageURL), is(secondBusinesses.imageURL)));
+        assertThat(result, not(empty()));
+        
+        boolean anyMatch = result.stream()
+            .map(URL::toString)
+            .anyMatch(url -> Objects.equal(url, matchingBusiness.imageURL) || 
+                             Objects.equal(url, secondBusinesses.imageURL));
+        
+        assertThat(anyMatch, is(true));
     }
 
     private YelpSearchRequest createExpectedYelpRequestFor(Store store)

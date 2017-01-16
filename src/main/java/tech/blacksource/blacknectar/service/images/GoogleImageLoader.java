@@ -37,6 +37,7 @@ import tech.redroma.google.places.requests.GetPhotoRequest;
 import tech.redroma.google.places.requests.NearbySearchRequest;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 
+import static java.util.stream.Collectors.toList;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
@@ -67,12 +68,43 @@ final class GoogleImageLoader implements ImageLoader
     }
 
     @Override
-    public URL getImageFor(Store store)
+    public List<URL> getImagesFor(Store store)
+    {
+
+        List<Place> places = tryToGetPlacesFor(store);
+
+        if (Lists.isEmpty(places))
+        {
+            return Lists.emptyList();
+        }
+
+        Place matchingPlace = tryToFindMatchingPlaceFor(store, places);
+
+        if (Objects.isNull(matchingPlace))
+        {
+            makeNoteThatNoMatchesFoundFor(store, places);
+            return Lists.emptyList();
+        }
+
+        if (!matchingPlace.hasPhotos())
+        {
+            makeNoteThatPlaceHasNoPhotos(store, matchingPlace);
+            return Lists.emptyList();
+        }
+
+        List<URL> urls = matchingPlace.photos.stream()
+            .map(photo -> this.loadPhoto(photo, matchingPlace))
+            .filter(Objects::nonNull)
+            .collect(toList());
+
+        return urls;
+    }
+
+    private List<Place> tryToGetPlacesFor(Store store)
     {
         NearbySearchRequest request = createRequestToSearchFor(store);
 
         List<Place> places;
-
         try
         {
             places = google.simpleSearchNearbyPlaces(request);
@@ -86,35 +118,9 @@ final class GoogleImageLoader implements ImageLoader
         if (Lists.isEmpty(places))
         {
             makeNoteThatNoPlacesFoundFor(store, request);
-            return null;
         }
 
-        Place matchingPlace = tryToFindMatchingPlaceFor(store, places);
-
-        if (Objects.isNull(matchingPlace))
-        {
-            makeNoteThatNoMatchesFoundFor(store, places);
-            return null;
-        }
-
-        if (!matchingPlace.hasPhotos())
-        {
-            makeNoteThatPlaceHasNoPhotos(store, matchingPlace);
-            return null;
-        }
-
-        Photo photo = Lists.oneOf(matchingPlace.photos);
-        GetPhotoRequest photoRequest = createRequestToGetPhoto(photo);
-
-        try
-        {
-            return google.getPhoto(photoRequest);
-        }
-        catch (GooglePlacesException ex)
-        {
-            makeNoteThatGooglePhotoCallFailed(photo, matchingPlace, ex);
-            throw new OperationFailedException(ex);
-        }
+        return Lists.nullToEmpty(places);
     }
 
     private NearbySearchRequest createRequestToSearchFor(Store store)
@@ -145,6 +151,25 @@ final class GoogleImageLoader implements ImageLoader
             .orElse(null);
     }
 
+    private URL loadPhoto(Photo photo, Place place)
+    {
+        GetPhotoRequest photoRequest = createRequestToGetPhoto(photo);
+
+        try
+        {
+            return google.getPhoto(photoRequest);
+        }
+        catch (GooglePlacesException ex)
+        {
+            makeNoteThatGooglePhotoCallFailed(photo, place, ex);
+            return null;
+        }
+    }
+
+    //================================================================
+    // Notes of Completion
+    //================================================================
+    
     private void makeNoteThatGoogleSearchFailed(GooglePlacesException ex, NearbySearchRequest request, Store store)
     {
         LOG.error("Failed to execute Google Place Search for store: [{}]", store, ex);

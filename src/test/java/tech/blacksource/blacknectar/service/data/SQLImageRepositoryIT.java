@@ -77,6 +77,14 @@ public class SQLImageRepositoryIT
 
     }
 
+    @After
+    public void tearDown() throws Exception
+    {
+        instance.deleteImage(image);
+
+        images.forEach(instance::deleteImage);
+    }
+
     private void setupResources() throws Exception
     {
         aroma = TestingResources.getAroma();
@@ -97,14 +105,6 @@ public class SQLImageRepositoryIT
         image = Lists.oneOf(images);
         storeId = image.getStoreId();
         imageId = image.getImageId();
-    }
-
-    @After
-    public void tearDown() throws Exception
-    {
-        instance.deleteImage(image);
-
-        images.forEach(instance::deleteImage);
     }
 
     @Test

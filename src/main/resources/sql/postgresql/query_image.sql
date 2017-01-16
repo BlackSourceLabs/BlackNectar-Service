@@ -1,5 +1,5 @@
 -- Finds a Particular image
--- Returns the Image, including the raw image_binary data.
+-- Returns the Image
 -- ===========================================================================
 
 SELECT store_id, image_id, height, width, size_in_bytes, content_type, image_type, source, url

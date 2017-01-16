@@ -100,16 +100,14 @@ public class RemoveStoreNumbers implements Callable<Void>
     {
         List<Store> stores = storeRepository.getAllStores();
 
-        for (Store store : stores)
-        {
-            Store updatedStore = transformation.apply(store);
-
-            if (areDifferent(updatedStore, store))
+        stores.parallelStream()
+            .filter(this::needUpdate)
+            .forEach(store -> 
             {
-                makeNoteThatUpdatingStore(store, updatedStore);
-                tryToUpdateStore(updatedStore);
-            }
-        }
+                 Store updatedStore = transformation.apply(store);
+                 makeNoteThatUpdatingStore(store, updatedStore);
+                 tryToUpdateStore(updatedStore);
+            });
         
     }
 
@@ -162,5 +160,11 @@ public class RemoveStoreNumbers implements Callable<Void>
             .withUrgency(Urgency.HIGH)
             .send();
             
+    }
+
+    private boolean needUpdate(Store store)
+    {
+        Store transformed = transformation.apply(store);
+        return areDifferent(transformed, store);
     }
 }

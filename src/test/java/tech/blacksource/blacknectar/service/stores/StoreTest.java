@@ -79,6 +79,7 @@ public class StoreTest
         assertThat(json.get(Store.Keys.ADDRESS), is(instance.getAddress().asJSON()));
         assertThat(json.get(Store.Keys.LOCATION), is(instance.getLocation().asJSON()));
         assertThat(json.get(Store.Keys.NAME).getAsString(), is(instance.getName()));
+        assertThat(json.get(Store.Keys.STORE_CODE).getAsString(), is(instance.getStoreCode()));
         assertThat(json.get(Store.Keys.STORE_ID).getAsString(), is(instance.getStoreId()));
         
         if (instance.hasMainImage())
@@ -99,6 +100,7 @@ public class StoreTest
         assertThat(newStore, not(instance));
         assertThat(newStore.getStoreId(), is(instance.getStoreId()));
         assertThat(newStore.getName(), is(instance.getName()));
+        assertThat(newStore.getStoreCode(), is(instance.getStoreCode()));
         assertThat(newStore.getLocation(), is(instance.getLocation()));
         assertThat(newStore.getAddress(), is(instance.getAddress()));
     }
@@ -122,6 +124,8 @@ public class StoreTest
         assertThrows(() -> builder.withLocation(null)).isInstanceOf(IllegalArgumentException.class);
         assertThrows(() -> builder.withName("")).isInstanceOf(IllegalArgumentException.class);
         assertThrows(() -> builder.withName(null)).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(() -> builder.withStoreCode("")).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(() -> builder.withStoreCode(null)).isInstanceOf(IllegalArgumentException.class);
         assertThrows(() -> builder.withMainImageURL("")).isInstanceOf(IllegalArgumentException.class);
         assertThrows(() -> builder.withMainImageURL(null)).isInstanceOf(IllegalArgumentException.class);
         assertThrows(() -> builder.withStoreID(null)).isInstanceOf(IllegalArgumentException.class);

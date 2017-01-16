@@ -226,6 +226,7 @@ final class SQLStoreRepository implements StoreRepository
         return database.update(insertStatement,
                                storeId,
                                store.getName(),
+                               store.getStoreCode(),
                                latitude,
                                longitude,
                                //Remember that for ST_Point function, it is longitude(x), latitude(y).
@@ -388,6 +389,7 @@ final class SQLStoreRepository implements StoreRepository
         database.update(sql, 
                         storeId,
                         store.getName(),
+                        store.getStoreCode(),
                         latitude,
                         longitude,
                         //For the ST_Point function, parameters are longitude,latitude.

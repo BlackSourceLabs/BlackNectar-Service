@@ -35,15 +35,13 @@ import tech.blacksource.blacknectar.service.exceptions.BlackNectarExceptionHandl
 import tech.blacksource.blacknectar.service.operations.ModuleOperations;
 import tech.redroma.google.places.GooglePlacesAPI;
 import tech.redroma.yelp.YelpAPI;
-import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.http.AlchemyHttp;
 
 /**
  *
  * @author SirWellington
  */
-@Internal
-final class ModuleServer extends AbstractModule
+public final class ModuleServer extends AbstractModule
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(ModuleServer.class);
@@ -74,7 +72,7 @@ final class ModuleServer extends AbstractModule
     {
         return new JdbcTemplate(dataSource, false);
     }
-    
+
     @Provides
     YelpAPI provideYelpAPI(Aroma aroma) throws Exception
     {
@@ -124,13 +122,13 @@ final class ModuleServer extends AbstractModule
 
     /**
      * Creates a connection to the built-in SQLite database.
-     * 
+     *
      * @return
-     * @throws SQLException 
+     * @throws SQLException
      */
     private Connection createSQLiteConnection() throws SQLException
     {
         return DriverManager.getConnection("jdbc:sqlite::resource:Stores.db");
     }
-   
+
 }

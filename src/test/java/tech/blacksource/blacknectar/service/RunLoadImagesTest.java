@@ -16,6 +16,7 @@
 
 package tech.blacksource.blacknectar.service;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -25,6 +26,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.jdbc.core.JdbcTemplate;
+import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.service.data.SQLQueries;
 import tech.blacksource.blacknectar.service.images.Image;
@@ -36,6 +38,7 @@ import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.mockito.Answers.RETURNS_MOCKS;
 import static org.mockito.Mockito.verify;
@@ -62,6 +65,7 @@ public class RunLoadImagesTest
     private Map<Store, Image> images;
     private RunLoadImages.Arguments arguments;
     private UUID storeId;
+    private List<URL> urls;
 
     @Mock
     private AlchemyHttp http;
@@ -91,6 +95,10 @@ public class RunLoadImagesTest
         stores = listOf(stores());
         images = stores.stream()
             .collect(toMap(s -> s, s -> one(images())));
+        
+        urls = images.values().stream()
+            .map(Image::getUrl)
+            .collect(toList());
 
         arguments = RunLoadImages.Arguments.Builder.newInstance()
             .withSleepTime(0, TimeUnit.MINUTES)
@@ -102,7 +110,8 @@ public class RunLoadImagesTest
 
     private void setupMocks() throws Exception
     {
-        images.forEach((store, image) -> when(imageLoader.getImageFor(store)).thenReturn(image.getUrl()));
+        images.forEach((store, image) -> when(imageLoader.getImagesFor(store))
+                                            .thenReturn(Lists.createFrom(image.getUrl())));
     }
     
     @DontRepeat
@@ -123,7 +132,7 @@ public class RunLoadImagesTest
         
         for (Store store : stores)
         {
-            verify(imageLoader).getImageFor(store);
+            verify(imageLoader).getImagesFor(store);
             
             UUID storeId = UUID.fromString(store.getStoreId());
             Image image = images.get(store);

@@ -20,6 +20,7 @@ import com.google.common.collect.Queues;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collection;
@@ -78,7 +79,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
     {
         checkThat(http, aroma, database)
             .are(notNull());
-        
+
         this.http = http;
         this.aroma = aroma;
         this.database = database;
@@ -91,6 +92,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
 
         long startTime = System.currentTimeMillis();
         long sleepTimeMillis = args.sleepTimeMillis;
+
         int totalStores = args.stores.size();
         int totalStoresProcessed = 0;
         int totalSuccesses = 0;
@@ -134,7 +136,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         {
             return;
         }
-        
+
         try
         {
             Thread.sleep(sleepTime);
@@ -164,12 +166,30 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
     {
         ImageLoader imageLoader = args.imageLoader;
 
-        URL imageUrl = imageLoader.getImageFor(store);
-        
-        checkThat(imageUrl)
-            .usingMessage("No Image found for Store: " + store)
-            .is(notNull());
-        
+        List<URL> images = imageLoader.getImagesFor(store);
+
+        checkThat(images)
+            .usingMessage("No Images found for Store: " + store)
+            .is(notNull())
+            .is(nonEmptyList());
+
+        images.stream().forEach(url -> this.tryToStoreImage(store, args, url));
+    }
+
+    private void tryToStoreImage(Store store, Arguments args, URL imageUrl)
+    {
+        try
+        {
+            storeImage(store, args, imageUrl);
+        }
+        catch (IOException ex)
+        {
+            makeNoteThatOperationToSaveImageFailed(store, args, ex);
+        }
+    }
+
+    private void storeImage(Store store, Arguments args, URL imageUrl) throws IOException
+    {
         byte[] imageData = http.go().download(imageUrl);
 
         BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageData));
@@ -181,9 +201,22 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         String imageType = getImageTypeFrom(contentType);
         String source = args.source;
 
-        saveImageInfoFor(store, imageUrl, width, height, imageData, size, contentType, imageType, source);
+        saveImageInfoFor(store, imageUrl, width, height, size, contentType, imageType, source);
 
         makeNoteThatImageSavedForStore(imageUrl, store, args);
+    }
+
+    private String getContentTypeFor(URL imageUrl) throws IOException
+    {
+        URLConnection connection = imageUrl.openConnection();
+        String contentType = connection.getContentType();
+        
+        if (connection instanceof HttpURLConnection)
+        {
+            ((HttpURLConnection) connection).disconnect();
+        }
+
+        return contentType;
     }
 
     private String getImageTypeFrom(String contentType) throws IOException
@@ -210,7 +243,6 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
                                   URL imageUrl,
                                   int width,
                                   int height,
-                                  byte[] binary,
                                   int size,
                                   String contentType,
                                   String imageType,
@@ -226,7 +258,6 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         database.update(statementToInsertImage,
                         storeId,
                         imageId,
-                        binary,
                         height,
                         width,
                         size,
@@ -236,21 +267,16 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
                         imageLink);
     }
 
-    private String getContentTypeFor(URL imageUrl) throws IOException
-    {
-        URLConnection connection = imageUrl.openConnection();
-        String contentType = connection.getContentType();
-
-        return contentType;
-    }
-
+    //================================================================
+    // Notes of Completion
+    //================================================================
     private void makeNoteOfCompletion(Arguments args, Store store, int totalSuccesses, int totalStoresProcessed, int totalStores)
     {
         String source = args.source;
         String message = "Found image from {} for Store. {}/{} successful. {}/{} done. \n\nStore: {}";
-        
+
         LOG.info(message, source, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores, store);
-        
+
         aroma.begin().titled("Image Saved")
             .text(message, source, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores, store)
             .withUrgency(Urgency.LOW)
@@ -263,9 +289,9 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         String source = args.source;
 
         String message = "Successfully saved Image [{}: {}] for store: {}";
-        
+
         LOG.debug(message, source, imageUrl, store);
-        
+
         aroma.begin().titled("Image Saved")
             .text(message, source, imageUrl, store)
             .withUrgency(Urgency.LOW)
@@ -278,7 +304,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         String message = "Failed to find an image from {} for store: {}";
 
         LOG.error(message, source, store, ex);
-        
+
         aroma.begin().titled("Image Load Failed")
             .text(message, source, store, ex)
             .withUrgency(Urgency.HIGH)
@@ -288,9 +314,9 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
     private void makeNoteThatSleepInterrupted(InterruptedException ex)
     {
         String message = "Thread Sleep Interrupted";
-       
+
         LOG.error(message, ex);
-        
+
         aroma.begin().titled("Script Interrupted")
             .text(message, ex)
             .withUrgency(Urgency.MEDIUM)
@@ -305,9 +331,9 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
     {
         String source = args.source;
         String message = "{}/{} - Failed to process image from {} for store: {}";
-        
+
         LOG.error(message, totalStoresProcessed, totalStores, source, store);
-        
+
         aroma.begin().titled("Store Image Load Failed")
             .text(message, totalStoresProcessed, totalStores, source, store)
             .withUrgency(Urgency.MEDIUM)
@@ -319,7 +345,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
     {
         String message = "Script[{}] completed in {} hours, with {}/{} successful and {}/{} processed";
         String source = args.source;
-       
+
         LOG.info(message, source, runtimeHours, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores);
 
         aroma.begin().titled("Script Finished")
@@ -328,6 +354,9 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
             .send();
     }
 
+    //================================================================
+    // Arguments Class
+    //================================================================
     static class Arguments
     {
 
@@ -405,6 +434,9 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
             return "Arguments{" + "sleepTimeMillis=" + sleepTimeMillis + ", source=" + source + ", imageLoader=" + imageLoader + ", stores=" + stores + '}';
         }
 
+        //================================================================
+        // Arguments Builder
+        //================================================================
         static class Builder
         {
 
@@ -426,9 +458,9 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
             Builder withSleepTime(@Positive int sleepTime, @Required TimeUnit timeUnit)
             {
                 checkThat(sleepTime).is(greaterThanOrEqualTo(0));
-                
+
                 checkThat(timeUnit).is(notNull());
-                
+
                 this.sleepTimeMillis = timeUnit.toMillis(sleepTime);
                 return this;
             }
@@ -457,11 +489,11 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
                 this.stores = Queues.newArrayDeque(stores);
                 return this;
             }
-            
+
             Builder withStores(@NonEmpty List<Store> stores)
             {
                 checkThat(stores).is(nonEmptyList());
-                
+
                 this.stores = Queues.newArrayDeque(stores);
                 return this;
             }

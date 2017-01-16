@@ -69,7 +69,7 @@ final class YelpImageLoader implements ImageLoader
     }
 
     @Override
-    public URL getImageFor(Store store)
+    public List<URL> getImagesFor(Store store)
     {
         checkThat(store).is(notNull());
 
@@ -77,13 +77,13 @@ final class YelpImageLoader implements ImageLoader
 
         if (isNullOrEmpty(url))
         {
-            return null;
+            return Lists.emptyList();
         }
         else
         {
             try
             {
-                return new URL(url);
+                return Lists.createFrom(new URL(url));
             }
             catch (MalformedURLException ex)
             {

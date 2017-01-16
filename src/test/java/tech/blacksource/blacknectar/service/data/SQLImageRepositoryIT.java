@@ -128,7 +128,6 @@ public class SQLImageRepositoryIT
         assertThrows(() -> instance.getImage(storeId, imageId)).isInstanceOf(DoesNotExistException.class);
     }
 
-
     @Test
     @SuppressWarnings("unchecked")
     public void testGetImagesForStore()
@@ -136,7 +135,7 @@ public class SQLImageRepositoryIT
         images.forEach(instance::addImage);
 
         List<Image> result = instance.getImagesForStore(storeId);
-        
+
         assertTrue(Sets.containTheSameElements(result, images));
     }
 

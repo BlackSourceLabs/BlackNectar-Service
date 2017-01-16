@@ -134,7 +134,7 @@ public class RemoveStoreNumbers implements Callable<Void>
     private void makeNoteThatUpdatingStore(Store store, Store updatedStore)
     {
         String message = "Updating Store [{}] with [{]]";
-        LOG.debug(message, store, updatedStore);
+        LOG.info(message, store, updatedStore);
 
         aroma.begin().titled("Updating Store")
             .text("Old Store:\n{}\n\nNew Store:\n{}", store, updatedStore)

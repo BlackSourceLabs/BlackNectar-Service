@@ -20,6 +20,7 @@ import com.google.common.collect.Queues;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collection;
@@ -209,6 +210,11 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
     {
         URLConnection connection = imageUrl.openConnection();
         String contentType = connection.getContentType();
+        
+        if (connection instanceof HttpURLConnection)
+        {
+            ((HttpURLConnection) connection).disconnect();
+        }
 
         return contentType;
     }

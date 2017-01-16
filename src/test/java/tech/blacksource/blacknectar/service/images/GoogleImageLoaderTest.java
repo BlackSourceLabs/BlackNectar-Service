@@ -55,7 +55,7 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
  *
  * @author SirWellington
  */
-@Repeat(25)
+@Repeat(10)
 @RunWith(AlchemyTestRunner.class)
 public class GoogleImageLoaderTest
 {
@@ -66,6 +66,7 @@ public class GoogleImageLoaderTest
     private List<Place> places;
 
     private Place matchingPlace;
+    @GenerateList(value = Photo.class, size = 15)
     private List<Photo> photos;
 
     private List<URL> urls;
@@ -100,7 +101,7 @@ public class GoogleImageLoaderTest
         matchingPlace = Lists.oneOf(places);
         matchingPlace.name = store.getName();
 
-        photos = matchingPlace.photos;
+        matchingPlace.photos = photos;
 
         urls = Lists.create();
         urlPairings = Maps.create();

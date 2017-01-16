@@ -66,13 +66,7 @@ public class ImageTest
     @Test
     public void testConstructor() throws Exception
     {
-        assertThrows(() -> new Image(null, null, null, 0, 0, 0, null, null, null, null));
-    }
-    
-    @Test
-    public void testHasImageData()
-    {
-        assertTrue(instance.hasImageData());
+        assertThrows(() -> new Image(null, null, 0, 0, 0, null, null, null, null));
     }
     
     @Test
@@ -109,12 +103,6 @@ public class ImageTest
     public void testGetImageId()
     {
         assertThat(instance.getImageId(), notNullValue());
-    }
-    
-    @Test
-    public void testGetImageData()
-    {
-        assertThat(instance.getImageData(), notNullValue());
     }
     
     @Test

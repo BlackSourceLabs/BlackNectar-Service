@@ -77,6 +77,14 @@ public class SQLImageRepositoryIT
 
     }
 
+    @After
+    public void tearDown() throws Exception
+    {
+        instance.deleteImage(image);
+
+        images.forEach(instance::deleteImage);
+    }
+
     private void setupResources() throws Exception
     {
         aroma = TestingResources.getAroma();
@@ -97,14 +105,6 @@ public class SQLImageRepositoryIT
         image = Lists.oneOf(images);
         storeId = image.getStoreId();
         imageId = image.getImageId();
-    }
-
-    @After
-    public void tearDown() throws Exception
-    {
-        instance.deleteImage(image);
-
-        images.forEach(instance::deleteImage);
     }
 
     @Test
@@ -129,24 +129,13 @@ public class SQLImageRepositoryIT
     }
 
     @Test
-    public void testGetImageWithoutData()
-    {
-        instance.addImage(image);
-
-        Image expected = Image.Builder.fromImage(image).withoutImageData().build();
-        Image result = instance.getImageWithoutData(storeId, imageId);
-
-        assertThat(result, is(expected));
-    }
-
-    @Test
     @SuppressWarnings("unchecked")
     public void testGetImagesForStore()
     {
         images.forEach(instance::addImage);
 
         List<Image> result = instance.getImagesForStore(storeId);
-        
+
         assertTrue(Sets.containTheSameElements(result, images));
     }
 
@@ -156,21 +145,6 @@ public class SQLImageRepositoryIT
         List<Image> results = instance.getImagesForStore(storeId);
         assertThat(results, notNullValue());
         assertThat(results, is(empty()));
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void testGetImagesForStoreWithouData()
-    {
-        images.forEach(instance::addImage);
-        
-        List<Image> expected = images.stream()
-            .map(img -> Image.Builder.fromImage(img).withoutImageData().build())
-            .collect(toList());
-
-        List<Image> results = instance.getImagesForStoreWithoutData(storeId);
-
-        assertTrue(Sets.containTheSameElements(results, expected));
     }
 
     @Test

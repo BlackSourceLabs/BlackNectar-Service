@@ -27,7 +27,6 @@ import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
-import static java.util.stream.Collectors.toList;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
@@ -70,24 +69,6 @@ public interface ImageRepository
         return this.getImage(UUID.fromString(storeId), imageId);
     }
     
-    /**
-     * Like {@link #getImage(java.lang.String, java.lang.String) }, but it returns only the Image information, without the
-     * {@linkplain Image#imageData data}.
-     *
-     * @param storeId
-     * @param imageId
-     * @return
-     * @throws BlackNectarAPIException
-     * @throws DoesNotExistException   If the image is not found.
-     */
-    default Image getImageWithoutData(@NonEmpty UUID storeId, @NonEmpty String imageId) throws DoesNotExistException, BlackNectarAPIException
-    {
-        Image image = this.getImage(storeId, imageId);
-
-        return Image.Builder.fromImage(image)
-            .withoutImageData()
-            .build();
-    }
 
     /**
      * Returns all of the images for a store.
@@ -132,46 +113,6 @@ public interface ImageRepository
      * @throws BlackNectarAPIException 
      */
     List<Image> getImagesForStore(@NonEmpty UUID storeId) throws BlackNectarAPIException;
-
-    /**
-     * Get all of the images for a store, without the {@linkplain Image#imageData image data}.
-     * <p>
-     * This is suitable if you want to query for images without downloaded the image.
-     * 
-     * @param storeId
-     * @return
-     * @throws BlackNectarAPIException 
-     */
-    default List<Image> getImagesForStoreWithoutData(@NonEmpty UUID storeId) throws BlackNectarAPIException
-    {
-        return this.getImagesForStore(storeId).stream()
-            .map(img -> Image.Builder.fromImage(img).withoutImageData().build())
-            .collect(toList());
-    }
-    
-    /**
-     * Convenience method for {@link #getImagesForStoreWithoutData(java.util.UUID) }.
-     * 
-     * @param store
-     * @return
-     * @throws BlackNectarAPIException
-     * @throws IllegalArgumentException 
-     */
-    default List<Image> getImagesForStoreWithoutData(@Required Store store) throws BlackNectarAPIException, IllegalArgumentException
-    {
-        checkThat(store)
-            .throwing(BadArgumentException.class)
-            .is(notNull());
-        
-        String storeId = store.getStoreId();
-        checkThat(storeId)
-            .throwing(BadArgumentException.class)
-            .usingMessage("store is missing storeId")
-            .is(nonEmptyString())
-            .is(validUUID());
-        
-        return this.getImagesForStoreWithoutData(UUID.fromString(storeId));
-    }
 
     /**
      * Checks whether the store has any pictures.

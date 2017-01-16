@@ -58,7 +58,6 @@ public class SQLImageMapperTest
     private SQLTools sqlTools;
 
     private Image image;
-    private Image imageWithoutData;
 
     private SQLImageMapper instance;
 
@@ -75,7 +74,6 @@ public class SQLImageMapperTest
     private void setupData() throws Exception
     {
         image = one(images());
-        imageWithoutData = Image.Builder.fromImage(image).withoutImageData().build();
     }
 
     private void setupMocks() throws Exception
@@ -103,25 +101,6 @@ public class SQLImageMapperTest
         assertThat(result, notNullValue());
         assertThat(result, is(image));
     }
-    
-    @Test
-    public void testWhenImageDataNotInColumn() throws Exception
-    {
-        when(sqlTools.hasColumn(results, SQLColumns.Images.IMAGE_BINARY))
-            .thenReturn(false);
-        
-        Image result = instance.mapRow(results, 0);
-        assertThat(result, is(imageWithoutData));
-    }
-
-    @Test
-    public void testWhenImageDataNotPresent() throws Exception
-    {
-        when(results.getBytes(SQLColumns.Images.IMAGE_BINARY)).thenReturn(null);
-
-        Image result = instance.mapRow(results, 0);
-        assertThat(result, is(imageWithoutData));
-    }
 
     @Test
     public void testWhenURLNotPresent() throws Exception
@@ -147,15 +126,6 @@ public class SQLImageMapperTest
         when(results.getInt(SQLColumns.Images.HEIGHT)).thenReturn(image.getHeight());
         when(results.getInt(SQLColumns.Images.WIDTH)).thenReturn(image.getWidth());
         when(results.getInt(SQLColumns.Images.SIZE_IN_BYTES)).thenReturn(image.getSizeInBytes());
-
-        if (image.hasImageData())
-        {
-            when(results.getBytes(SQLColumns.Images.IMAGE_BINARY)).thenReturn(image.getImageData());
-        }
-        else
-        {
-            when(results.getBytes(SQLColumns.Images.IMAGE_BINARY)).thenThrow(SQLException.class);
-        }
     }
 
 }

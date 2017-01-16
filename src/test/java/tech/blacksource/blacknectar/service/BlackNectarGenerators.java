@@ -29,7 +29,6 @@ import tech.sirwellington.alchemy.generator.AlchemyGenerator;
 import tech.sirwellington.alchemy.generator.StringGenerators;
 
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
-import static tech.sirwellington.alchemy.generator.BinaryGenerators.binary;
 import static tech.sirwellington.alchemy.generator.NetworkGenerators.httpUrls;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.doubles;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
@@ -100,7 +99,6 @@ public class BlackNectarGenerators
             return Image.Builder.newInstance()
                 .withStoreID(UUID.randomUUID())
                 .withImageID(one(hexadecimalString(20)))
-                .withImageData(one(binary(100)))
                 .withSizeInBytes(one(integers(100, 1_000)))
                 .withSource(one(alphabeticString()))
                 .withURL(one(httpUrls()))

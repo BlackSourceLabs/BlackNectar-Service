@@ -132,16 +132,6 @@ public interface SQLImageMapper extends RowMapper<Image>
                 }
             }
 
-            if (sqlTools.hasColumn(results, SQLColumns.Images.IMAGE_BINARY))
-            {
-                byte[] binary = results.getBytes(SQLColumns.Images.IMAGE_BINARY);
-
-                if (binary != null)
-                {
-                    builder = builder.withImageData(binary);
-                }
-            }
-
             return builder.build();
         }
 

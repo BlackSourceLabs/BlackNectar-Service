@@ -162,7 +162,7 @@ public class SearchStoresOperationTest
             Image image = images().get();
             images.put(store, image);
 
-            when(imageRepository.getImagesForStoreWithoutData(store))
+            when(imageRepository.getImagesForStore(store))
                 .thenReturn(Lists.createFrom(image));
         });
 
@@ -230,7 +230,7 @@ public class SearchStoresOperationTest
     @Test
     public void testWhenImageRepositoryFails() throws Exception
     {
-        when(imageRepository.getImagesForStoreWithoutData(any(Store.class)))
+        when(imageRepository.getImagesForStore(any(Store.class)))
             .thenThrow(new OperationFailedException());
         
         assertThrows(() -> instance.handle(request, response))

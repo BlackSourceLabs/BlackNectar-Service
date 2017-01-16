@@ -121,7 +121,6 @@ public class SQLImageRepositoryTest
         verify(database).update(sql,
                                 image.getStoreId(),
                                 image.getImageId(),
-                                image.getImageData(),
                                 image.getHeight(),
                                 image.getWidth(),
                                 image.getSizeInBytes(),
@@ -143,19 +142,6 @@ public class SQLImageRepositoryTest
     }
 
     @Test
-    public void testGetImageWithoutData()
-    {
-        String sql = SQLQueries.QUERY_IMAGE_WITHOUT_DATA;
-
-        Image expected = Image.Builder.fromImage(image).withoutImageData().build();
-        when(database.queryForObject(sql, imageMapper, storeId, imageId))
-            .thenReturn(expected);
-
-        Image result = instance.getImageWithoutData(storeId, imageId);
-        assertThat(result, is(expected));
-    }
-
-    @Test
     public void testGetImagesForStore()
     {
         String query = SQLQueries.QUERY_IMAGES_FOR_STORE;
@@ -165,19 +151,6 @@ public class SQLImageRepositoryTest
 
         List<Image> results = instance.getImagesForStore(storeId);
         assertThat(results, is(images));
-    }
-
-    @Test
-    public void testGetImagesForStoreWithouData()
-    {
-        String sql = SQLQueries.QUERY_IMAGES_FOR_STORE_WITHOUT_DATA;
-
-        List<Image> expected = images.stream()
-            .map(img -> Image.Builder.fromImage(img).withoutImageData().build())
-            .collect(toList());
-
-        when(database.query(sql, imageMapper, storeId))
-            .thenReturn(expected);
     }
 
     @Test

@@ -99,23 +99,6 @@ final class SQLImageRepository implements ImageRepository
     }
 
     @Override
-    public Image getImageWithoutData(UUID storeId, String imageId) throws DoesNotExistException, BlackNectarAPIException
-    {
-        checkNotNull(imageId);
-        checkNotEmpty(imageId);
-
-        try
-        {
-            return _getImageWithoutData(storeId, imageId);
-        }
-        catch (Exception ex)
-        {
-            makeNoteThatFailedToGetImage(storeId, imageId, ex);
-            throw new OperationFailedException(ex);
-        }
-    }
-
-    @Override
     public List<Image> getImagesForStore(UUID storeId) throws BlackNectarAPIException
     {
         checkNotNull(storeId);
@@ -131,21 +114,6 @@ final class SQLImageRepository implements ImageRepository
         }
     }
 
-    @Override
-    public List<Image> getImagesForStoreWithoutData(UUID storeId) throws BlackNectarAPIException
-    {
-        checkNotNull(storeId);
-
-        try
-        {
-            return _getImagesForStoreWithoutData(storeId);
-        }
-        catch (Exception ex)
-        {
-            makeNoteThatFailedToGetImagesForStore(storeId, ex);
-            throw new OperationFailedException(ex);
-        }
-    }
 
     @Override
     public boolean hasImages(UUID storeId) throws BlackNectarAPIException
@@ -199,7 +167,6 @@ final class SQLImageRepository implements ImageRepository
         database.update(insertStatement,
                         image.getStoreId(),
                         image.getImageId(),
-                        image.getImageData(),
                         image.getHeight(),
                         image.getWidth(),
                         image.getSizeInBytes(),
@@ -219,16 +186,6 @@ final class SQLImageRepository implements ImageRepository
         return result;
     }
 
-    private Image _getImageWithoutData(UUID storeId, String imageId)
-    {
-        String query = SQLQueries.QUERY_IMAGE_WITHOUT_DATA;
-
-        Image result = database.queryForObject(query, imageMapper, storeId, imageId);
-        checkHaveResult(result);
-
-        return result;
-    }
-
     private List<Image> _getImagesForStore(UUID storeId)
     {
         String query = SQLQueries.QUERY_IMAGES_FOR_STORE;
@@ -236,15 +193,6 @@ final class SQLImageRepository implements ImageRepository
         List<Image> results = database.query(query, imageMapper, storeId);
 
         return Lists.nullToEmpty(results);
-    }
-
-    private List<Image> _getImagesForStoreWithoutData(UUID storeId)
-    {
-        String query = SQLQueries.QUERY_IMAGES_FOR_STORE_WITHOUT_DATA;
-
-        List<Image> images = database.query(query, imageMapper, storeId);
-
-        return Lists.nullToEmpty(images);
     }
 
     private boolean _hasImage(UUID storeId)

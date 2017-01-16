@@ -18,24 +18,31 @@
 package tech.blacksource.blacknectar.service.images;
 
 import java.net.URL;
+import java.util.List;
 import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
+import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
+
+import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.INTERFACE;
 
 
 /**
- *
+ * Image Loaders scour the Internet to find images relevant to a particular store. 
+ * Each implementation has its own source and characteristics.
+ * 
  * @author SirWellington
  */
+@StrategyPattern(role = INTERFACE)
 public interface ImageLoader 
 {
     /**
-     * Tries to find an image pertaining to the store online.
+     * Tries to find images pertaining to the store.
      * 
      * @param store The store to search for.
      * @return A URL pointing to a relevant image, null is one cannot be found.
      * 
      * @throws BlackNectarAPIException 
      */
-    URL getImageFor(@Required Store store) throws BlackNectarAPIException;
+    List<URL> getImagesFor(@Required Store store) throws BlackNectarAPIException;
 }

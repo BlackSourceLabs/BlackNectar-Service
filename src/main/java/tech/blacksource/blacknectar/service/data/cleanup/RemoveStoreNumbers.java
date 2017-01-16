@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
- 
-package tech.blacksource.blacknectar.service.data.cleanup
-    ;
-
+package tech.blacksource.blacknectar.service.data.cleanup;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -44,8 +41,9 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
  */
 public class RemoveStoreNumbers implements Callable<Void>
 {
+
     private final static Logger LOG = LoggerFactory.getLogger(RemoveStoreNumbers.class);
-    
+
     private final Aroma aroma;
     private final StoreRepository storeRepository;
     private final ExtractStoreCodeTransformation transformation;
@@ -55,7 +53,7 @@ public class RemoveStoreNumbers implements Callable<Void>
     {
         checkThat(aroma, storeRepository, transformation)
             .are(notNull());
-        
+
         this.aroma = aroma;
         this.storeRepository = storeRepository;
         this.transformation = transformation;
@@ -64,9 +62,9 @@ public class RemoveStoreNumbers implements Callable<Void>
     public static void main(String[] args) throws Exception
     {
         Injector injector = Guice.createInjector(new ModuleServer(), new ModuleProductionDatabase());
-        
+
         RemoveStoreNumbers instance = injector.getInstance(RemoveStoreNumbers.class);
-        
+
         instance.call();
     }
 
@@ -74,7 +72,7 @@ public class RemoveStoreNumbers implements Callable<Void>
     public Void call() throws Exception
     {
         long start = System.currentTimeMillis();
-        
+
         try
         {
             execute();
@@ -85,41 +83,36 @@ public class RemoveStoreNumbers implements Callable<Void>
             throw ex;
         }
         long end = System.currentTimeMillis();
-        
+
         LOG.info("Script completed in {}ms", end - start);
         aroma.begin().titled("Stores Updated")
             .text("Successfully cleaned store numbers in {}ms", end - start)
             .withUrgency(Urgency.MEDIUM)
             .send();
-        
+
         return null;
 
     }
 
-    private  void execute() throws Exception
+    private void execute() throws Exception
     {
         List<Store> stores = storeRepository.getAllStores();
 
         stores.parallelStream()
             .filter(this::needUpdate)
-            .forEach(store -> 
+            .forEach(store ->
             {
-                 Store updatedStore = transformation.apply(store);
-                 makeNoteThatUpdatingStore(store, updatedStore);
-                 tryToUpdateStore(updatedStore);
+                Store updatedStore = transformation.apply(store);
+                makeNoteThatUpdatingStore(store, updatedStore);
+                tryToUpdateStore(updatedStore);
             });
-        
+
     }
 
-    private void makeNoteThatProcessFailed(Exception ex)
+    private boolean needUpdate(Store store)
     {
-        String message = "Failed to run scrip to remove and strip store data";
-        LOG.error(message, ex);
-        
-        aroma.begin().titled("Data Cleanup Failed")
-            .text(message, ex)
-            .withUrgency(Urgency.HIGH)
-            .send();
+        Store transformed = transformation.apply(store);
+        return areDifferent(transformed, store);
     }
 
     private boolean areDifferent(Store oldStore, Store updatedStore)
@@ -127,11 +120,22 @@ public class RemoveStoreNumbers implements Callable<Void>
         return !Objects.equals(oldStore, updatedStore);
     }
 
+    private void makeNoteThatProcessFailed(Exception ex)
+    {
+        String message = "Failed to run scrip to remove and strip store data";
+        LOG.error(message, ex);
+
+        aroma.begin().titled("Data Cleanup Failed")
+            .text(message, ex)
+            .withUrgency(Urgency.HIGH)
+            .send();
+    }
+
     private void makeNoteThatUpdatingStore(Store store, Store updatedStore)
     {
         String message = "Updating Store [{}] with [{]]";
         LOG.debug(message, store, updatedStore);
-        
+
         aroma.begin().titled("Updating Store")
             .text("Old Store:\n{}\n\nNew Store:\n{}", store, updatedStore)
             .withUrgency(Urgency.LOW)
@@ -144,7 +148,7 @@ public class RemoveStoreNumbers implements Callable<Void>
         {
             storeRepository.updateStore(updatedStore);
         }
-        catch(BlackNectarAPIException ex)
+        catch (BlackNectarAPIException ex)
         {
             makeNoteThatUpdateFailed(updatedStore, ex);
         }
@@ -154,17 +158,12 @@ public class RemoveStoreNumbers implements Callable<Void>
     {
         String message = "Failed to update store: [{}]";
         LOG.error(message, updatedStore, ex);
-        
+
         aroma.begin().titled("Store Update Failed")
             .text("Failed to update store:\n{}\n\n{}", updatedStore, ex)
             .withUrgency(Urgency.HIGH)
             .send();
-            
+
     }
 
-    private boolean needUpdate(Store store)
-    {
-        Store transformed = transformation.apply(store);
-        return areDifferent(transformed, store);
-    }
 }

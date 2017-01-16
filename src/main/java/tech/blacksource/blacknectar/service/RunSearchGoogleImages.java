@@ -68,7 +68,7 @@ public final class RunSearchGoogleImages implements Callable<Void>
 
     public static void main(String[] args) throws Exception
     {
-        Injector injector = Guice.createInjector(new ModuleServer());
+        Injector injector = Guice.createInjector(new ModuleServer(), new ModuleProductionDatabase());
 
         RunSearchGoogleImages instance = injector.getInstance(RunSearchGoogleImages.class);
         instance.call();

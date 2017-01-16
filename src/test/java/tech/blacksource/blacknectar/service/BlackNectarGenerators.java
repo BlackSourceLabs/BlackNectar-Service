@@ -37,6 +37,7 @@ import static tech.sirwellington.alchemy.generator.NumberGenerators.positiveInte
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphanumericString;
 import static tech.sirwellington.alchemy.generator.StringGenerators.hexadecimalString;
+import static tech.sirwellington.alchemy.generator.StringGenerators.numericString;
 import static tech.sirwellington.alchemy.generator.StringGenerators.uuids;
 
 /**
@@ -86,6 +87,7 @@ public class BlackNectarGenerators
                 .withAddress(addresses().get())
                 .withLocation(locations().get())
                 .withName(one(alphabeticString()))
+                .withStoreCode(one(numericString(4)))
                 .withMainImageURL(one(httpUrls()).toString())
                 .build(); 
         };

@@ -114,10 +114,10 @@ public class RemoveStoreNumbers implements Callable<Void>
         try
         {
             Store transformed = transformation.apply(store);
-            
+
             return areDifferent(transformed, store);
         }
-        catch(RuntimeException ex)
+        catch (RuntimeException ex)
         {
             makeNoteThatFailedToTransform(store, ex);
             return false;
@@ -143,7 +143,7 @@ public class RemoveStoreNumbers implements Callable<Void>
     private void makeNoteThatUpdatingStore(Store store, Store updatedStore)
     {
         String message = "Updating Store [{}] with [{]]";
-        LOG.info(message, store, updatedStore);
+        LOG.debug(message, store, updatedStore);
 
         aroma.begin().titled("Updating Store")
             .text("Old Store:\n{}\n\nNew Store:\n{}", store, updatedStore)

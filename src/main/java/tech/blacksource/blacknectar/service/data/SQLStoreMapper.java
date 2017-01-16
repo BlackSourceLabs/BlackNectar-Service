@@ -139,6 +139,16 @@ interface SQLStoreMapper extends RowMapper<Store>
                 }
             }
             
+            if (sqlTools.hasColumn(results, SQLColumns.STORE_CODE))
+            {
+                String storeCode = results.getString(SQLColumns.STORE_CODE);
+                
+                if (!isNullOrEmpty(storeCode))
+                {
+                    storeBuilder = storeBuilder.withStoreCode(storeCode);
+                }
+            }
+            
             return storeBuilder.build();
         }
         

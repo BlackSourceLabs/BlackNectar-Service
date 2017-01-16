@@ -77,7 +77,11 @@ public class SQLStoreMapperTest
     private void setupMocks() throws Exception
     {
         setupResultsWithStore(results, store);
+        
         when(sqlTools.hasColumn(results, SQLColumns.Images.URL))
+            .thenReturn(true);
+        
+        when(sqlTools.hasColumn(results, SQLColumns.STORE_CODE))
             .thenReturn(true);
     }
     
@@ -122,11 +126,24 @@ public class SQLStoreMapperTest
     {
         assertThrows(() -> instance.mapRow(null, 1)).isInstanceOf(IllegalArgumentException.class);
     }
+    
+    @DontRepeat
+    @Test
+    public void testWhenHasNoStoreCodeColumn() throws Exception
+    {
+        when(sqlTools.hasColumn(results, SQLColumns.STORE_CODE)).thenReturn(false);
+        
+        Store result = instance.mapRow(results, 1);
+        Store expected = Store.Builder.fromStore(store).withoutStoreCode().build();
+        
+        assertThat(result, is(expected));
+    }
 
     private void setupResultsWithStore(ResultSet results, Store store) throws SQLException
     {
         when(results.getObject(SQLColumns.STORE_ID, UUID.class)).thenReturn(UUID.fromString(store.getStoreId()));
         when(results.getString(SQLColumns.STORE_NAME)).thenReturn(store.getName());
+        when(results.getString(SQLColumns.STORE_CODE)).thenReturn(store.getStoreCode());
         when(results.getString(SQLColumns.ADDRESS_LINE_ONE)).thenReturn(store.getAddress().getAddressLineOne());
         when(results.getString(SQLColumns.ADDRESS_LINE_TWO)).thenReturn(store.getAddress().getAddressLineTwo());
         when(results.getString(SQLColumns.CITY)).thenReturn(store.getAddress().getCity());
@@ -137,20 +154,6 @@ public class SQLStoreMapperTest
         when(results.getDouble(SQLColumns.LATITUDE)).thenReturn(store.getLocation().getLatitude());
         when(results.getDouble(SQLColumns.LONGITUDE)).thenReturn(store.getLocation().getLongitude());
         when(results.getString(SQLColumns.Images.URL)).thenReturn(store.getMainImageURL());
-    }
-
-    @Test
-    public void testMapRow() throws Exception
-    {
-    }
-
-    public class SQLStoreMapperImpl implements SQLStoreMapper
-    {
-
-        public Store mapRow(ResultSet results, int rowNum) throws SQLException
-        {
-            return null;
-        }
     }
 
 }

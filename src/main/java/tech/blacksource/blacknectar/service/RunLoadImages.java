@@ -172,14 +172,14 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
             .is(notNull())
             .is(nonEmptyList());
 
-        images.stream().forEach(img -> this.tryToStoreImage(store, args, img));
+        images.stream().forEach(url -> this.tryToStoreImage(store, args, url));
     }
 
-    private void tryToStoreImage(Store store, Arguments args, URL url)
+    private void tryToStoreImage(Store store, Arguments args, URL imageUrl)
     {
         try
         {
-            storeImage(store, args, url);
+            storeImage(store, args, imageUrl);
         }
         catch (IOException ex)
         {
@@ -187,22 +187,22 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         }
     }
 
-    private void storeImage(Store store, Arguments args, URL url) throws IOException
+    private void storeImage(Store store, Arguments args, URL imageUrl) throws IOException
     {
-        byte[] imageData = http.go().download(url);
+        byte[] imageData = http.go().download(imageUrl);
 
         BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageData));
         int height = image.getHeight();
         int width = image.getWidth();
         int size = imageData.length;
 
-        String contentType = getContentTypeFor(url);
+        String contentType = getContentTypeFor(imageUrl);
         String imageType = getImageTypeFrom(contentType);
         String source = args.source;
 
-        saveImageInfoFor(store, url, width, height, size, contentType, imageType, source);
+        saveImageInfoFor(store, imageUrl, width, height, size, contentType, imageType, source);
 
-        makeNoteThatImageSavedForStore(url, store, args);
+        makeNoteThatImageSavedForStore(imageUrl, store, args);
     }
 
     private String getContentTypeFor(URL imageUrl) throws IOException

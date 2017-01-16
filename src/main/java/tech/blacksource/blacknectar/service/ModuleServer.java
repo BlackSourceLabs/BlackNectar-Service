@@ -43,7 +43,7 @@ import tech.sirwellington.alchemy.http.AlchemyHttp;
  * @author SirWellington
  */
 @Internal
-final class ModuleServer extends AbstractModule
+public final class ModuleServer extends AbstractModule
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(ModuleServer.class);

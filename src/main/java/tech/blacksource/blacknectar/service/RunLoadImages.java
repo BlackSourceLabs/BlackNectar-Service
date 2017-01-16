@@ -169,7 +169,8 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
 
         checkThat(images)
             .usingMessage("No Images found for Store: " + store)
-            .is(notNull());
+            .is(notNull())
+            .is(nonEmptyList());
 
         images.stream().forEach(img -> this.tryToStoreImage(store, args, img));
     }

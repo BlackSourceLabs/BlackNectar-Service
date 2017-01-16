@@ -31,8 +31,9 @@ import tech.blacksource.blacknectar.service.stores.Store;
  */
 public final class ExtractStoreCodeTransformation implements StoreTransformation 
 {
+    //^"[\w'\-\./ ]+ [\w\-\#]{0,2}[\d]+[A-Za-z]?"
     private final static Logger LOG = LoggerFactory.getLogger(ExtractStoreCodeTransformation.class);
-    private static final String STORE_CODE_PATTERN = "[A-Za-z]?\\d+[A-Za-z]?";
+    private static final String STORE_CODE_PATTERN = "[\\w\\-\\#]{0,2}[\\d]+[A-Za-z]?";
 
     @Override
     public Store apply(Store store)

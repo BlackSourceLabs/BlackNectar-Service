@@ -18,7 +18,6 @@ package tech.blacksource.blacknectar.service.images;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
@@ -33,7 +32,6 @@ import static tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPat
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.NetworkAssertions.validURL;
-import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThan;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.positiveInteger;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.validUUID;
@@ -51,7 +49,6 @@ public final class Image
 
     private final UUID storeId;
     private final String imageId;
-    private final byte[] imageData;
     private final int height;
     private final int width;
     private final int sizeInBytes;
@@ -62,7 +59,6 @@ public final class Image
 
     Image(UUID storeId,
           String imageId,
-          byte[] imageData,
           int height,
           int width,
           int sizeInBytes,
@@ -77,7 +73,6 @@ public final class Image
         
         this.storeId = storeId;
         this.imageId = imageId;
-        this.imageData = imageData;
         this.height = height;
         this.width = width;
         this.sizeInBytes = sizeInBytes;
@@ -85,11 +80,6 @@ public final class Image
         this.imageType = imageType;
         this.source = source;
         this.url = url;
-    }
-
-    public boolean hasImageData()
-    {
-        return imageData != null && imageData.length > 0;
     }
 
     public boolean hasContentType()
@@ -120,11 +110,6 @@ public final class Image
     public String getImageId()
     {
         return imageId;
-    }
-
-    public byte[] getImageData()
-    {
-        return imageData;
     }
 
     public int getHeight()
@@ -168,7 +153,6 @@ public final class Image
         int hash = 7;
         hash = 29 * hash + Objects.hashCode(this.storeId);
         hash = 29 * hash + Objects.hashCode(this.imageId);
-        hash = 29 * hash + Arrays.hashCode(this.imageData);
         hash = 29 * hash + this.height;
         hash = 29 * hash + this.width;
         hash = 29 * hash + this.sizeInBytes;
@@ -227,10 +211,6 @@ public final class Image
         {
             return false;
         }
-        if (!Arrays.equals(this.imageData, other.imageData))
-        {
-            return false;
-        }
         if (!Objects.equals(this.url, other.url))
         {
             return false;
@@ -241,7 +221,7 @@ public final class Image
     @Override
     public String toString()
     {
-        return "Image{" + "storeId=" + storeId + ", imageId=" + imageId + ", imageData=" + imageData + ", height=" + height + ", width=" + width + ", sizeInBytes=" + sizeInBytes + ", contentType=" + contentType + ", imageType=" + imageType + ", source=" + source + ", url=" + url + '}';
+        return "Image{" + "storeId=" + storeId + ", imageId=" + imageId + ", height=" + height + ", width=" + width + ", sizeInBytes=" + sizeInBytes + ", contentType=" + contentType + ", imageType=" + imageType + ", source=" + source + ", url=" + url + '}';
     }
 
     @BuilderPattern(role = BUILDER)
@@ -250,7 +230,6 @@ public final class Image
 
         private UUID storeId;
         private String imageId;
-        private byte[] imageData;
         private int height;
         private int width;
         private int sizeInBytes;
@@ -276,7 +255,6 @@ public final class Image
             
             builder.storeId = image.storeId;
             builder.imageId = image.imageId;
-            builder.imageData = image.imageData;
             builder.height = image.height;
             builder.width = image.width;
             builder.sizeInBytes = image.sizeInBytes;
@@ -316,18 +294,6 @@ public final class Image
             return this;
         }
 
-        public Builder withImageData(@Required byte[] binary) throws IllegalArgumentException
-        {
-            checkThat(binary)
-                .is(notNull());
-
-            checkThat(binary.length)
-                .usingMessage("Image Data cannot be empty")
-                .is(greaterThan(0));
-
-            this.imageData = binary;
-            return this;
-        }
 
         public Builder withWidthAndHeight(int width, int height) throws IllegalArgumentException
         {
@@ -396,12 +362,6 @@ public final class Image
             return this;
         }
         
-        public Builder withoutImageData()
-        {
-            this.imageData = null;
-            return this;
-        }
-        
         public Image build() throws IllegalStateException
         {
             checkThat(storeId)
@@ -412,13 +372,13 @@ public final class Image
                 .usingMessage("imageId is required")
                 .is(nonEmptyString());
 
-            return new Image(storeId, imageId, imageData, height, width, sizeInBytes, contentType, imageType, source, url);
+            return new Image(storeId, imageId, height, width, sizeInBytes, contentType, imageType, source, url);
         }
 
         @Override
         public String toString()
         {
-            return "Builder{" + "storeId=" + storeId + ", imageId=" + imageId + ", imageData=" + imageData + ", height=" + height + ", width=" + width + ", sizeInBytes=" + sizeInBytes + ", contentType=" + contentType + ", imageType=" + imageType + ", source=" + source + ", url=" + url + '}';
+            return "Builder{" + "storeId=" + storeId + ", imageId=" + imageId + ", height=" + height + ", width=" + width + ", sizeInBytes=" + sizeInBytes + ", contentType=" + contentType + ", imageType=" + imageType + ", source=" + source + ", url=" + url + '}';
         }
 
     }

@@ -83,6 +83,9 @@ public class SQLStoreMapperTest
         
         when(sqlTools.hasColumn(results, SQLColumns.STORE_CODE))
             .thenReturn(true);
+        
+        when(sqlTools.hasColumn(results, SQLColumns.IS_FARMERS_MARKET))
+            .thenReturn(true);
     }
     
     @DontRepeat
@@ -138,6 +141,19 @@ public class SQLStoreMapperTest
         
         assertThat(result, is(expected));
     }
+    
+    @DontRepeat
+    @Test
+    public void testWhenHasNoFarmersMarketColumn() throws Exception
+    {
+        store = Store.Builder.fromStore(store).isFarmersMarket(true).build();
+        setupResultsWithStore(results, store);
+        
+        when(sqlTools.hasColumn(results, SQLColumns.IS_FARMERS_MARKET)).thenReturn(Boolean.FALSE);
+        
+        Store result = instance.mapRow(results, 0);
+        assertThat(result.isFarmersMarket(), is(false));
+    }
 
     private void setupResultsWithStore(ResultSet results, Store store) throws SQLException
     {
@@ -154,6 +170,7 @@ public class SQLStoreMapperTest
         when(results.getDouble(SQLColumns.LATITUDE)).thenReturn(store.getLocation().getLatitude());
         when(results.getDouble(SQLColumns.LONGITUDE)).thenReturn(store.getLocation().getLongitude());
         when(results.getString(SQLColumns.Images.URL)).thenReturn(store.getMainImageURL());
+        when(results.getBoolean(SQLColumns.IS_FARMERS_MARKET)).thenReturn(store.isFarmersMarket());
     }
 
 }

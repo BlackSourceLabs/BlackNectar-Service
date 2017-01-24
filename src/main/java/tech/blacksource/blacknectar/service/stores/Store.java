@@ -70,9 +70,13 @@ public class Store implements JSONRepresentable
     @SerializedName(Keys.MAIN_IMAGE)
     private final String mainImageURL;
 
+    @SerializedName(Keys.IS_FARMERS_MARKET)
+    private final boolean isFarmersMarket;
+
     private final JsonObject json;
 
-    public Store(String storeId, String name, String storeCode, Location location, Address address, String mainImageURL)
+    public Store(String storeId, String name, String storeCode, Location location, Address address, String mainImageURL,
+                 boolean isFarmersMarket)
     {
         checkThat(storeId).usingMessage("storeId must be a valid UUID").is(validUUID());
         checkThat(address).is(validAddress());
@@ -90,6 +94,8 @@ public class Store implements JSONRepresentable
         this.location = location;
         this.address = address;
         this.mainImageURL = mainImageURL;
+        this.isFarmersMarket = isFarmersMarket;
+
         this.json = createJSON();
     }
 
@@ -167,6 +173,11 @@ public class Store implements JSONRepresentable
         return mainImageURL;
     }
 
+    public boolean isFarmersMarket()
+    {
+        return isFarmersMarket;
+    }
+
     @Override
     public JsonObject asJSON()
     {
@@ -176,14 +187,13 @@ public class Store implements JSONRepresentable
     @Override
     public int hashCode()
     {
-        int hash = 3;
-        hash = 83 * hash + Objects.hashCode(this.storeId);
-        hash = 83 * hash + Objects.hashCode(this.name);
-        hash = 83 * hash + Objects.hashCode(this.storeCode);
-        hash = 83 * hash + Objects.hashCode(this.location);
-        hash = 83 * hash + Objects.hashCode(this.address);
-        hash = 83 * hash + Objects.hashCode(this.mainImageURL);
-        hash = 83 * hash + Objects.hashCode(this.json);
+        int hash = 7;
+        hash = 53 * hash + Objects.hashCode(this.storeId);
+        hash = 53 * hash + Objects.hashCode(this.name);
+        hash = 53 * hash + Objects.hashCode(this.storeCode);
+        hash = 53 * hash + Objects.hashCode(this.location);
+        hash = 53 * hash + Objects.hashCode(this.address);
+        hash = 53 * hash + Objects.hashCode(this.mainImageURL);
         return hash;
     }
 
@@ -203,6 +213,10 @@ public class Store implements JSONRepresentable
             return false;
         }
         final Store other = (Store) obj;
+        if (this.isFarmersMarket != other.isFarmersMarket)
+        {
+            return false;
+        }
         if (!Objects.equals(this.storeId, other.storeId))
         {
             return false;
@@ -227,17 +241,13 @@ public class Store implements JSONRepresentable
         {
             return false;
         }
-        if (!Objects.equals(this.json, other.json))
-        {
-            return false;
-        }
         return true;
     }
 
     @Override
     public String toString()
     {
-        return "Store{" + "storeId=" + storeId + ", name=" + name + ", storeCode=" + storeCode + ", location=" + location + ", address=" + address + ", mainImageURL=" + mainImageURL + ", json=" + json + '}';
+        return "Store{" + "storeId=" + storeId + ", name=" + name + ", storeCode=" + storeCode + ", location=" + location + ", address=" + address + ", mainImageURL=" + mainImageURL + ", isFarmersMarket=" + isFarmersMarket + '}';
     }
 
     private JsonObject createJSON()
@@ -248,12 +258,13 @@ public class Store implements JSONRepresentable
         jsonObject.addProperty(Keys.NAME, this.name);
         jsonObject.add(Keys.LOCATION, location.asJSON());
         jsonObject.add(Keys.ADDRESS, this.address.asJSON());
+        jsonObject.addProperty(Keys.IS_FARMERS_MARKET, isFarmersMarket);
 
         if (hasStoreCode())
         {
             jsonObject.addProperty(Keys.STORE_CODE, this.storeCode);
         }
-        
+
         if (hasMainImage())
         {
             jsonObject.addProperty(Keys.MAIN_IMAGE, this.mainImageURL);
@@ -274,6 +285,7 @@ public class Store implements JSONRepresentable
         static final String LOCATION = "location";
         static final String ADDRESS = "address";
         static final String MAIN_IMAGE = "main_image_url";
+        static final String IS_FARMERS_MARKET = "is_farmers_market";
     }
 
     public static final Store SAMPLE_STORE = createSampleStore();
@@ -293,7 +305,7 @@ public class Store implements JSONRepresentable
 
         String sampleImage = "https://s3-media3.fl.yelpcdn.com/bphoto/hzF7KhWb1B6cdGJ1y9E05A/o.jpg";
 
-        return new Store(storeId, name, null, location, address, sampleImage);
+        return new Store(storeId, name, null, location, address, sampleImage, false);
     }
 
     /**
@@ -313,13 +325,14 @@ public class Store implements JSONRepresentable
             checkThat(store).is(notNull());
 
             Builder builder = new Builder();
-            
+
             builder.storeId = store.storeId;
             builder.storeCode = store.storeCode;
             builder.name = store.name;
             builder.location = store.location;
             builder.address = store.address;
             builder.mainImageURL = store.mainImageURL;
+            builder.isFarmersMarket = store.isFarmersMarket;
 
             return builder;
         }
@@ -330,6 +343,7 @@ public class Store implements JSONRepresentable
         private Location location;
         private Address address;
         private String mainImageURL;
+        private boolean isFarmersMarket = false;
 
         Builder()
         {
@@ -368,30 +382,31 @@ public class Store implements JSONRepresentable
             this.name = name;
             return this;
         }
-        
+
         /**
-         * Sets the store code for the store. This is optional, and is used for Chain stores, where there is
-         * more than one store with the same name.
+         * Sets the store code for the store. This is optional, and is used for Chain stores, where there is more than one store
+         * with the same name.
          * <p>
-         * For example, with a store name of {@code Dollar Tree 736}, the Store's name is "Dollar Tree" and the
-         * Store Code is "736".
-         * 
+         * For example, with a store name of {@code Dollar Tree 736}, the Store's name is "Dollar Tree" and the Store Code is
+         * "736".
+         *
          * @param storeCode
          * @return
-         * @throws IllegalArgumentException 
+         * @throws IllegalArgumentException
          */
         public Builder withStoreCode(@NonEmpty String storeCode) throws IllegalArgumentException
         {
             checkThat(storeCode)
                 .is(nonEmptyString());
-            
+
             this.storeCode = storeCode;
             return this;
         }
-        
+
         /**
          * Unsets the Store Code.
-         * @return 
+         *
+         * @return
          */
         public Builder withoutStoreCode()
         {
@@ -439,6 +454,26 @@ public class Store implements JSONRepresentable
             this.mainImageURL = null;
             return this;
         }
+        
+        /**
+         * Set if the store is a Farmer's Market.
+         * @return 
+         */
+        public Builder isFarmersMarket()
+        {
+            this.isFarmersMarket = true;
+            return this;
+        }
+        
+        /**
+         * Set if the store is not a Farmer's Market.
+         * @return 
+         */
+        public Builder notFarmersMarket()
+        {
+            this.isFarmersMarket = false;
+            return this;
+        }
 
         public Store build() throws IllegalStateException
         {
@@ -459,7 +494,13 @@ public class Store implements JSONRepresentable
                 .usingMessage("Address is missing or invalid")
                 .is(validAddress());
 
-            return new Store(this.storeId, this.name, this.storeCode, this.location, this.address, this.mainImageURL);
+            return new Store(this.storeId,
+                             this.name,
+                             this.storeCode,
+                             this.location,
+                             this.address,
+                             this.mainImageURL,
+                             this.isFarmersMarket);
         }
     }
 

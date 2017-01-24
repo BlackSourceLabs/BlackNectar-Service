@@ -43,6 +43,7 @@ public final class SQLColumns
     static final String COUNTY = "county";
     static final String ZIP_CODE = "zip_code";
     static final String LOCAL_ZIP_CODE = "local_zip_code";
+    static final String IS_FARMERS_MARKET = "is_farmers_market";
     
     
     public static class Images 

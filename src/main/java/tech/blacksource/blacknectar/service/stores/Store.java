@@ -457,21 +457,12 @@ public class Store implements JSONRepresentable
         
         /**
          * Set if the store is a Farmer's Market.
+         * @param isFarmersMarket {@code true } if the store is a Farmer's Market, {@code false} otherwise.
          * @return 
          */
-        public Builder isFarmersMarket()
+        public Builder isFarmersMarket(boolean isFarmersMarket)
         {
-            this.isFarmersMarket = true;
-            return this;
-        }
-        
-        /**
-         * Set if the store is not a Farmer's Market.
-         * @return 
-         */
-        public Builder notFarmersMarket()
-        {
-            this.isFarmersMarket = false;
+            this.isFarmersMarket = isFarmersMarket;
             return this;
         }
 

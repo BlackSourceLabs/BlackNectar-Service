@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS Stores
     county TEXT,
     zip_code TEXT,
     local_zip_code TEXT,
+		is_farmers_market BOOLEAN DEFAULT false,
 
     CONSTRAINT Unique_Stores UNIQUE(store_name, latitude, longitude)
 );

@@ -149,6 +149,12 @@ interface SQLStoreMapper extends RowMapper<Store>
                 }
             }
             
+            if (sqlTools.hasColumn(results, SQLColumns.IS_FARMERS_MARKET))
+            {
+                boolean isFarmersMarket = results.getBoolean(SQLColumns.IS_FARMERS_MARKET);
+                storeBuilder.isFarmersMarket(isFarmersMarket);
+            }
+            
             return storeBuilder.build();
         }
         

@@ -29,6 +29,7 @@ import tech.sirwellington.alchemy.generator.AlchemyGenerator;
 import tech.sirwellington.alchemy.generator.StringGenerators;
 
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.BooleanGenerators.booleans;
 import static tech.sirwellington.alchemy.generator.NetworkGenerators.httpUrls;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.doubles;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
@@ -88,6 +89,7 @@ public class BlackNectarGenerators
                 .withName(one(alphabeticString()))
                 .withStoreCode(one(numericString(4)))
                 .withMainImageURL(one(httpUrls()).toString())
+                .isFarmersMarket(one(booleans()))
                 .build(); 
         };
     }

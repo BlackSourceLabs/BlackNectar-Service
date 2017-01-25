@@ -132,7 +132,7 @@ public class SQLStoreMapperTest
     
     @DontRepeat
     @Test
-    public void testWhenHasNoStoreCodeColumn() throws Exception
+    public void testWhenHasStoreCodeColumnDoesNotExist() throws Exception
     {
         when(sqlTools.hasColumn(results, SQLColumns.STORE_CODE)).thenReturn(false);
         
@@ -144,7 +144,7 @@ public class SQLStoreMapperTest
     
     @DontRepeat
     @Test
-    public void testWhenHasNoFarmersMarketColumn() throws Exception
+    public void testWhenFarmersMarketColumnDoesNotExist() throws Exception
     {
         store = Store.Builder.fromStore(store).isFarmersMarket(true).build();
         setupResultsWithStore(results, store);

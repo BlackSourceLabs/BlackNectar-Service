@@ -81,6 +81,7 @@ public class StoreTest
         assertThat(json.get(Store.Keys.NAME).getAsString(), is(instance.getName()));
         assertThat(json.get(Store.Keys.STORE_CODE).getAsString(), is(instance.getStoreCode()));
         assertThat(json.get(Store.Keys.STORE_ID).getAsString(), is(instance.getStoreId()));
+        assertThat(json.get(Store.Keys.IS_FARMERS_MARKET).getAsBoolean(), is(instance.isFarmersMarket()));
         
         if (instance.hasMainImage())
         {
@@ -103,6 +104,7 @@ public class StoreTest
         assertThat(newStore.getStoreCode(), is(instance.getStoreCode()));
         assertThat(newStore.getLocation(), is(instance.getLocation()));
         assertThat(newStore.getAddress(), is(instance.getAddress()));
+        assertThat(newStore.isFarmersMarket(), is(instance.isFarmersMarket()));
     }
     
     @DontRepeat

@@ -61,6 +61,9 @@ public class Store implements JSONRepresentable
     @SerializedName(Keys.STORE_CODE)
     private final String storeCode;
 
+    @SerializedName(Keys.IS_FARMERS_MARKET)
+    private final boolean isFarmersMarket;
+
     @SerializedName(Keys.LOCATION)
     private final Location location;
 
@@ -69,9 +72,6 @@ public class Store implements JSONRepresentable
 
     @SerializedName(Keys.MAIN_IMAGE)
     private final String mainImageURL;
-
-    @SerializedName(Keys.IS_FARMERS_MARKET)
-    private final boolean isFarmersMarket;
 
     private final JsonObject json;
 

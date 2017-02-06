@@ -146,8 +146,8 @@ public final class Server
     
     void setupSecurity(Service service)
     {
-        String keystore = "../Certificates/BlackSource.jks";
-        String keystorePasswordFile = "../Certificates/keystore-password.txt";
+        String keystore = "./secrets/BlackSource.jks";
+        String keystorePasswordFile = "./secrets/keystore-password.txt";
         String keystorePassword = Files.readFile(keystorePasswordFile);
 
         if (!isNullOrEmpty(keystorePassword))

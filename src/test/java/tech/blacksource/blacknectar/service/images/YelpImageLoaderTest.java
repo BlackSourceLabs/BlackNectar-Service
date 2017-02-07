@@ -16,33 +16,26 @@
 
 package tech.blacksource.blacknectar.service.images;
 
-import com.google.common.base.Objects;
 import java.net.URL;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
-import tech.blacksource.blacknectar.service.algorithms.StoreMatchingAlgorithm;
-import tech.blacksource.blacknectar.service.stores.Location;
+import tech.blacksource.blacknectar.service.algorithms.StoreSearchAlgorithm;
 import tech.blacksource.blacknectar.service.stores.Store;
-import tech.redroma.yelp.Address;
-import tech.redroma.yelp.Coordinate;
 import tech.redroma.yelp.YelpAPI;
 import tech.redroma.yelp.YelpBusiness;
-import tech.redroma.yelp.YelpSearchRequest;
 import tech.sirwellington.alchemy.generator.NetworkGenerators;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
-import tech.sirwellington.alchemy.test.junit.runners.GenerateList;
+import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_MOCKS;
@@ -55,14 +48,12 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
  *
  * @author SirWellington
  */
-@Repeat(10)
+@Repeat(25)
 @RunWith(AlchemyTestRunner.class)
 public class YelpImageLoaderTest
 {
 
-    @GenerateList(YelpBusiness.class)
-    private List<YelpBusiness> yelpBusinesses;
-
+    @GeneratePojo
     private YelpBusiness matchingBusiness;
 
     private Store store;
@@ -71,7 +62,7 @@ public class YelpImageLoaderTest
     private Aroma aroma;
 
     @Mock
-    private StoreMatchingAlgorithm<YelpBusiness> matchingAlgorithm;
+    private StoreSearchAlgorithm<YelpBusiness> searchAlgorithm;
 
     @Mock
     private YelpAPI yelpAPI;
@@ -85,7 +76,7 @@ public class YelpImageLoaderTest
         setupData();
         setupMocks();
 
-        instance = new YelpImageLoader(aroma, matchingAlgorithm, yelpAPI);
+        instance = new YelpImageLoader(aroma, searchAlgorithm, yelpAPI);
     }
 
     private void setupData() throws Exception
@@ -97,37 +88,25 @@ public class YelpImageLoaderTest
 
     private void setupYelpData()
     {
-
-        for (YelpBusiness business : yelpBusinesses)
-        {
-            //Make sure the business has a valid URL
-            business.imageURL = NetworkGenerators.httpUrls().get().toString();
-        }
-
-        matchingBusiness = Lists.oneOf(yelpBusinesses);
+        matchingBusiness.imageURL = NetworkGenerators.httpUrls().get().toString();
     }
 
     private void setupMocks() throws Exception
     {
-
-        YelpSearchRequest expectedRequest = createExpectedYelpRequestFor(store);
-
-        when(yelpAPI.searchForBusinesses(expectedRequest)).thenReturn(yelpBusinesses);
-
-        when(matchingAlgorithm.matchesStore(matchingBusiness, store)).thenReturn(true);
+        when(searchAlgorithm.findMatchFor(store)).thenReturn(matchingBusiness);
     }
 
     @DontRepeat
     @Test
     public void testConstructor() throws Exception
     {
-        assertThrows(() -> new YelpImageLoader(null, matchingAlgorithm, yelpAPI))
+        assertThrows(() -> new YelpImageLoader(null, searchAlgorithm, yelpAPI))
             .isInstanceOf(IllegalArgumentException.class);
 
         assertThrows(() -> new YelpImageLoader(aroma, null, yelpAPI))
             .isInstanceOf(IllegalArgumentException.class);
 
-        assertThrows(() -> new YelpImageLoader(aroma, matchingAlgorithm, null))
+        assertThrows(() -> new YelpImageLoader(aroma, searchAlgorithm, null))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -146,67 +125,18 @@ public class YelpImageLoaderTest
     @Test
     public void testGetImageForWhenNoMatchesFound() throws Exception
     {
-        when(matchingAlgorithm.matchesStore(matchingBusiness, store))
-            .thenReturn(false);
+        when(searchAlgorithm.findMatchFor(store)).thenReturn(null);
 
         List<URL> result = instance.getImagesFor(store);
         assertThat(result, notNullValue());
         assertThat(result, is(empty()));
     }
 
+    @DontRepeat
     @Test
-    public void testGetImageWhenMultipleBusinessesMatch() throws Exception
+    public void testGetImageWithBadArgs() throws Exception
     {
-        YelpBusiness secondBusinesses = Lists.oneOf(yelpBusinesses);
-
-        when(matchingAlgorithm.matchesStore(secondBusinesses, store))
-            .thenReturn(true);
-        
-        List<URL> result = instance.getImagesFor(store);
-        
-        assertThat(result, notNullValue());
-        assertThat(result, not(empty()));
-        
-        boolean anyMatch = result.stream()
-            .map(URL::toString)
-            .anyMatch(url -> Objects.equal(url, matchingBusiness.imageURL) || 
-                             Objects.equal(url, secondBusinesses.imageURL));
-        
-        assertThat(anyMatch, is(true));
-    }
-
-    private YelpSearchRequest createExpectedYelpRequestFor(Store store)
-    {
-        Address yelpAddress = copyAddressFrom(store.getAddress());
-        Coordinate coordinate = copyCoordinateFrom(store.getLocation());
-
-        return YelpSearchRequest.newBuilder()
-            .withCoordinate(coordinate)
-            .withLimit(YelpImageLoader.DEFAULT_YELP_LIMIT)
-            .withSearchTerm(store.getName())
-            .withSortBy(YelpSearchRequest.SortType.DISTANCE)
-            .build();
-    }
-
-    private Address copyAddressFrom(tech.blacksource.blacknectar.service.stores.Address address)
-    {
-        Address yelpAddress = new Address();
-
-        yelpAddress.address1 = address.getAddressLineOne();
-        yelpAddress.address2 = address.getAddressLineTwo();
-        yelpAddress.city = address.getCity();
-        yelpAddress.state = address.getState();
-        yelpAddress.zipCode = String.valueOf(address.getZipCode());
-
-        return yelpAddress;
-    }
-
-    private Coordinate copyCoordinateFrom(Location location)
-    {
-        double lat = location.getLatitude();
-        double lon = location.getLongitude();
-
-        return Coordinate.of(lat, lon);
+        assertThrows(() -> instance.getImagesFor(null)).isInstanceOf(IllegalArgumentException.class);
     }
 
 }

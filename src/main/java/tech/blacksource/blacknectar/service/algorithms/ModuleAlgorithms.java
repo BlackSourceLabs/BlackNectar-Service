@@ -38,6 +38,7 @@ public final class ModuleAlgorithms extends AbstractModule
     protected void configure()
     {
         bind(new TypeLiteral<StoreSearchAlgorithm<Place>>() {}).to(GooglePlacesStoreSearchAlgorithm.class);
+        bind(new TypeLiteral<StoreSearchAlgorithm<YelpBusiness>>() {}).to(YelpStoreSearchAlgorithm.class);
     }
 
     @Provides

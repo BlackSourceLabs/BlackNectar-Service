@@ -59,6 +59,7 @@ public class SQLQueriesTest
         assertThat(SQLQueries.DELETE_STORE, not(isEmptyOrNullString()));
         
         assertThat(SQLQueries.INSERT_GOOGLE_DATA, not(isEmptyOrNullString()));
+        assertThat(SQLQueries.INSERT_GOOGLE_PHOTO, not(isEmptyOrNullString()));
         assertThat(SQLQueries.INSERT_STORE, not(isEmptyOrNullString()));
         assertThat(SQLQueries.INSERT_STORE_IMAGE, not(isEmptyOrNullString()));
         assertThat(SQLQueries.INSERT_IMAGE, not(isEmptyOrNullString()));

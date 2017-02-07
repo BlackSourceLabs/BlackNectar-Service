@@ -4,7 +4,7 @@
 CREATE TABLE IF NOT EXISTS Stores_Google_Data
 (
 		store_id uuid PRIMARY KEY REFERENCES Stores(store_id),
-		place_id text UNIQUE NOT NULL,
+		place_id text NOT NULL,
 		name TEXT,
 		rating NUMERIC,
 		vicinity TEXT,

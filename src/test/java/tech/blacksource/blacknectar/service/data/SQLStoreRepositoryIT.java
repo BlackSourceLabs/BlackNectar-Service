@@ -222,6 +222,7 @@ public class SQLStoreRepositoryIT
     public void testSearchForStoresResultsHaveImages() throws Exception
     {
         BlackNectarSearchRequest request = new BlackNectarSearchRequest()
+            .withRadius(10_000)
             .withCenter(LA);
         
         List<Store> results = instance.searchForStores(request);

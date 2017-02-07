@@ -26,17 +26,17 @@ import org.mockito.Mock;
 import sir.wellington.alchemy.collections.lists.Lists;
 import sir.wellington.alchemy.collections.maps.Maps;
 import tech.aroma.client.Aroma;
-import tech.blacksource.blacknectar.service.algorithms.StoreMatchingAlgorithm;
+import tech.blacksource.blacknectar.service.algorithms.StoreSearchAlgorithm;
+import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.redroma.google.places.GooglePlacesAPI;
-import tech.redroma.google.places.data.Location;
 import tech.redroma.google.places.data.Photo;
 import tech.redroma.google.places.data.Place;
 import tech.redroma.google.places.requests.GetPhotoRequest;
-import tech.redroma.google.places.requests.NearbySearchRequest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateList;
+import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.empty;
@@ -46,7 +46,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_MOCKS;
 import static org.mockito.Mockito.when;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
-import static tech.blacksource.blacknectar.service.images.GoogleImageLoader.DEFAULT_RADIUS;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.NetworkGenerators.httpUrls;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
@@ -60,20 +59,6 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
 public class GoogleImageLoaderTest
 {
 
-    private Store store;
-
-    @GenerateList(Place.class)
-    private List<Place> places;
-
-    private Place matchingPlace;
-    @GenerateList(value = Photo.class, size = 15)
-    private List<Photo> photos;
-
-    private List<URL> urls;
-    private Map<Photo, URL> urlPairings;
-
-    private NearbySearchRequest expectedRequest;
-
     @Mock
     private GooglePlacesAPI google;
 
@@ -81,9 +66,20 @@ public class GoogleImageLoaderTest
     private Aroma aroma;
 
     @Mock
-    private StoreMatchingAlgorithm<Place> matchingAlgorithm;
+    private StoreSearchAlgorithm<Place> searchAlgorithm;
 
     private GoogleImageLoader instance;
+
+    private Store store;
+
+    @GeneratePojo
+    private Place matchingPlace;
+    
+    @GenerateList(value = Photo.class, size = 15)
+    private List<Photo> photos;
+
+    private List<URL> urls;
+    private Map<Photo, URL> urlPairings;
 
     @Before
     public void setUp() throws Exception
@@ -92,39 +88,31 @@ public class GoogleImageLoaderTest
         setupData();
         setupMocks();
 
-        instance = new GoogleImageLoader(aroma, google, matchingAlgorithm);
+        instance = new GoogleImageLoader(aroma, google, searchAlgorithm);
     }
 
     private void setupData() throws Exception
     {
         store = one(stores());
-        matchingPlace = Lists.oneOf(places);
-        matchingPlace.name = store.getName();
 
         matchingPlace.photos = photos;
 
         urls = Lists.create();
         urlPairings = Maps.create();
-        
+
         for (Photo photo : photos)
         {
             URL url = one(httpUrls());
             urls.add(url);
             urlPairings.put(photo, url);
         }
-        
+
     }
 
     private void setupMocks() throws Exception
     {
-        expectedRequest = createExpectedRequestFor(store);
-
-        when(google.simpleSearchNearbyPlaces(expectedRequest))
-            .thenReturn(places);
-
-        when(matchingAlgorithm.matchesStore(matchingPlace, store))
-            .thenReturn(true);
-
+        when(searchAlgorithm.findMatchFor(store)).thenReturn(matchingPlace);
+        
         for (Photo photo : photos)
         {
             GetPhotoRequest photoRequest = createExpectedPhotoRequestFor(photo);
@@ -138,10 +126,10 @@ public class GoogleImageLoaderTest
     @Test
     public void testConstructor() throws Exception
     {
-        assertThrows(() -> new GoogleImageLoader(null, google, matchingAlgorithm))
+        assertThrows(() -> new GoogleImageLoader(null, google, searchAlgorithm))
             .isInstanceOf(IllegalArgumentException.class);
 
-        assertThrows(() -> new GoogleImageLoader(aroma, null, matchingAlgorithm))
+        assertThrows(() -> new GoogleImageLoader(aroma, null, searchAlgorithm))
             .isInstanceOf(IllegalArgumentException.class);
 
         assertThrows(() -> new GoogleImageLoader(aroma, google, null))
@@ -152,7 +140,7 @@ public class GoogleImageLoaderTest
     public void testGetImageFor()
     {
         List<URL> result = instance.getImagesFor(store);
-        
+
         assertThat(result, notNullValue());
         assertThat(result, is(urls));
     }
@@ -161,23 +149,19 @@ public class GoogleImageLoaderTest
     @Test
     public void testGetImageForWhenNoMatch() throws Exception
     {
-        when(matchingAlgorithm.matchesStore(matchingPlace, store))
-            .thenReturn(false);
+        when(searchAlgorithm.findMatchFor(store)).thenReturn(null);
 
         List<URL> result = instance.getImagesFor(store);
         assertThat(result, notNullValue());
         assertThat(result, is(empty()));
     }
-
-    private NearbySearchRequest createExpectedRequestFor(Store store)
+    
+    @DontRepeat
+    @Test
+    public void testGetImageForWithBadArgs() throws Exception
     {
-        Location location = Location.of(store.getLocation().getLatitude(), store.getLocation().getLongitude());
-
-        return NearbySearchRequest.newBuilder()
-            .withKeyword(store.getName().toLowerCase())
-            .withLocation(location)
-            .withRadiusInMeters(DEFAULT_RADIUS)
-            .build();
+        assertThrows(() -> instance.getImagesFor(null))
+            .isInstanceOf(BadArgumentException.class);
     }
 
     private GetPhotoRequest createExpectedPhotoRequestFor(Photo photo)

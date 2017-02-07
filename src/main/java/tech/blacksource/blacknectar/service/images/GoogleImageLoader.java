@@ -25,19 +25,18 @@ import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
-import tech.blacksource.blacknectar.service.algorithms.StoreMatchingAlgorithm;
-import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
+import tech.blacksource.blacknectar.service.algorithms.StoreSearchAlgorithm;
+import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.redroma.google.places.GooglePlacesAPI;
-import tech.redroma.google.places.data.Location;
 import tech.redroma.google.places.data.Photo;
 import tech.redroma.google.places.data.Place;
 import tech.redroma.google.places.exceptions.GooglePlacesException;
 import tech.redroma.google.places.requests.GetPhotoRequest;
-import tech.redroma.google.places.requests.NearbySearchRequest;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 
 import static java.util.stream.Collectors.toList;
+import static tech.blacksource.blacknectar.service.stores.Store.validStore;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
@@ -50,39 +49,33 @@ final class GoogleImageLoader implements ImageLoader
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(GoogleImageLoader.class);
-    static final int DEFAULT_RADIUS = 1_000;
 
     private final Aroma aroma;
     private final GooglePlacesAPI google;
-    private final StoreMatchingAlgorithm<Place> matchingAlgorithm;
+    private final StoreSearchAlgorithm<Place> googlePlaces;
 
     @Inject
-    GoogleImageLoader(Aroma aroma, GooglePlacesAPI google, StoreMatchingAlgorithm<Place> matchingAlgorithm)
+    GoogleImageLoader(Aroma aroma, GooglePlacesAPI google, StoreSearchAlgorithm<Place> googlePlaces)
     {
-        checkThat(aroma, google, matchingAlgorithm)
+        checkThat(aroma, google, googlePlaces)
             .are(notNull());
 
         this.aroma = aroma;
         this.google = google;
-        this.matchingAlgorithm = matchingAlgorithm;
+        this.googlePlaces = googlePlaces;
     }
 
     @Override
     public List<URL> getImagesFor(Store store)
     {
-
-        List<Place> places = tryToGetPlacesFor(store);
-
-        if (Lists.isEmpty(places))
-        {
-            return Lists.emptyList();
-        }
-
-        Place matchingPlace = tryToFindMatchingPlaceFor(store, places);
+        checkThat(store)
+            .throwing(BadArgumentException.class)
+            .is(validStore());
+        
+        Place matchingPlace = googlePlaces.findMatchFor(store);
 
         if (Objects.isNull(matchingPlace))
         {
-            makeNoteThatNoMatchesFoundFor(store, places);
             return Lists.emptyList();
         }
 
@@ -100,55 +93,12 @@ final class GoogleImageLoader implements ImageLoader
         return urls;
     }
 
-    private List<Place> tryToGetPlacesFor(Store store)
-    {
-        NearbySearchRequest request = createRequestToSearchFor(store);
-
-        List<Place> places;
-        try
-        {
-            places = google.simpleSearchNearbyPlaces(request);
-        }
-        catch (GooglePlacesException ex)
-        {
-            makeNoteThatGoogleSearchFailed(ex, request, store);
-            throw new OperationFailedException("Could not make Google API Request", ex);
-        }
-
-        if (Lists.isEmpty(places))
-        {
-            makeNoteThatNoPlacesFoundFor(store, request);
-        }
-
-        return Lists.nullToEmpty(places);
-    }
-
-    private NearbySearchRequest createRequestToSearchFor(Store store)
-    {
-        Location location = Location.of(store.getLocation().getLatitude(), store.getLocation().getLongitude());
-
-        return NearbySearchRequest.newBuilder()
-            .withKeyword(store.getName().toLowerCase())
-            .withLocation(location)
-            .withRadiusInMeters(DEFAULT_RADIUS)
-            .build();
-
-    }
-
     private GetPhotoRequest createRequestToGetPhoto(Photo photo)
     {
         return GetPhotoRequest.newBuilder()
             .withPhotoReference(photo.photoReference)
             .withMaxHeight(GetPhotoRequest.Builder.MAX_HEIGHT)
             .build();
-    }
-
-    private Place tryToFindMatchingPlaceFor(Store store, List<Place> places)
-    {
-        return places.stream()
-            .filter(place -> matchingAlgorithm.matchesStore(place, store))
-            .findFirst()
-            .orElse(null);
     }
 
     private URL loadPhoto(Photo photo, Place place)
@@ -169,27 +119,6 @@ final class GoogleImageLoader implements ImageLoader
     //================================================================
     // Notes of Completion
     //================================================================
-    
-    private void makeNoteThatGoogleSearchFailed(GooglePlacesException ex, NearbySearchRequest request, Store store)
-    {
-        LOG.error("Failed to execute Google Place Search for store: [{}]", store, ex);
-
-        aroma.begin().titled("Google API Failed")
-            .text("Failed to execute Google Place Search. \n\nStore:\n{}\n\nRequest:\n{}\n\n{}", store, request, ex)
-            .withUrgency(Urgency.HIGH)
-            .send();
-    }
-
-    private void makeNoteThatNoMatchesFoundFor(Store store, List<Place> places)
-    {
-        LOG.warn("No matches found for store: [{}]", store);
-
-        aroma.begin().titled("No Store Matches")
-            .text("No Google Places found matching store:\n\n{}\n\nAmong results:\n{}", store, places)
-            .withUrgency(Urgency.MEDIUM)
-            .send();
-    }
-
     private void makeNoteThatPlaceHasNoPhotos(Store store, Place place)
     {
         LOG.info("Matching store has no photos: {}", place);
@@ -206,16 +135,6 @@ final class GoogleImageLoader implements ImageLoader
         aroma.begin().titled("Image Load Failed")
             .text("API Call to Google failed.\nPhoto: {}\n\nPlace:\n{}\n\n{}", photo, place, ex)
             .withUrgency(Urgency.HIGH);
-    }
-
-    private void makeNoteThatNoPlacesFoundFor(Store store, NearbySearchRequest request)
-    {
-        LOG.warn("No matches found for store: [{}]", store);
-
-        aroma.begin().titled("No Places Found")
-            .text("No Google Places found for Store:\n\n{}\n\nFor Request:\n{}", store, request)
-            .withUrgency(Urgency.MEDIUM)
-            .send();
     }
 
 }

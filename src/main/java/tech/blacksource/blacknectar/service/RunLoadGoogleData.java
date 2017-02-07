@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
+import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
 import tech.blacksource.blacknectar.service.algorithms.StoreSearchAlgorithm;
@@ -34,6 +35,7 @@ import tech.blacksource.blacknectar.service.data.SQLQueries;
 import tech.blacksource.blacknectar.service.data.StoreRepository;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.redroma.google.places.GooglePlacesAPI;
+import tech.redroma.google.places.data.Photo;
 import tech.redroma.google.places.data.Place;
 import tech.redroma.google.places.data.PlaceDetails;
 import tech.redroma.google.places.data.Types;
@@ -186,6 +188,33 @@ public class RunLoadGoogleData implements Callable<Void>
                         toStringArray(place.types),
                         null);
         
+        savePhotosFor(placeDetails);
+        
+    }
+    
+    private void savePhotosFor(PlaceDetails placeDetails)
+    {
+        List<Photo> photos = placeDetails.getPhotos();
+        if (Lists.isEmpty(photos))
+        {
+            return;
+        }
+        
+        photos.forEach(p -> this.savePhoto(p, placeDetails));
+    }
+    
+    private void savePhoto(Photo photo, PlaceDetails place)
+    {
+        String statement = SQLQueries.INSERT_GOOGLE_PHOTO;
+        String attributions = String.join(",", Lists.nullToEmpty(photo.htmlAttributions));
+        
+        database.update(statement,
+                        photo.photoReference,
+                        place.getPlaceId(),
+                        photo.height,
+                        photo.width,
+                        attributions,
+                        null);
     }
     
     private PlaceDetails getPlaceDetailsFor(Place place)
@@ -196,6 +225,7 @@ public class RunLoadGoogleData implements Callable<Void>
     private String toStringArray(List<Types.ReturnedPlaceType> types)
     {
         List<String> list = types.stream()
+            .filter(Objects::nonNull)
             .map(t -> t.toString())
             .collect(toList());
         

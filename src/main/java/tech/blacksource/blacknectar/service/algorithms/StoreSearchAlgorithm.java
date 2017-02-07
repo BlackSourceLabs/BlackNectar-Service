@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-
 package tech.blacksource.blacknectar.service.algorithms;
 
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.annotations.arguments.Optional;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
+import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 
+import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.INTERFACE;
 
 /**
  *
@@ -28,13 +29,15 @@ import tech.sirwellington.alchemy.annotations.arguments.Required;
  * @param <Result> The data type returned by the specific Search Engine.
  * @see StoreMatchingAlgorithm
  */
-public interface StoreSearchAlgorithm<Result> 
+@StrategyPattern(role = INTERFACE)
+public interface StoreSearchAlgorithm<Result>
 {
+
     /**
      * Finds data pertaining to the Store.
-     * 
+     *
      * @param store The store to search for.
-     * @return  Information about the Store, or null if no match was found.
+     * @return Information about the Store, or null if no match was found.
      */
     @Optional
     Result findMatchFor(@Required Store store);

@@ -87,10 +87,15 @@ public final class Server
         }
         catch (RuntimeException ex)
         {
-            AROMA.begin().titled("Server Launch Failed")
-                .text("Could not create Guice Injector: {}", ex)
-                .withUrgency(Urgency.HIGH)
-                .send();
+            LOG.error("Server Launch Failed", ex);
+
+            if (AROMA != null)
+            {
+                AROMA.begin().titled("Server Launch Failed")
+                    .text("Could not create Guice Injector: {}", ex)
+                    .withUrgency(Urgency.HIGH)
+                    .send();
+            }
 
             throw ex;
         }

@@ -117,8 +117,8 @@ public class RunLoadGoogleData implements Callable<Void>
             
             if (success)
             {
-                ++completed;
-                makeNoteOfSuccess(completed, processed, totalStores);
+                ++succeeded;
+                makeNoteOfSuccess(succeeded, processed, totalStores);
             }
             else
             {
@@ -128,7 +128,7 @@ public class RunLoadGoogleData implements Callable<Void>
             
         }
         
-        makeNoteThatScriptCompleted(completed, failed, totalStores);
+        makeNoteThatScriptCompleted(succeeded, failed, totalStores);
         
         return null;
     }

@@ -82,8 +82,8 @@ public final class Server
         try
         {
             injector = Guice.createInjector(new ModuleServer(), new ModuleProductionDatabase());
-            server = injector.getInstance(Server.class);
             AROMA = injector.getInstance(Aroma.class);
+            server = injector.getInstance(Server.class);
         }
         catch (RuntimeException ex)
         {

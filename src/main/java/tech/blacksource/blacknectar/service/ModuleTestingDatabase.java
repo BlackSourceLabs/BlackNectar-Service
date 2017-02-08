@@ -50,27 +50,13 @@ public final class ModuleTestingDatabase extends AbstractModule
     @Singleton
     DataSource provideSQLConnection(Aroma aroma) throws SQLException
     {
-        int port = 5432;
-        String database = "testing";
-        String host = "database.blacksource.tech";
-        String user = Files.readFile("./secrets/postgres-user.txt").trim();
-        String password = Files.readFile("./secrets/postgres-password.txt").trim();
-        
-        String applicationName = "BlackNectar";
 
-        String url = String.format("jdbc:postgresql://%s:%d/%s?user=%s&password=%s&ApplicationName=%s",
-                                   host,
-                                   port,
-                                   database,
-                                   user,
-                                   password,
-                                   applicationName);
-
+        String url = createAWSConnection();
 
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
         dataSource.setUrl(url);
-        
-        try(Connection connection = dataSource.getConnection();)
+
+        try (Connection connection = dataSource.getConnection();)
         {
             checkThat(connection)
                 .throwing(SQLException.class)
@@ -78,7 +64,7 @@ public final class ModuleTestingDatabase extends AbstractModule
         }
         catch (SQLException ex)
         {
-            String message = "Failed to create connection to PostgreSQL. Defaulting to SQLite.";
+            String message = "Failed to create connection to PostgreSQL.";
             LOG.error(message, ex);
             aroma.begin().titled("SQL Connection Failed")
                 .text(message, ex)
@@ -108,5 +94,47 @@ public final class ModuleTestingDatabase extends AbstractModule
                 throw new FailedAssertionException("Could not check for connection", ex);
             }
         };
+    }
+
+    private String createTestConnection()
+    {
+        int port = 5432;
+        String database = "testing";
+        String host = "database.blacksource.tech";
+        String user = Files.readFile("./secrets/postgres-user.txt").trim();
+        String password = Files.readFile("./secrets/postgres-password.txt").trim();
+
+        String applicationName = "BlackNectar";
+
+        String url = String.format("jdbc:postgresql://%s:%d/%s?user=%s&password=%s&ApplicationName=%s",
+                                   host,
+                                   port,
+                                   database,
+                                   user,
+                                   password,
+                                   applicationName);
+
+        return url;
+    }
+
+    private String createAWSConnection()
+    {
+        int port = 5432;
+        String database = "testing";
+        String host = "blacksourcedatabase.ckh1p3qdxanw.us-west-2.rds.amazonaws.com";
+        String user = Files.readFile("./secrets/postgres-user.txt").trim();
+        String password = Files.readFile("./secrets/postgres-password.txt").trim();
+
+        String applicationName = "BlackNectar";
+
+        String url = String.format("jdbc:postgresql://%s:%d/%s?user=%s&password=%s&ApplicationName=%s",
+                                   host,
+                                   port,
+                                   database,
+                                   user,
+                                   password,
+                                   applicationName);
+        
+        return url;
     }
 }

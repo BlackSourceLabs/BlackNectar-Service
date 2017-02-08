@@ -82,7 +82,7 @@ public class RunLoadGoogleData implements Callable<Void>
     
     public static void main(String[] args) throws Exception
     {
-        Injector injector = Guice.createInjector(new ModuleServer(), new ModuleTestingDatabase());
+        Injector injector = Guice.createInjector(new ModuleServer(), new ModuleDatabaseTesting());
         
         RunLoadGoogleData instance = injector.getInstance(RunLoadGoogleData.class);
         instance.call();

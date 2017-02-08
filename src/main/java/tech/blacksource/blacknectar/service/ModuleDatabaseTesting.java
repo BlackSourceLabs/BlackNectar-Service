@@ -36,10 +36,10 @@ import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
  *
  * @author SirWellington
  */
-public final class ModuleTestingDatabase extends AbstractModule
+public final class ModuleDatabaseTesting extends AbstractModule
 {
 
-    private final static Logger LOG = LoggerFactory.getLogger(ModuleTestingDatabase.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ModuleDatabaseTesting.class);
 
     @Override
     protected void configure()

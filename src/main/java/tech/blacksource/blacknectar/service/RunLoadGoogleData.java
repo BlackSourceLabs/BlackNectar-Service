@@ -95,7 +95,7 @@ public class RunLoadGoogleData implements Callable<Void>
         
         int totalStores = stores.size();
         int processed = -1;
-        int completed = 0;
+        int succeeded = 0;
         int failed = 0;
         
         makeNoteThatScriptStartedWith(totalStores);

@@ -67,7 +67,7 @@ public final class RunSearchYelpImages implements Callable<Void>
     
     public static void main(String[] args) throws Exception
     {
-        Injector injector = Guice.createInjector(new ModuleServer(), new ModuleProductionDatabase());
+        Injector injector = Guice.createInjector(new ModuleServer(), new ModuleDatabaseProduction());
         
         RunSearchYelpImages instance = injector.getInstance(RunSearchYelpImages.class);
         instance.call();

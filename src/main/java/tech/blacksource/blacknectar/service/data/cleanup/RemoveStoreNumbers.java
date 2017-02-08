@@ -21,7 +21,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.blacksource.blacknectar.service.ModuleProductionDatabase;
+import tech.blacksource.blacknectar.service.ModuleDatabaseProduction;
 import tech.blacksource.blacknectar.service.ModuleServer;
 
 /**
@@ -36,7 +36,7 @@ public final class RemoveStoreNumbers
     public static void main(String[] args) throws Exception
     {
         Injector injector = Guice.createInjector(new ModuleServer(), 
-                                                 new ModuleProductionDatabase(),
+                                                 new ModuleDatabaseProduction(),
                                                  new ModuleRemoveStoreNumbers());
         
         RunStoreTransformation instance = injector.getInstance(RunStoreTransformation.class);

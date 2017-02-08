@@ -58,7 +58,7 @@ public final class ModuleDatabaseProduction extends AbstractModule
         //Explicitly setting the schema seems to conflict with Postgis functions, so 
         //ignoring for now.
         String schema = "blacknectar";
-        String applicationName = "BlackNectar";
+        String applicationName = "BlackNectarService";
 
         String url = String.format("jdbc:postgresql://%s:%d/%s?user=%s&password=%s&ApplicationName=%s",
                                    host,

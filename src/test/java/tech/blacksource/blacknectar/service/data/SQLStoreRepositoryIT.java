@@ -35,10 +35,12 @@ import tech.blacksource.blacknectar.service.stores.Store;
 import tech.blacksource.blacknectar.service.stores.StoreDataSource;
 import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
+import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
@@ -213,6 +215,23 @@ public class SQLStoreRepositoryIT
         results.forEach(s -> assertThat(s.getName(),
                                           anyOf(containsString(searchTerm),
                                                 containsString(searchTerm.toUpperCase()))));
+    }
+
+    @DontRepeat
+    @Test
+    public void testSearchForStoresResultsHaveImages() throws Exception
+    {
+        BlackNectarSearchRequest request = new BlackNectarSearchRequest()
+            .withRadius(10_000)
+            .withCenter(LA);
+        
+        List<Store> results = instance.searchForStores(request);
+        
+        long withImages = results.stream()
+            .filter(Store::hasMainImage)
+            .count();
+        
+        assertThat(withImages, greaterThan(0L));
     }
 
     @Ignore

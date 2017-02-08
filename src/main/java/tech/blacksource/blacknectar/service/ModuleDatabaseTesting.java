@@ -104,7 +104,7 @@ public final class ModuleDatabaseTesting extends AbstractModule
         String user = Files.readFile("./secrets/postgres-user.txt").trim();
         String password = Files.readFile("./secrets/postgres-password.txt").trim();
 
-        String applicationName = "BlackNectar";
+        String applicationName = "BlackNectarService";
 
         String url = String.format("jdbc:postgresql://%s:%d/%s?user=%s&password=%s&ApplicationName=%s",
                                    host,
@@ -125,7 +125,7 @@ public final class ModuleDatabaseTesting extends AbstractModule
         String user = Files.readFile("./secrets/postgres-user.txt").trim();
         String password = Files.readFile("./secrets/postgres-password.txt").trim();
 
-        String applicationName = "BlackNectar";
+        String applicationName = "BlackNectarService";
 
         String url = String.format("jdbc:postgresql://%s:%d/%s?user=%s&password=%s&ApplicationName=%s",
                                    host,

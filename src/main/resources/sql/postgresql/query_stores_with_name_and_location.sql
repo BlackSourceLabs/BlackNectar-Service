@@ -9,6 +9,6 @@ SELECT
 FROM Stores
 LEFT JOIN Store_Cover_Images USING(store_id)
 LEFT JOIN Store_Images USING(store_id, image_id)
-WHERE store_name LIKE ?
-AND ST_DWithin(location, ST_SetSRID(ST_Point(?, ?), 4326)::geography, ?)
+WHERE ST_DWithin(location, ST_SetSRID(ST_Point(?, ?), 4326)::geography, ?)
+AND store_name LIKE ?
 ORDER BY distance_meters

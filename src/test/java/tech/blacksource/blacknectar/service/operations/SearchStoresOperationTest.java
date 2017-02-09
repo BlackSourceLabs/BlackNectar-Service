@@ -117,6 +117,10 @@ public class SearchStoresOperationTest
 
     @GenerateInteger
     private Integer limit;
+    
+    @GenerateInteger(value = RANGE, min = 10_000, max = 99_999)
+    private Integer zipCodeInt;
+    private String zipCode;
 
     private QueryParamsMap queryParams;
 
@@ -140,6 +144,8 @@ public class SearchStoresOperationTest
         ip = one(ip4Addresses());
         latitude = one(latitudes());
         longitude = one(longitudes());
+        
+        zipCode = String.valueOf(zipCodeInt);
 
         expectedSearchRequest = createExpectedRequest();
         images = Maps.create();
@@ -257,23 +263,16 @@ public class SearchStoresOperationTest
         when(params.hasKey(QueryKeys.RADIUS)).thenReturn(true);
         when(params.hasKey(QueryKeys.LIMIT)).thenReturn(true);
         when(params.hasKey(QueryKeys.SEARCH_TERM)).thenReturn(true);
+        when(params.hasKey(QueryKeys.ZIP_CODE)).thenReturn(true);
 
         when(params.value(QueryKeys.LATITUDE)).thenReturn(String.valueOf(latitude));
         when(params.value(QueryKeys.LONGITUDE)).thenReturn(String.valueOf(longitude));
         when(params.value(QueryKeys.RADIUS)).thenReturn(radius.toString());
         when(params.value(QueryKeys.LIMIT)).thenReturn(limit.toString());
         when(params.value(QueryKeys.SEARCH_TERM)).thenReturn(searchTerm);
+        when(params.value(QueryKeys.ZIP_CODE)).thenReturn(zipCode);
 
         return params;
-    }
-
-    private Store storeWithImage(Store store)
-    {
-        Image image = images.get(store);
-
-        return Store.Builder.fromStore(store)
-            .withMainImageURL(image.getUrl().toString())
-            .build();
     }
 
     private List<Store> withoutImages(List<Store> stores)

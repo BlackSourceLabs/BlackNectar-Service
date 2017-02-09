@@ -255,6 +255,7 @@ final class SQLStoreRepository implements StoreRepository
         }
     }
 
+    
     private List<Store> findStoresBasedOfRequest(BlackNectarSearchRequest request)
     {
 
@@ -268,10 +269,10 @@ final class SQLStoreRepository implements StoreRepository
             return database.query(query, storeMapper,
                                   longitude,
                                   latitude,
-                                  toSQLSearchTerm(request.searchTerm),
                                   longitude,
                                   latitude,
-                                  request.radiusInMeters);
+                                  request.radiusInMeters,
+                                  toSQLSearchTerm(request.searchTerm));
         }
         else if (request.hasCenter())
         {
@@ -284,6 +285,16 @@ final class SQLStoreRepository implements StoreRepository
                                   longitude,
                                   latitude,
                                   request.radiusInMeters);
+        }
+        else if (request.hasZipCode() && request.hasSearchTerm())
+        {
+            return database.query(query, storeMapper,
+                                  request.zipCode,
+                                  toSQLSearchTerm(request.searchTerm));
+        }
+        else if (request.hasZipCode())
+        {
+            return database.query(query, storeMapper, request.zipCode);
         }
         else if (request.hasSearchTerm())
         {
@@ -307,6 +318,14 @@ final class SQLStoreRepository implements StoreRepository
         else if (request.hasCenter())
         {
             query = SQLQueries.QUERY_STORES_WITH_LOCATION;
+        }
+        else if (request.hasZipCode() && request.hasSearchTerm())
+        {
+            query = SQLQueries.QUERY_STORES_WITH_NAME_AND_ZIPCODE;
+        }
+        else if (request.hasZipCode())
+        {
+            query = SQLQueries.QUERY_STORES_WITH_ZIPCODE;
         }
         else if (request.hasSearchTerm())
         {

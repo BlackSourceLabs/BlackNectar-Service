@@ -263,14 +263,12 @@ public class SearchStoresOperationTest
         when(params.hasKey(QueryKeys.RADIUS)).thenReturn(true);
         when(params.hasKey(QueryKeys.LIMIT)).thenReturn(true);
         when(params.hasKey(QueryKeys.SEARCH_TERM)).thenReturn(true);
-        when(params.hasKey(QueryKeys.ZIP_CODE)).thenReturn(true);
 
         when(params.value(QueryKeys.LATITUDE)).thenReturn(String.valueOf(latitude));
         when(params.value(QueryKeys.LONGITUDE)).thenReturn(String.valueOf(longitude));
         when(params.value(QueryKeys.RADIUS)).thenReturn(radius.toString());
         when(params.value(QueryKeys.LIMIT)).thenReturn(limit.toString());
         when(params.value(QueryKeys.SEARCH_TERM)).thenReturn(searchTerm);
-        when(params.value(QueryKeys.ZIP_CODE)).thenReturn(zipCode);
 
         return params;
     }

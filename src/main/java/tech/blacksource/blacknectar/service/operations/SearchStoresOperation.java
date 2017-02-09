@@ -348,7 +348,7 @@ public class SearchStoresOperation implements Route
         static final String SEARCH_TERM = "searchTerm";
         static final String ZIP_CODE = "zipCode";
 
-        static Set<String> KEYS = Sets.createFrom(LATITUDE, LONGITUDE, LIMIT, RADIUS, SEARCH_TERM);
+        static Set<String> KEYS = Sets.createFrom(LATITUDE, LONGITUDE, LIMIT, RADIUS, SEARCH_TERM, ZIP_CODE);
     }
 
 }

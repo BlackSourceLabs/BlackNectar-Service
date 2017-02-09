@@ -63,8 +63,9 @@ public final class SQLQueries
     //Queries
     public static final String QUERY_STORES_WITH_LOCATION = loadQuery("query_stores_with_location.sql");
     public static final String QUERY_STORES_WITH_NAME = loadQuery("query_stores_with_name.sql");
-    public static final String QUERY_STORES_WITH_NAME_AND_LOCATION = loadQuery("query_stores_with_name_and_location.sql");
     public static final String QUERY_STORES_WITH_ZIPCODE = loadQuery("query_stores_with_zipcode.sql");
+    
+    public static final String QUERY_STORES_WITH_NAME_AND_LOCATION = loadQuery("query_stores_with_name_and_location.sql");
     public static final String QUERY_STORES_WITH_NAME_AND_ZIPCODE = loadQuery("query_stores_with_name_and_zipcode.sql");
     
     public static final String QUERY_IMAGE = loadQuery("query_image.sql");

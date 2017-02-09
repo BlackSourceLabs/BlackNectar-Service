@@ -176,6 +176,16 @@ public class MemoryStoreRepositoryTest
         List<Store> results = instance.searchForStores(request);
         assertThat(results, contains(store));
     }
+    
+    @Test
+    public void testSearchForStoresByZipCode() throws Exception
+    {
+        request = new BlackNectarSearchRequest()
+            .withZipCode(store.getAddress().getZipCode());
+        
+        List<Store> results = instance.searchForStores(request);
+        assertThat(results, contains(store));
+    }
 
     @Test
     public void testLimit() throws Exception

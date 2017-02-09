@@ -195,17 +195,22 @@ final class MemoryStoreRepository implements StoreRepository
     {
         return store ->
         {
-            if (store == null || !store.hasZipCode())
+            if (store == null || store.getAddress() == null)
             {
                 return false;
             }
-            
+
+            if (isNullOrEmpty(store.getAddress().getZipCode()))
+            {
+                return false;
+            }
+
             if (isNullOrEmpty(zipCode))
             {
                 return false;
             }
             
-            return Objects.equals(store.zipCode, zipCode);
+            return Objects.equals(store.getAddress().getZipCode(), zipCode);
         };
     }
 

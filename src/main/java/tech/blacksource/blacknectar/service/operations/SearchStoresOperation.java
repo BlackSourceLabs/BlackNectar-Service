@@ -37,12 +37,12 @@ import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
+import tech.sirwellington.alchemy.arguments.assertions.CollectionAssertions;
 
 import static tech.blacksource.blacknectar.service.data.MediaTypes.APPLICATION_JSON;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.AddressAssertions.validZipCodeString;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
-import static tech.sirwellington.alchemy.arguments.assertions.CollectionAssertions.collectionContaining;
 import static tech.sirwellington.alchemy.arguments.assertions.CollectionAssertions.elementInCollection;
 import static tech.sirwellington.alchemy.arguments.assertions.GeolocationAssertions.validLatitude;
 import static tech.sirwellington.alchemy.arguments.assertions.GeolocationAssertions.validLongitude;
@@ -305,13 +305,16 @@ public class SearchStoresOperation implements Route
                     .is(elementInCollection(QueryKeys.KEYS));
             }
 
-            if (!queryParams.contains(QueryKeys.SEARCH_TERM))
+            checkThat(queryParams)
+                .usingMessage("query parameters must contain at least one of 'searchTerm', 'zipCode', 'latitude', 'longitude")
+                .is(CollectionAssertions.collectionContainingAtLeastOnceOf(QueryKeys.SEARCH_TERM, QueryKeys.LATITUDE,
+                                                                           QueryKeys.LONGITUDE, QueryKeys.ZIP_CODE));
+            
+            if (queryParams.contains(QueryKeys.LATITUDE) || queryParams.contains(QueryKeys.LONGITUDE))
             {
                 checkThat(queryParams)
-                    .usingMessage("latitude parameter is missing")
-                    .is(collectionContaining(QueryKeys.LATITUDE))
-                    .usingMessage("longitude parameter is missing")
-                    .is(collectionContaining(QueryKeys.LONGITUDE));
+                    .usingMessage("query parameters must include both 'latitude' and 'longitude' if using location")
+                    .is(CollectionAssertions.collectionContainingAll(QueryKeys.LATITUDE, QueryKeys.LONGITUDE));
             }
         };
     }

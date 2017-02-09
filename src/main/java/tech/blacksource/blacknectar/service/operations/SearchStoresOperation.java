@@ -77,18 +77,18 @@ public class SearchStoresOperation implements Route
     private final static double MAX_RADIUS_METERS = 100_000;
 
     private final Aroma aroma;
-    private final StoreRepository stores;
-    private final ImageRepository images;
+    private final StoreRepository storesRepository;
+    private final ImageRepository imagesRepository;
     
     @Inject
-    SearchStoresOperation(Aroma aroma, StoreRepository stores, ImageRepository images)
+    SearchStoresOperation(Aroma aroma, StoreRepository storesRepository, ImageRepository imagesRepository)
     {
-        checkThat(aroma, stores, images)
+        checkThat(aroma, storesRepository, imagesRepository)
             .are(notNull());
         
         this.aroma = aroma;
-        this.stores = stores;
-        this.images = images;
+        this.storesRepository = storesRepository;
+        this.imagesRepository = imagesRepository;
     }
 
     @Override
@@ -128,7 +128,7 @@ public class SearchStoresOperation implements Route
 
         try
         {
-            return stores.searchForStores(searchRequest);
+            return storesRepository.searchForStores(searchRequest);
         }
         catch (Exception ex)
         {
@@ -300,7 +300,7 @@ public class SearchStoresOperation implements Route
 
     private Store tryToEnrichStoreWithImage(Store store)
     {
-        List<Image> storeImages = images.getImagesForStore(store);
+        List<Image> storeImages = imagesRepository.getImagesForStore(store);
 
         if (Lists.isEmpty(storeImages))
         {

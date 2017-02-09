@@ -257,7 +257,7 @@ public class RunLoadGoogleData implements Callable<Void>
     
     private void makeNoteThatScriptCompleted(int completed, int failed, int totalStores)
     {
-        String message = "Completed processing all stores. [{} completed, {} failed, {} total stores]";
+        String message = "[{} completed, {} failed, {} total stores] - Completed processing all stores.";
         
         LOG.info(message, completed, failed, totalStores);
         
@@ -270,7 +270,7 @@ public class RunLoadGoogleData implements Callable<Void>
     private void makeNoteOfSuccess(int completed, int processed, int totalStores)
     {
         int remaining = totalStores - processed;
-        String message = "Successfully stored Place Information. [{} succeeded, {} processed, {} remaining, {} total]";
+        String message = "[{} succeeded, {} processed, {} remaining, {} total] - Successfully stored Place Information.";
         
         LOG.info(message, completed, processed, remaining, totalStores);
         aroma.begin().titled("Google Place Saved")
@@ -281,7 +281,7 @@ public class RunLoadGoogleData implements Callable<Void>
     
     private void makeNoteOfFailure(int failed, int processed, int totalStores)
     {
-        String message = "Failed to store Place Information. [{} failed, {} processed, {} remaining, {} total";
+        String message = "[{} failed, {} processed, {} remaining, {} total] - Failed to store Place Information.";
         int remaining = totalStores - processed;
         
         LOG.warn(message, failed, processed, remaining, totalStores);

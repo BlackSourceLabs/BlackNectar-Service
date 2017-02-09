@@ -129,7 +129,7 @@ public class SearchStoresOperationTest
         setupData();
         setupMocks();
 
-        instance = new SearchStoresOperation(aroma, storesRepository, imageRepository);
+        instance = new SearchStoresOperation(aroma, storesRepository);
     }
 
     private void setupData() throws Exception
@@ -172,9 +172,8 @@ public class SearchStoresOperationTest
     @Test
     public void testConstructor()
     {
-        assertThrows(() -> new SearchStoresOperation(null, storesRepository, imageRepository));
-        assertThrows(() -> new SearchStoresOperation(aroma, null, imageRepository));
-        assertThrows(() -> new SearchStoresOperation(aroma, storesRepository, null));
+        assertThrows(() -> new SearchStoresOperation(null, storesRepository));
+        assertThrows(() -> new SearchStoresOperation(aroma, null));
     }
 
     @Test

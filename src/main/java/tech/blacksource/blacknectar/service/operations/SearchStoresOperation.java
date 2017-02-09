@@ -34,7 +34,6 @@ import tech.blacksource.blacknectar.service.data.BlackNectarSearchRequest;
 import tech.blacksource.blacknectar.service.data.StoreRepository;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
-import tech.blacksource.blacknectar.service.images.ImageRepository;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
@@ -76,17 +75,15 @@ public class SearchStoresOperation implements Route
 
     private final Aroma aroma;
     private final StoreRepository storesRepository;
-    private final ImageRepository imagesRepository;
     
     @Inject
-    SearchStoresOperation(Aroma aroma, StoreRepository storesRepository, ImageRepository imagesRepository)
+    SearchStoresOperation(Aroma aroma, StoreRepository storesRepository)
     {
-        checkThat(aroma, storesRepository, imagesRepository)
+        checkThat(aroma, storesRepository)
             .are(notNull());
         
         this.aroma = aroma;
         this.storesRepository = storesRepository;
-        this.imagesRepository = imagesRepository;
     }
 
     @Override

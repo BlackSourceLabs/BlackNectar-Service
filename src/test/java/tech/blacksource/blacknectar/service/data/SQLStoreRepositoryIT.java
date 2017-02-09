@@ -45,6 +45,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -67,6 +68,9 @@ public class SQLStoreRepositoryIT
 {
     private static final Location NYC = Location.with(40.758659, -73.985217);
     private static final Location LA = Location.with(34.0420322, -118.2541062);
+    private static final String ZIP_SANTA_MONICA = "90401";
+    private static final String ZIP_BRONX = "10455";
+    
 
     private Aroma aroma;
     private JdbcTemplate database;
@@ -215,6 +219,37 @@ public class SQLStoreRepositoryIT
         results.forEach(s -> assertThat(s.getName(),
                                           anyOf(containsString(searchTerm),
                                                 containsString(searchTerm.toUpperCase()))));
+    }
+    
+    @Test
+    public void testSearchForStoresWithZipCode() throws Exception
+    {
+        String zipCode = ZIP_SANTA_MONICA;
+        
+        BlackNectarSearchRequest request = new BlackNectarSearchRequest()
+            .withZipCode(zipCode);
+        
+        List<Store> results = instance.searchForStores(request);
+        assertThat(results, not(empty()));
+        
+        results.forEach(s -> assertThat(s.getAddress().getZipCode(), is(zipCode)));
+    }
+    
+    @Test
+    public void testSearchForStoresWithZipCodeAndName() throws Exception
+    {
+        String name = "Duane";
+        String zip = ZIP_BRONX;
+        
+        BlackNectarSearchRequest request = new BlackNectarSearchRequest()
+            .withZipCode(zip)
+            .withSearchTerm(name);
+        
+        List<Store> results = instance.searchForStores(request);
+        assertThat(results, notNullValue());
+
+        results.forEach(s -> assertThat(s.getAddress().getZipCode(), is(zip)));
+        results.forEach(s -> assertThat(s.getName(), containsString(name)));
     }
 
     @DontRepeat

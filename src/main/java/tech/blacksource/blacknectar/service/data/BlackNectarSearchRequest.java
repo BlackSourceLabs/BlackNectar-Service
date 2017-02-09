@@ -21,21 +21,23 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.blacksource.blacknectar.service.stores.Location;
+import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 import tech.sirwellington.alchemy.annotations.concurrency.Mutable;
 import tech.sirwellington.alchemy.annotations.concurrency.ThreadUnsafe;
 import tech.sirwellington.alchemy.annotations.objects.Pojo;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.AddressAssertions.validZipCode;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThanOrEqualTo;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.positiveInteger;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
- * This is a mutable request object that encapsulates parameters for a BlackNectar API request.
- * All of the fields are publicly accessible and mutable, which makes this class Thread-Unsafe.
- * 
+ * This is a mutable request object that encapsulates parameters for a BlackNectar API request. All of the fields are publicly
+ * accessible and mutable, which makes this class Thread-Unsafe.
+ *
  * @author SirWellington
  */
 @Pojo
@@ -48,92 +50,110 @@ public class BlackNectarSearchRequest
 
     public Location center;
     public double radiusInMeters;
+    public String zipCode;
     public int limit;
     public String searchTerm;
 
     public BlackNectarSearchRequest()
     {
         this.searchTerm = "";
+        this.zipCode = null;
         this.center = null;
         this.radiusInMeters = 0;
         this.limit = 0;
     }
 
-    public BlackNectarSearchRequest(String searchTerm, Location center, double radiusInMeters, int limit)
+    public BlackNectarSearchRequest(String searchTerm, Location center, double radiusInMeters, String zipCode, int limit)
     {
         this.searchTerm = searchTerm;
         this.center = center;
         this.radiusInMeters = radiusInMeters;
+        this.zipCode = zipCode;
         this.limit = limit;
     }
-    
+
     public boolean hasRadius()
     {
         return radiusInMeters > 0;
     }
-    
+
     public boolean hasCenter()
     {
         return center != null;
     }
-    
+
     public boolean hasLimit()
     {
         return limit > 0;
     }
-    
+
     public boolean hasSearchTerm()
     {
         return !Strings.isNullOrEmpty(searchTerm);
     }
-    
+
+    public boolean hasZipCode()
+    {
+        return !Strings.isNullOrEmpty(zipCode);
+    }
+
     public BlackNectarSearchRequest withSearchTerm(String searchTerm)
     {
         checkThat(searchTerm)
             .usingMessage("searchTerm cannot be empty")
             .is(nonEmptyString());
-        
+
         this.searchTerm = searchTerm;
         return this;
     }
-    
+
     public BlackNectarSearchRequest withCenter(@Required Location center)
     {
         checkThat(center)
             .usingMessage("center cannot be null")
             .is(notNull());
-        
+
         this.center = center;
         return this;
     }
-    
+
     public BlackNectarSearchRequest withLimit(int limit)
     {
         checkThat(limit)
             .is(positiveInteger());
-        
+
         this.limit = limit;
         return this;
     }
-    
+
     public BlackNectarSearchRequest withRadius(double radius)
     {
         checkThat(radius)
             .is(greaterThanOrEqualTo(0.0));
-        
+
         this.radiusInMeters = radius;
         return this;
     }
-    
+
+    public BlackNectarSearchRequest withZipCode(@NonEmpty String zipCode)
+    {
+        checkThat(zipCode)
+            .is(nonEmptyString())
+            .is(validZipCode());
+
+        this.zipCode = zipCode;
+        return this;
+    }
 
     @Override
     public int hashCode()
     {
         int hash = 7;
-        hash = 17 * hash + Objects.hashCode(this.center);
-        hash = 17 * hash + (int) (Double.doubleToLongBits(this.radiusInMeters) ^ (Double.doubleToLongBits(this.radiusInMeters) >>> 32));
-        hash = 17 * hash + this.limit;
-        hash = 17 * hash + Objects.hashCode(this.searchTerm);
+        hash = 37 * hash + Objects.hashCode(this.center);
+        hash = 37 * hash + (int) (Double.doubleToLongBits(this.radiusInMeters) ^ (Double.doubleToLongBits(this.radiusInMeters) >>> 32));
+        hash = 37 * hash + Objects.hashCode(this.zipCode);
+        hash = 37 * hash + this.limit;
+        hash = 37 * hash + Objects.hashCode(this.searchTerm);
         return hash;
     }
 
@@ -161,6 +181,10 @@ public class BlackNectarSearchRequest
         {
             return false;
         }
+        if (!Objects.equals(this.zipCode, other.zipCode))
+        {
+            return false;
+        }
         if (!Objects.equals(this.searchTerm, other.searchTerm))
         {
             return false;
@@ -175,7 +199,7 @@ public class BlackNectarSearchRequest
     @Override
     public String toString()
     {
-        return "BlackNectarSearchRequest{" + "center=" + center + ", radiusInMeters=" + radiusInMeters + ", limit=" + limit + ", searchTerm=" + searchTerm + '}';
+        return "BlackNectarSearchRequest{" + "center=" + center + ", radiusInMeters=" + radiusInMeters + ", zipCode=" + zipCode + ", limit=" + limit + ", searchTerm=" + searchTerm + '}';
     }
 
 }

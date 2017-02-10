@@ -12,7 +12,7 @@ for Stores in the United States that support EBT (Electronic Benefits Transfer) 
 # Group Stores
 
 
-## Search Stores [/stores{?limit,searchTerm,latitude,longitude,radius}]
+## Search Stores [/stores{?limit,searchTerm,latitude,longitude,radius, zipCode}]
 
 Search for available EBT Stores.
 
@@ -26,6 +26,8 @@ Search for available EBT Stores.
                                       Searches for stores near the specified geo-coordinate.
     + radius (number, optional)     - Defines the radius (in meters) for the geo-query. 
                                       Radius can only be used with `latitude` and `longitude`.
+    + zipCode (string, optional)    - Searches for store in this Zip Code. This parameter can be used in place of latitude & longitude.
+                                      The Radius parameter has no effect on this query.
 
 
 ### Search [GET]
@@ -42,6 +44,7 @@ Search for Stores using the specified query parameters.
 ## Data Structures
 
 ### Store
++ store_id: The unique identifier for the Store
 + store_name: Angelica's Market (string, required) - The name of the Store.
 + is_farmers_market (boolean, required) - Tells whether the store is a Farmer's Market or not.
 + address (Address, required)

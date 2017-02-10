@@ -307,7 +307,7 @@ public class SearchStoresOperation implements Route
                     .usingMessage("Unrecognized Query Parameter: " + key)
                     .is(elementInCollection(QueryKeys.KEYS));
                 
-                checkThat(request.queryParams(key))
+                checkThat(request.queryMap().value(key))
                     .is(argumentWithSaneLength());
             }
 

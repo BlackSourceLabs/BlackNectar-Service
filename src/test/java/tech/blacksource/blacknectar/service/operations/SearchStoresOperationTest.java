@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import sir.wellington.alchemy.collections.lists.Lists;
 import sir.wellington.alchemy.collections.maps.Maps;
+import sir.wellington.alchemy.collections.sets.Sets;
 import spark.QueryParamsMap;
 import spark.Request;
 import spark.Response;
@@ -56,6 +57,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static sir.wellington.alchemy.collections.sets.Sets.toSet;
+import static tech.blacksource.blacknectar.service.BlackNectarAssertions.MAX_QUERY_PARAMETER_ARGUMENT_LENGTH;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.images;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.blacksource.blacknectar.service.JSON.collectArray;
@@ -120,7 +122,7 @@ public class SearchStoresOperationTest
     
     private QueryParamsMap queryParams;
     
-    @GenerateString(length = MAX_QUERY_PARAMETER_ARGUMENT_LENGTH)
+    @GenerateString(length = MAX_QUERY_PARAMETER_ARGUMENT_LENGTH * 2)
     private String reallyLongString;
 
     private BlackNectarSearchRequest expectedSearchRequest;
@@ -156,7 +158,7 @@ public class SearchStoresOperationTest
         when(request.ip()).thenReturn(ip);
         when(request.queryString()).thenReturn(queryString);
         when(request.queryMap()).thenReturn(queryParams);
-        when(request.queryParams()).thenReturn(QueryKeys.KEYS);
+        when(request.queryParams()).thenReturn(Sets.copyOf(QueryKeys.KEYS));
 
         when(storesRepository.searchForStores(expectedSearchRequest)).thenReturn(stores);
 
@@ -242,10 +244,20 @@ public class SearchStoresOperationTest
     @Test
     public void testWithInsanelyLongQueryParameterKey() throws Exception
     {
-        when(queryParams.value(QueryKeys.SEARCH_TERM)).thenReturn(reallyLongString);
+        Set<String> queryParamKeys = request.queryParams();
+        queryParamKeys.add(reallyLongString);
+        when(request.queryParams()).thenReturn(queryParamKeys);
         
+        assertThrows(() -> instance.handle(request, response)).isInstanceOf(BadArgumentException.class);
+    }
+
+    @Test
+    public void testWithInsanelyLongQueryParameterValue() throws Exception
+    {
+        when(queryParams.value(QueryKeys.SEARCH_TERM)).thenReturn(reallyLongString);
+
         assertThrows(() -> instance.handle(request, response))
-            .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(BadArgumentException.class);
     }
 
     private BlackNectarSearchRequest createExpectedRequest()
@@ -276,6 +288,13 @@ public class SearchStoresOperationTest
         when(params.value(QueryKeys.LIMIT)).thenReturn(limit.toString());
         when(params.value(QueryKeys.SEARCH_TERM)).thenReturn(searchTerm);
 
+        when(params.value(QueryKeys.LATITUDE)).thenReturn(String.valueOf(latitude));
+        when(params.value(QueryKeys.LONGITUDE)).thenReturn(String.valueOf(longitude));
+        when(params.value(QueryKeys.RADIUS)).thenReturn(radius.toString());
+        when(params.value(QueryKeys.LIMIT)).thenReturn(limit.toString());
+        when(params.value(QueryKeys.SEARCH_TERM)).thenReturn(searchTerm);
+        
+        
         return params;
     }
 

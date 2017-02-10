@@ -39,6 +39,7 @@ import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 import tech.sirwellington.alchemy.arguments.assertions.CollectionAssertions;
 
+import static tech.blacksource.blacknectar.service.BlackNectarAssertions.argumentWithSaneLength;
 import static tech.blacksource.blacknectar.service.data.MediaTypes.APPLICATION_JSON;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.AddressAssertions.validZipCodeString;
@@ -299,10 +300,14 @@ public class SearchStoresOperation implements Route
             for (String key : queryParams)
             {
                 checkThat(key)
+                    .is(argumentWithSaneLength())
                     .usingMessage("Unexpected empty query parameter")
                     .is(nonEmptyString())
                     .usingMessage("Unrecognized Query Parameter: " + key)
                     .is(elementInCollection(QueryKeys.KEYS));
+                
+                checkThat(request.queryParams(key))
+                    .is(argumentWithSaneLength());
             }
 
             checkThat(queryParams)

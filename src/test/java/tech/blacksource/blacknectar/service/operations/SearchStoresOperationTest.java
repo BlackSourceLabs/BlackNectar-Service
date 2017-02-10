@@ -118,11 +118,10 @@ public class SearchStoresOperationTest
     @GenerateInteger
     private Integer limit;
     
-    @GenerateInteger(value = RANGE, min = 10_000, max = 99_999)
-    private Integer zipCodeInt;
-    private String zipCode;
-
     private QueryParamsMap queryParams;
+    
+    @GenerateString(length = MAX_QUERY_PARAMETER_ARGUMENT_LENGTH)
+    private String reallyLongString;
 
     private BlackNectarSearchRequest expectedSearchRequest;
 
@@ -145,8 +144,6 @@ public class SearchStoresOperationTest
         latitude = one(latitudes());
         longitude = one(longitudes());
         
-        zipCode = String.valueOf(zipCodeInt);
-
         expectedSearchRequest = createExpectedRequest();
         images = Maps.create();
     }
@@ -240,6 +237,15 @@ public class SearchStoresOperationTest
         
         assertThrows(() -> instance.handle(request, response))
             .isInstanceOf(BlackNectarAPIException.class);
+    }
+    
+    @Test
+    public void testWithInsanelyLongQueryParameterKey() throws Exception
+    {
+        when(queryParams.value(QueryKeys.SEARCH_TERM)).thenReturn(reallyLongString);
+        
+        assertThrows(() -> instance.handle(request, response))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     private BlackNectarSearchRequest createExpectedRequest()

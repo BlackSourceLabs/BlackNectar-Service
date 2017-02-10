@@ -35,8 +35,8 @@ import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.p
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
- * This is a mutable request object that encapsulates parameters for a BlackNectar API request. All of the fields are publicly
- * accessible and mutable, which makes this class Thread-Unsafe.
+ * This is a mutable request object that encapsulates parameters for a BlackNectar API request. 
+ * All of the fields are publicly accessible and mutable, which makes this class Thread-Unsafe.
  *
  * @author SirWellington
  */

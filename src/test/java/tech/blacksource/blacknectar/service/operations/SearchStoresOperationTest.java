@@ -117,6 +117,10 @@ public class SearchStoresOperationTest
 
     @GenerateInteger
     private Integer limit;
+    
+    @GenerateInteger(value = RANGE, min = 10_000, max = 99_999)
+    private Integer zipCodeInt;
+    private String zipCode;
 
     private QueryParamsMap queryParams;
 
@@ -129,7 +133,7 @@ public class SearchStoresOperationTest
         setupData();
         setupMocks();
 
-        instance = new SearchStoresOperation(aroma, storesRepository, imageRepository);
+        instance = new SearchStoresOperation(aroma, storesRepository);
     }
 
     private void setupData() throws Exception
@@ -140,6 +144,8 @@ public class SearchStoresOperationTest
         ip = one(ip4Addresses());
         latitude = one(latitudes());
         longitude = one(longitudes());
+        
+        zipCode = String.valueOf(zipCodeInt);
 
         expectedSearchRequest = createExpectedRequest();
         images = Maps.create();
@@ -172,9 +178,8 @@ public class SearchStoresOperationTest
     @Test
     public void testConstructor()
     {
-        assertThrows(() -> new SearchStoresOperation(null, storesRepository, imageRepository));
-        assertThrows(() -> new SearchStoresOperation(aroma, null, imageRepository));
-        assertThrows(() -> new SearchStoresOperation(aroma, storesRepository, null));
+        assertThrows(() -> new SearchStoresOperation(null, storesRepository));
+        assertThrows(() -> new SearchStoresOperation(aroma, null));
     }
 
     @Test
@@ -266,15 +271,6 @@ public class SearchStoresOperationTest
         when(params.value(QueryKeys.SEARCH_TERM)).thenReturn(searchTerm);
 
         return params;
-    }
-
-    private Store storeWithImage(Store store)
-    {
-        Image image = images.get(store);
-
-        return Store.Builder.fromStore(store)
-            .withMainImageURL(image.getUrl().toString())
-            .build();
     }
 
     private List<Store> withoutImages(List<Store> stores)

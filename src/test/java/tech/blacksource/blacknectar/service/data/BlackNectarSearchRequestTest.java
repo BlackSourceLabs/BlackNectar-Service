@@ -31,6 +31,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.locations;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.negativeIntegers;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.positiveDoubles;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.positiveIntegers;
@@ -55,6 +56,8 @@ public class BlackNectarSearchRequestTest
     private double radiusInMeters;
     private int limit;
     private String searchTerm;
+    
+    private String zipCode;
 
     @Before
     public void setUp() throws Exception
@@ -70,7 +73,9 @@ public class BlackNectarSearchRequestTest
         limit = one(positiveIntegers());
         radiusInMeters = one(positiveDoubles());
         searchTerm = one(alphabeticString());
-
+        
+        int zipCodeInt = integers(10_000, 99_999).get();
+        zipCode = String.valueOf(zipCodeInt);
     }
 
     @Test
@@ -122,6 +127,15 @@ public class BlackNectarSearchRequestTest
 
         instance.searchTerm = searchTerm;
         assertThat(instance.hasSearchTerm(), is(true));
+    }
+    
+    @Test
+    public void testHasZipCode() throws Exception
+    {
+        assertThat(instance.hasZipCode(), is(false));
+        
+        instance.zipCode = zipCode;
+        assertThat(instance.hasZipCode(), is(true));
     }
 
     @Test
@@ -182,6 +196,23 @@ public class BlackNectarSearchRequestTest
     {
         double badRadius = one(NumberGenerators.doubles(-10000, -1));
         assertThrows(() -> instance.withRadius(badRadius));
+    }
+    
+    @Test
+    public void testWithZipCode() throws Exception
+    {
+        BlackNectarSearchRequest result = instance.withZipCode(zipCode);
+        assertThat(result, notNullValue());
+        assertThat(result.zipCode, is(zipCode));
+    }
+    
+    @Test
+    public void testHasZipCodeWithBadArgs() throws Exception
+    {
+        String badZipCode = one(alphabeticString());
+        assertThrows(() -> instance.withZipCode(badZipCode)).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(() -> instance.withZipCode("")).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(() -> instance.withZipCode(null)).isInstanceOf(IllegalArgumentException.class);
     }
 
 }

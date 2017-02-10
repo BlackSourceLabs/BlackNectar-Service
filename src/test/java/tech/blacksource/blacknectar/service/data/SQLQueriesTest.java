@@ -66,7 +66,9 @@ public class SQLQueriesTest
         
         assertThat(SQLQueries.QUERY_STORES_WITH_LOCATION, not(isEmptyOrNullString()));
         assertThat(SQLQueries.QUERY_STORES_WITH_NAME, not(isEmptyOrNullString()));
+        assertThat(SQLQueries.QUERY_STORES_WITH_ZIPCODE, not(isEmptyOrNullString()));
         assertThat(SQLQueries.QUERY_STORES_WITH_NAME_AND_LOCATION, not(isEmptyOrNullString()));
+        assertThat(SQLQueries.QUERY_STORES_WITH_NAME_AND_ZIPCODE, not(isEmptyOrNullString()));
         assertThat(SQLQueries.QUERY_IMAGES_FOR_STORE, not(isEmptyOrNullString()));
         assertThat(SQLQueries.QUERY_IMAGE, not(isEmptyOrNullString()));
         

@@ -197,6 +197,25 @@ public class SQLStoreRepositoryTest
         assertThat(results, not(empty()));
         assertThat(results, is(stores));
     }
+    
+    @Test
+    public void testSearchForStoresWithZipCode() throws Exception
+    {
+        int zipCodeInt = one(integers(10_000, 99_999));
+        String zipCode = String.valueOf(zipCodeInt);
+        
+        request = new BlackNectarSearchRequest()
+            .withSearchTerm(one(alphabeticString()))
+            .withZipCode(zipCode);
+        
+        when(database.query(eq(SQLQueries.QUERY_STORES_WITH_NAME_AND_ZIPCODE), eq(storeMapper), Mockito.<Object>anyVararg()))
+            .thenReturn(stores);
+        
+        List<Store> results = instance.searchForStores(request);
+        
+        assertThat(results, not(empty()));
+        assertThat(results, is(stores));
+    }
 
     @Test
     public void testAddStore() throws Exception

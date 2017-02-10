@@ -134,6 +134,11 @@ final class MemoryStoreRepository implements StoreRepository
                 stream = stream.filter(nearby(request.center, DEFAULT_RADIUS));
             }
         }
+        
+        if (request.hasZipCode())
+        {
+            stream = stream.filter(hasZipCode(request.zipCode));
+        }
 
         return stream.collect(toList());
     }
@@ -183,6 +188,29 @@ final class MemoryStoreRepository implements StoreRepository
             }
             
             return storeName.contains(term);
+        };
+    }
+    
+    private Predicate<Store> hasZipCode(String zipCode)
+    {
+        return store ->
+        {
+            if (store == null || store.getAddress() == null)
+            {
+                return false;
+            }
+
+            if (isNullOrEmpty(store.getAddress().getZipCode()))
+            {
+                return false;
+            }
+
+            if (isNullOrEmpty(zipCode))
+            {
+                return false;
+            }
+            
+            return Objects.equals(store.getAddress().getZipCode(), zipCode);
         };
     }
 

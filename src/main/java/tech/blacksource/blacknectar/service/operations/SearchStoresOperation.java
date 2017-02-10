@@ -17,13 +17,11 @@
 package tech.blacksource.blacknectar.service.operations;
 
 import com.google.gson.JsonArray;
-import java.net.URL;
 import java.util.List;
 import java.util.Set;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sir.wellington.alchemy.collections.lists.Lists;
 import sir.wellington.alchemy.collections.sets.Sets;
 import spark.QueryParamsMap;
 import spark.Request;
@@ -36,16 +34,15 @@ import tech.blacksource.blacknectar.service.data.BlackNectarSearchRequest;
 import tech.blacksource.blacknectar.service.data.StoreRepository;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
-import tech.blacksource.blacknectar.service.images.Image;
-import tech.blacksource.blacknectar.service.images.ImageRepository;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
+import tech.sirwellington.alchemy.arguments.assertions.CollectionAssertions;
 
 import static tech.blacksource.blacknectar.service.data.MediaTypes.APPLICATION_JSON;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.AddressAssertions.validZipCodeString;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
-import static tech.sirwellington.alchemy.arguments.assertions.CollectionAssertions.collectionContaining;
 import static tech.sirwellington.alchemy.arguments.assertions.CollectionAssertions.elementInCollection;
 import static tech.sirwellington.alchemy.arguments.assertions.GeolocationAssertions.validLatitude;
 import static tech.sirwellington.alchemy.arguments.assertions.GeolocationAssertions.validLongitude;
@@ -77,18 +74,16 @@ public class SearchStoresOperation implements Route
     private final static double MAX_RADIUS_METERS = 100_000;
 
     private final Aroma aroma;
-    private final StoreRepository stores;
-    private final ImageRepository images;
+    private final StoreRepository storesRepository;
     
     @Inject
-    SearchStoresOperation(Aroma aroma, StoreRepository stores, ImageRepository images)
+    SearchStoresOperation(Aroma aroma, StoreRepository storesRepository)
     {
-        checkThat(aroma, stores, images)
+        checkThat(aroma, storesRepository)
             .are(notNull());
         
         this.aroma = aroma;
-        this.stores = stores;
-        this.images = images;
+        this.storesRepository = storesRepository;
     }
 
     @Override
@@ -128,7 +123,7 @@ public class SearchStoresOperation implements Route
 
         try
         {
-            return stores.searchForStores(searchRequest);
+            return storesRepository.searchForStores(searchRequest);
         }
         catch (Exception ex)
         {
@@ -146,6 +141,7 @@ public class SearchStoresOperation implements Route
         insertRadiusIfPresentInto(searchRequest, queryParameters);
         insertSearchTermIfPresentInto(searchRequest, queryParameters);
         insertLimitIfPresentInto(searchRequest, queryParameters);
+        insertZipCodeIfPresentInto(searchRequest, queryParameters);
 
         return searchRequest;
     }
@@ -250,6 +246,23 @@ public class SearchStoresOperation implements Route
 
         request.withSearchTerm(searchTerm);
     }
+    
+    private void insertZipCodeIfPresentInto(BlackNectarSearchRequest request, QueryParamsMap queryParameters)
+    {
+        if (!hasZipCodeParameter(queryParameters))
+        {
+            return;
+        }
+        
+        String zipCode = queryParameters.value(QueryKeys.ZIP_CODE);
+        
+        checkThat(zipCode)
+            .throwing(BadArgumentException.class)
+            .is(validZipCodeString());
+        
+        request.withZipCode(zipCode);
+            
+    }
 
     private boolean hasLocationParameters(QueryParamsMap queryParams)
     {
@@ -271,6 +284,11 @@ public class SearchStoresOperation implements Route
     {
         return queryParams.hasKey(QueryKeys.RADIUS);
     }
+    
+    private boolean hasZipCodeParameter(QueryParamsMap queryParamsMap)
+    {
+        return queryParamsMap.hasKey(QueryKeys.ZIP_CODE);
+    }
 
     private AlchemyAssertion<Request> validRequest()
     {
@@ -287,45 +305,18 @@ public class SearchStoresOperation implements Route
                     .is(elementInCollection(QueryKeys.KEYS));
             }
 
-            if (!queryParams.contains(QueryKeys.SEARCH_TERM))
+            checkThat(queryParams)
+                .usingMessage("query parameters must contain at least one of 'searchTerm', 'zipCode', 'latitude', 'longitude")
+                .is(CollectionAssertions.collectionContainingAtLeastOnceOf(QueryKeys.SEARCH_TERM, QueryKeys.LATITUDE,
+                                                                           QueryKeys.LONGITUDE, QueryKeys.ZIP_CODE));
+            
+            if (queryParams.contains(QueryKeys.LATITUDE) || queryParams.contains(QueryKeys.LONGITUDE))
             {
                 checkThat(queryParams)
-                    .usingMessage("latitude parameter is missing")
-                    .is(collectionContaining(QueryKeys.LATITUDE))
-                    .usingMessage("longitude parameter is missing")
-                    .is(collectionContaining(QueryKeys.LONGITUDE));
+                    .usingMessage("query parameters must include both 'latitude' and 'longitude' if using location")
+                    .is(CollectionAssertions.collectionContainingAll(QueryKeys.LATITUDE, QueryKeys.LONGITUDE));
             }
         };
-    }
-
-    private Store tryToEnrichStoreWithImage(Store store)
-    {
-        List<Image> storeImages = images.getImagesForStore(store);
-
-        if (Lists.isEmpty(storeImages))
-        {
-            return store;
-        }
-
-        Store enrichedStore = enrichStoreWithAnImageFrom(store, storeImages);
-
-        return enrichedStore;
-    }
-
-    private Store enrichStoreWithAnImageFrom(Store store, List<Image> storeImages)
-    {
-        Image selectedImage = Lists.oneOf(storeImages);
-
-        URL url = selectedImage.getUrl();
-
-        return insertURLIntoStore(url, store);
-    }
-
-    private Store insertURLIntoStore(URL url, Store store)
-    {
-        return Store.Builder.fromStore(store)
-            .withMainImageURL(url.toString())
-            .build();
     }
 
     private void makeNoteOfRequestReceived(Request request)
@@ -358,8 +349,9 @@ public class SearchStoresOperation implements Route
         static final String LIMIT = "limit";
         static final String RADIUS = "radius";
         static final String SEARCH_TERM = "searchTerm";
+        static final String ZIP_CODE = "zipCode";
 
-        static Set<String> KEYS = Sets.createFrom(LATITUDE, LONGITUDE, LIMIT, RADIUS, SEARCH_TERM);
+        static Set<String> KEYS = Sets.createFrom(LATITUDE, LONGITUDE, LIMIT, RADIUS, SEARCH_TERM, ZIP_CODE);
     }
 
 }

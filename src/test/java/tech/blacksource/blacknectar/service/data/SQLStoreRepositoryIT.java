@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -29,10 +28,8 @@ import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.service.TestingResources;
 import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
-import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
-import tech.blacksource.blacknectar.service.stores.StoreDataSource;
 import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
@@ -82,9 +79,6 @@ public class SQLStoreRepositoryIT
     private Store store;
     private String storeId;
     
-    private List<Store> allStores;
-
-    
     @Before
     public void setUp() throws Exception
     {
@@ -97,8 +91,8 @@ public class SQLStoreRepositoryIT
     @After
     public void tearDown() throws Exception
     {
-        stores.forEach(instance::deleteStore);
         instance.deleteStore(store);
+        stores.parallelStream().forEach(instance::deleteStore);
     }
 
     private void setupData() throws Exception
@@ -106,7 +100,6 @@ public class SQLStoreRepositoryIT
         stores = listOf(stores());
         store = Lists.oneOf(stores);
         storeId = store.getStoreId();
-        allStores = StoreDataSource.FILE.getAllStores();
     }
 
     private void setupMocks() throws Exception
@@ -267,23 +260,6 @@ public class SQLStoreRepositoryIT
             .count();
         
         assertThat(withImages, greaterThan(0L));
-    }
-
-    @Ignore
-    @Test
-    public void testAddAllStores()
-    {
-        for (Store store : allStores)
-        {
-            try
-            {
-                instance.addStore(store);
-            }
-            catch (OperationFailedException ex)
-            {
-            }
-        }
-
     }
     
     @Test

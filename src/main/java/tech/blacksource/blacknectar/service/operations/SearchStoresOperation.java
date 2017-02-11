@@ -17,6 +17,7 @@
 package tech.blacksource.blacknectar.service.operations;
 
 import com.google.gson.JsonArray;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.inject.Inject;
@@ -39,6 +40,7 @@ import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 import tech.sirwellington.alchemy.arguments.assertions.CollectionAssertions;
 
+import static tech.blacksource.blacknectar.service.BlackNectarAssertions.argumentWithSaneLength;
 import static tech.blacksource.blacknectar.service.data.MediaTypes.APPLICATION_JSON;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.AddressAssertions.validZipCodeString;
@@ -299,10 +301,14 @@ public class SearchStoresOperation implements Route
             for (String key : queryParams)
             {
                 checkThat(key)
+                    .is(argumentWithSaneLength())
                     .usingMessage("Unexpected empty query parameter")
                     .is(nonEmptyString())
                     .usingMessage("Unrecognized Query Parameter: " + key)
                     .is(elementInCollection(QueryKeys.KEYS));
+                
+                checkThat(request.queryMap().value(key))
+                    .is(argumentWithSaneLength());
             }
 
             checkThat(queryParams)
@@ -351,7 +357,7 @@ public class SearchStoresOperation implements Route
         static final String SEARCH_TERM = "searchTerm";
         static final String ZIP_CODE = "zipCode";
 
-        static Set<String> KEYS = Sets.createFrom(LATITUDE, LONGITUDE, LIMIT, RADIUS, SEARCH_TERM, ZIP_CODE);
+        static Set<String> KEYS = Collections.unmodifiableSet(Sets.createFrom(LATITUDE, LONGITUDE, LIMIT, RADIUS, SEARCH_TERM, ZIP_CODE));
     }
 
 }

@@ -102,7 +102,7 @@ public class FileRepositoryTest
         List<Store> results = instance.getAllStores();
         assertThat(results, notNullValue());
         assertThat(results, not(empty()));
-        assertThat(results.size(), greaterThanOrEqualTo(3000));
+        assertThat(results.size(), greaterThanOrEqualTo(100));
         assertThat(results.size(), lessThanOrEqualTo(FileStoreDataSource.MAXIMUM_STORES));
         
         results.forEach(s -> assertThat(s.getStoreId(), is(storeIdString)));

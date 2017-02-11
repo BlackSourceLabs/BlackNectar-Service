@@ -91,8 +91,8 @@ public class SQLStoreRepositoryIT
     @After
     public void tearDown() throws Exception
     {
-        stores.forEach(instance::deleteStore);
         instance.deleteStore(store);
+        stores.parallelStream().forEach(instance::deleteStore);
     }
 
     private void setupData() throws Exception

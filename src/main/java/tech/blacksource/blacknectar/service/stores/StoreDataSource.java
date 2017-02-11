@@ -19,6 +19,7 @@ package tech.blacksource.blacknectar.service.stores;
 import com.google.inject.ImplementedBy;
 import java.util.List;
 import tech.aroma.client.Aroma;
+import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 /**
  * A {@link StoreDataSource} represents a resource that can provide access to all EBT stores.
@@ -39,5 +40,15 @@ public interface StoreDataSource
      */
     List<Store> getAllStores();
     
-    static StoreDataSource FILE = new FileStoreDataSource(Aroma.create(), IDGenerator.INSTANCE);
+    /**
+     * Creates a new file-based Data Source that reads all of
+     * the stores out of a CSV file.
+     * 
+     * @param aroma
+     * @return 
+     */
+    static StoreDataSource newFileBasedDataSource(@Required Aroma aroma)
+    {
+        return new FileStoreDataSource(aroma, IDGenerator.INSTANCE);
+    }
 }

@@ -24,10 +24,10 @@ import tech.sirwellington.alchemy.annotations.arguments.Required;
 /**
  * A {@link StoreDataSource} represents a resource that can provide access to all EBT stores.
  * For a file-based Data Source that loads stores from a government-provided CSV file, see
- * {@link #FILE}.
+ * {@link #newFileBasedDataSource(tech.aroma.client.Aroma) }.
  * 
  * @author SirWellington
- * @see #FILE
+ * @see #newFileBasedDataSource(tech.aroma.client.Aroma) 
  */
 @ImplementedBy(FileStoreDataSource.class)
 public interface StoreDataSource

@@ -20,12 +20,12 @@ package tech.blacksource.blacknectar.service.data;
 import java.sql.SQLException;
 import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
+import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
 import tech.blacksource.blacknectar.service.stores.Store;
-import tech.blacksource.blacknectar.service.stores.StoreDataSource;
 import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
@@ -141,12 +141,14 @@ public interface StoreRepository
 
     /**
      * Creates a new in-memory service that performs all operations in-memory.
+     * <p>
+     * Note that to start, the memory service included is empty.
      * 
      * @return 
      */
     static StoreRepository newMemoryService()
     {
-        List<Store> stores = StoreDataSource.FILE.getAllStores();
+        List<Store> stores = Lists.create();
         GeoCalculator formula = GeoCalculator.HARVESINE;
 
         return new MemoryStoreRepository(stores, formula);

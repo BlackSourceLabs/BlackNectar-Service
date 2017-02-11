@@ -51,7 +51,7 @@ final class FileStoreDataSource implements StoreDataSource
     private static final String FILENAME = "Stores.csv";
 
     private final List<Store> stores;
-    final static int MAXIMUM_STORES = 30_000;
+    final static int MAXIMUM_STORES = 1_000;
 
     private final Aroma aroma;
     private final IDGenerator idGenerator;

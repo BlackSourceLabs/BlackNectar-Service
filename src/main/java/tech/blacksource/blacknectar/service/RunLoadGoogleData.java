@@ -104,7 +104,7 @@ public class RunLoadGoogleData implements Callable<Void>
         {
             ++processed;
             
-            Place place = storeSearch.findMatchFor(store);
+            Place place = tryToFindMatchFor(store);
             
             if (place == null)
             {
@@ -301,6 +301,18 @@ public class RunLoadGoogleData implements Callable<Void>
             .text(message, store, ex)
             .withUrgency(Urgency.HIGH)
             .send();
+    }
+
+    private Place tryToFindMatchFor(Store store)
+    {
+        try
+        {
+            return storeSearch.findMatchFor(store);
+        }
+        catch(Exception ex)
+        {
+            return null;
+        }
     }
     
 }

@@ -133,7 +133,18 @@ public class RunLoadGoogleData implements Callable<Void>
         return null;
     }
     
-    
+    private Place tryToFindMatchFor(Store store)
+    {
+        try
+        {
+            return storeSearch.findMatchFor(store);
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
+    }
+
     private boolean tryToStorePlaceInformation(Place place, Store store)
     {
         try
@@ -304,16 +315,4 @@ public class RunLoadGoogleData implements Callable<Void>
             .send();
     }
 
-    private Place tryToFindMatchFor(Store store)
-    {
-        try
-        {
-            return storeSearch.findMatchFor(store);
-        }
-        catch(Exception ex)
-        {
-            return null;
-        }
-    }
-    
 }

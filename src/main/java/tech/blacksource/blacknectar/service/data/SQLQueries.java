@@ -56,6 +56,8 @@ public final class SQLQueries
     public static final String DELETE_STORE = loadQuery("delete_store.sql");
 
     //Insert Statements
+    public static final String INSERT_GOOGLE_DATA = loadQuery("insert_google_data.sql");
+    public static final String INSERT_GOOGLE_PHOTO = loadQuery("insert_google_places_photo.sql");
     public static final String INSERT_STORE = loadQuery("insert_store.sql");
     public static final String INSERT_STORE_IMAGE = loadQuery("insert_store_image.sql");
     public static final String INSERT_IMAGE = loadQuery("insert_image.sql");

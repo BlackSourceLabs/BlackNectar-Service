@@ -18,6 +18,7 @@ package tech.blacksource.blacknectar.service.algorithms;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.client.Aroma;
@@ -36,7 +37,8 @@ public final class ModuleAlgorithms extends AbstractModule
     @Override
     protected void configure()
     {
-
+        bind(new TypeLiteral<StoreSearchAlgorithm<Place>>() {}).to(GooglePlacesStoreSearchAlgorithm.class);
+        bind(new TypeLiteral<StoreSearchAlgorithm<YelpBusiness>>() {}).to(YelpStoreSearchAlgorithm.class);
     }
 
     @Provides

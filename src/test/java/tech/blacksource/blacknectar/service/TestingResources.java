@@ -35,7 +35,7 @@ public class TestingResources
 {
     private final static Logger LOG = LoggerFactory.getLogger(TestingResources.class);
 
-    private static final Injector INJECTOR = Guice.createInjector(new ModuleServer(), new ModuleTestingDatabase());
+    private static final Injector INJECTOR = Guice.createInjector(new ModuleServer(), new ModuleDatabaseTesting());
 
     public static Injector createInjector()
     {

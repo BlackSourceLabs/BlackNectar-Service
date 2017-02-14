@@ -26,16 +26,13 @@ import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
-import tech.blacksource.blacknectar.service.algorithms.StoreMatchingAlgorithm;
-import tech.blacksource.blacknectar.service.stores.Location;
+import tech.blacksource.blacknectar.service.algorithms.StoreSearchAlgorithm;
 import tech.blacksource.blacknectar.service.stores.Store;
-import tech.redroma.yelp.Coordinate;
 import tech.redroma.yelp.YelpAPI;
 import tech.redroma.yelp.YelpBusiness;
-import tech.redroma.yelp.YelpSearchRequest;
-import tech.redroma.yelp.exceptions.YelpException;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static tech.blacksource.blacknectar.service.stores.Store.validStore;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
@@ -47,31 +44,28 @@ final class YelpImageLoader implements ImageLoader
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(YelpImageLoader.class);
-    
-    /**
-     * The default limit to use when searching for Yelp Stores.
-     */
-    final static int DEFAULT_YELP_LIMIT = 15;
 
     private final Aroma aroma;
-    private final StoreMatchingAlgorithm<YelpBusiness> matchingAlgorithm;
+    private final StoreSearchAlgorithm<YelpBusiness> searchAlgorithm;
     private final YelpAPI yelp;
 
     @Inject
-    YelpImageLoader(Aroma aroma, StoreMatchingAlgorithm<YelpBusiness> matchingAlgorithm, YelpAPI yelp)
+    YelpImageLoader(Aroma aroma, StoreSearchAlgorithm<YelpBusiness> searchAlgorithm, YelpAPI yelp)
     {
-        checkThat(aroma, matchingAlgorithm, yelp)
+        checkThat(aroma, searchAlgorithm, yelp)
             .are(notNull());
 
         this.aroma = aroma;
-        this.matchingAlgorithm = matchingAlgorithm;
+        this.searchAlgorithm = searchAlgorithm;
         this.yelp = yelp;
     }
 
     @Override
     public List<URL> getImagesFor(Store store)
     {
-        checkThat(store).is(notNull());
+        checkThat(store)
+            .is(notNull())
+            .is(validStore());
 
         String url = tryToGetAPhotoURLFor(store);
 
@@ -87,11 +81,7 @@ final class YelpImageLoader implements ImageLoader
             }
             catch (MalformedURLException ex)
             {
-                LOG.error("Failed to parse URL: [{}]", url, ex);
-                aroma.begin().titled("URL Parse Failed")
-                    .text("Could not parse URL: [{}]", url, ex)
-                    .withUrgency(Urgency.LOW)
-                    .send();
+                makeNoteThatURLParseFailed(url, ex);
 
                 return null;
             }
@@ -101,108 +91,22 @@ final class YelpImageLoader implements ImageLoader
 
     private String tryToGetAPhotoURLFor(Store store)
     {
-        YelpSearchRequest request = buildRequestFor(store);
+        YelpBusiness yelpStore = searchAlgorithm.findMatchFor(store);
 
-        List<YelpBusiness> results = null;
-
-        try
+        if (Objects.nonNull(yelpStore) && Objects.nonNull(yelpStore.imageURL))
         {
-            results = yelp.searchForBusinesses(request);
-        }
-        catch (YelpException ex)
-        {
-            String message = "Failed to search yelp for business information";
-
-            LOG.error(message, ex);
-            aroma.begin().titled("Yelp Call Failed")
-                .text("{}\n\nFor Request:\n{}", message, request, ex)
-                .withUrgency(Urgency.HIGH)
-                .send();
-        }
-
-        if (!Lists.isEmpty(results))
-        {
-            makeNoteOfYelpRequest(request, results, store);
-
-            YelpBusiness yelpStore = tryToFindMatchingBusiness(results, store);
-
-            if (Objects.nonNull(yelpStore) && Objects.nonNull(yelpStore.imageURL))
-            {
-                return yelpStore.imageURL;
-            }
+            return yelpStore.imageURL;
         }
 
         return null;
     }
 
-    private YelpSearchRequest buildRequestFor(Store store)
+    private void makeNoteThatURLParseFailed(String url, MalformedURLException ex)
     {
-        Coordinate coordinate = copyCoordinateFrom(store.getLocation());
-
-        return YelpSearchRequest.newBuilder()
-            .withCoordinate(coordinate)
-            .withLimit(DEFAULT_YELP_LIMIT)
-            .withSearchTerm(store.getName())
-            .withSortBy(YelpSearchRequest.SortType.DISTANCE)
-            .build();
-    }
-
-    private Coordinate copyCoordinateFrom(Location location)
-    {
-        return Coordinate.of(location.getLatitude(), location.getLongitude());
-    }
-
-    private YelpBusiness tryToFindMatchingBusiness(List<YelpBusiness> results, Store store)
-    {
-
-        for (YelpBusiness business : results)
-        {
-            if (areSimilar(business, store))
-            {
-                makeNoteThatBusinessPickedForStore(business, store);
-
-                return business;
-            }
-        }
-
-        makeNotThatYelpMatchFailedFor(store);
-
-        return null;
-    }
-
-    private boolean areSimilar(YelpBusiness business, Store store)
-    {
-        return matchingAlgorithm.matchesStore(business, store);
-    }
-
-    private void makeNoteOfYelpRequest(YelpSearchRequest request, List<YelpBusiness> results, Store store)
-    {
-        String message = "Yelp request {} \n\nResulted in {} results \n\nFor Store [{}]:\n\n{}";
-        LOG.debug(message, request, results.size(), store);
-        aroma.begin().titled("Yelp Request Complete")
-            .text(message, request, results.size(), store, results)
-            .withUrgency(Urgency.LOW)
-            .send();
-    }
-
-    private void makeNotThatYelpMatchFailedFor(Store store)
-    {
-        String message = "Could not find a Yelp Store close to: \n\n{}";
-        LOG.debug(message, store);
-        aroma.begin().titled("Yelp Match Failed")
-            .text(message, store)
-            .withUrgency(Urgency.LOW)
-            .send();
-    }
-
-    private void makeNoteThatBusinessPickedForStore(YelpBusiness business, Store store)
-    {
-        String message = "Picked Yelp Business [{}] for Store [{}]";
-
-        LOG.debug(message, business, store);
-
-        aroma.begin().titled("Store Picked")
-            .text("Business: {}\n\n For Store: \n\n{}", business, store)
+        LOG.error("Failed to parse URL: [{}]", url, ex);
+        
+        aroma.begin().titled("URL Parse Failed")
+            .text("Could not parse URL: [{}]", url, ex)
             .withUrgency(Urgency.LOW)
             .send();
     }

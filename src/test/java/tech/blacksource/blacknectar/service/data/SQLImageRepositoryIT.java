@@ -31,7 +31,6 @@ import tech.blacksource.blacknectar.service.exceptions.DoesNotExistException;
 import tech.blacksource.blacknectar.service.images.Image;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
-import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.empty;
@@ -48,7 +47,6 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
  *
  * @author SirWellington
  */
-@Repeat(5)
 @RunWith(AlchemyTestRunner.class)
 public class SQLImageRepositoryIT
 {

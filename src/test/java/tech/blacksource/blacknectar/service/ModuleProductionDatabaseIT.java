@@ -42,14 +42,14 @@ public class ModuleProductionDatabaseIT
     @Mock(answer = RETURNS_MOCKS)
     private Aroma fakeAroma;
     
-    private ModuleProductionDatabase instance;
+    private ModuleDatabaseProduction instance;
 
     @Before
     public void setUp() throws Exception
     {
         setupData();
         setupMocks();
-        instance = new ModuleProductionDatabase();
+        instance = new ModuleDatabaseProduction();
     }
 
 

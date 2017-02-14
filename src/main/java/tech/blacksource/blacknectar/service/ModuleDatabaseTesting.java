@@ -36,10 +36,10 @@ import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
  *
  * @author SirWellington
  */
-public final class ModuleTestingDatabase extends AbstractModule
+public final class ModuleDatabaseTesting extends AbstractModule
 {
 
-    private final static Logger LOG = LoggerFactory.getLogger(ModuleTestingDatabase.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ModuleDatabaseTesting.class);
 
     @Override
     protected void configure()
@@ -50,27 +50,13 @@ public final class ModuleTestingDatabase extends AbstractModule
     @Singleton
     DataSource provideSQLConnection(Aroma aroma) throws SQLException
     {
-        int port = 5432;
-        String database = "testing";
-        String host = "database.blacksource.tech";
-        String user = Files.readFile("./secrets/postgres-user.txt").trim();
-        String password = Files.readFile("./secrets/postgres-password.txt").trim();
-        
-        String applicationName = "BlackNectar";
 
-        String url = String.format("jdbc:postgresql://%s:%d/%s?user=%s&password=%s&ApplicationName=%s",
-                                   host,
-                                   port,
-                                   database,
-                                   user,
-                                   password,
-                                   applicationName);
-
+        String url = createProductionTestConnection();
 
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
         dataSource.setUrl(url);
-        
-        try(Connection connection = dataSource.getConnection();)
+
+        try (Connection connection = dataSource.getConnection();)
         {
             checkThat(connection)
                 .throwing(SQLException.class)
@@ -78,7 +64,7 @@ public final class ModuleTestingDatabase extends AbstractModule
         }
         catch (SQLException ex)
         {
-            String message = "Failed to create connection to PostgreSQL. Defaulting to SQLite.";
+            String message = "Failed to create connection to PostgreSQL.";
             LOG.error(message, ex);
             aroma.begin().titled("SQL Connection Failed")
                 .text(message, ex)
@@ -108,5 +94,47 @@ public final class ModuleTestingDatabase extends AbstractModule
                 throw new FailedAssertionException("Could not check for connection", ex);
             }
         };
+    }
+
+    private String createDevelopmentTestConnection()
+    {
+        int port = 5432;
+        String database = "testing";
+        String host = "dev.database.blacksource.tech";
+        String user = Files.readFile("./secrets/postgres-user.txt").trim();
+        String password = Files.readFile("./secrets/postgres-password.txt").trim();
+
+        String applicationName = "BlackNectarService";
+
+        String url = String.format("jdbc:postgresql://%s:%d/%s?user=%s&password=%s&ApplicationName=%s",
+                                   host,
+                                   port,
+                                   database,
+                                   user,
+                                   password,
+                                   applicationName);
+
+        return url;
+    }
+
+    private String createProductionTestConnection()
+    {
+        int port = 5432;
+        String database = "testing";
+        String host = "prod.database.blacksource.tech";
+        String user = Files.readFile("./secrets/postgres-user.txt").trim();
+        String password = Files.readFile("./secrets/postgres-password.txt").trim();
+
+        String applicationName = "BlackNectarService";
+
+        String url = String.format("jdbc:postgresql://%s:%d/%s?user=%s&password=%s&ApplicationName=%s",
+                                   host,
+                                   port,
+                                   database,
+                                   user,
+                                   password,
+                                   applicationName);
+        
+        return url;
     }
 }

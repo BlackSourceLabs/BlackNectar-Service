@@ -36,10 +36,10 @@ import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
  *
  * @author SirWellington
  */
-public final class ModuleProductionDatabase extends AbstractModule
+public final class ModuleDatabaseProduction extends AbstractModule
 {
 
-    private final static Logger LOG = LoggerFactory.getLogger(ModuleProductionDatabase.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ModuleDatabaseProduction.class);
 
     @Override
     protected void configure()
@@ -58,7 +58,7 @@ public final class ModuleProductionDatabase extends AbstractModule
         //Explicitly setting the schema seems to conflict with Postgis functions, so 
         //ignoring for now.
         String schema = "blacknectar";
-        String applicationName = "BlackNectar";
+        String applicationName = "BlackNectarService";
 
         String url = String.format("jdbc:postgresql://%s:%d/%s?user=%s&password=%s&ApplicationName=%s",
                                    host,

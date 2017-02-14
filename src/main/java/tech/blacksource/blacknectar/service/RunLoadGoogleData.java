@@ -133,16 +133,6 @@ public class RunLoadGoogleData implements Callable<Void>
         return null;
     }
     
-    private void makeNoteThatScriptStartedWith(int totalStores)
-    {
-        String message = "Script Started with {} Total stores for processing.";
-        LOG.debug(message, totalStores);
-        
-        aroma.begin().titled("Script Began")
-            .text(message, totalStores)
-            .withUrgency(Urgency.LOW)
-            .send();
-    }
     
     private boolean tryToStorePlaceInformation(Place place, Store store)
     {
@@ -242,6 +232,17 @@ public class RunLoadGoogleData implements Callable<Void>
         return gson.toJson(object);
     }
     
+    private void makeNoteThatScriptStartedWith(int totalStores)
+    {
+        String message = "Script Started with {} Total stores for processing.";
+        LOG.debug(message, totalStores);
+
+        aroma.begin().titled("Script Began")
+            .text(message, totalStores)
+            .withUrgency(Urgency.LOW)
+            .send();
+    }
+
     private void makeNoteThatNoPlaceFound(Store store, int failed, int processed, int totalStores)
     {
         String message = "[{} failed, {} processed, {} remaining, {} total] - No matching place found for store: {}";

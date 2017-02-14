@@ -1,5 +1,4 @@
--- Used to store information about Photos retrieved from the
--- Google Places API.
+-- Used to store information about Ratings for Google Places 
 -- ===========================================================================
 
 CREATE TABLE IF NOT EXISTS Google_Places_Ratings

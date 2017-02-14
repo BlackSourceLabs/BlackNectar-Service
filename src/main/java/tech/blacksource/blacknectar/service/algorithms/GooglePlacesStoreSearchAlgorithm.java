@@ -46,7 +46,7 @@ class GooglePlacesStoreSearchAlgorithm implements StoreSearchAlgorithm<Place>
 {
     
     private final static Logger LOG = LoggerFactory.getLogger(GooglePlacesStoreSearchAlgorithm.class);
-    static final int DEFAULT_RADIUS = 1_000;
+    static final int DEFAULT_RADIUS = 4_000;
     
     private final Aroma aroma;
     private final GooglePlacesAPI google;

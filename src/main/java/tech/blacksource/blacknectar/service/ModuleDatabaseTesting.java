@@ -51,7 +51,7 @@ public final class ModuleDatabaseTesting extends AbstractModule
     DataSource provideSQLConnection(Aroma aroma) throws SQLException
     {
 
-        String url = createAWSConnection();
+        String url = createProductionTestConnection();
 
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
         dataSource.setUrl(url);
@@ -96,11 +96,11 @@ public final class ModuleDatabaseTesting extends AbstractModule
         };
     }
 
-    private String createTestConnection()
+    private String createDevelopmentTestConnection()
     {
         int port = 5432;
         String database = "testing";
-        String host = "database.blacksource.tech";
+        String host = "dev.database.blacksource.tech";
         String user = Files.readFile("./secrets/postgres-user.txt").trim();
         String password = Files.readFile("./secrets/postgres-password.txt").trim();
 
@@ -117,11 +117,11 @@ public final class ModuleDatabaseTesting extends AbstractModule
         return url;
     }
 
-    private String createAWSConnection()
+    private String createProductionTestConnection()
     {
         int port = 5432;
         String database = "testing";
-        String host = "blacksourcedatabase.ckh1p3qdxanw.us-west-2.rds.amazonaws.com";
+        String host = "prod.database.blacksource.tech";
         String user = Files.readFile("./secrets/postgres-user.txt").trim();
         String password = Files.readFile("./secrets/postgres-password.txt").trim();
 

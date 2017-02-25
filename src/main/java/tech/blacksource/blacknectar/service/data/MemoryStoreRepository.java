@@ -131,7 +131,7 @@ final class MemoryStoreRepository implements StoreRepository
             }
             else 
             {
-                stream = stream.filter(nearby(request.center, DEFAULT_RADIUS));
+                stream = stream.filter(nearby(request.center, DEFAULT_RADIUS_METERS));
             }
         }
         

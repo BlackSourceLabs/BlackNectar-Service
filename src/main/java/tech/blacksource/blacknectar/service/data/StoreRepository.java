@@ -49,7 +49,7 @@ public interface StoreRepository
      * <p>
      * A little more than 8 miles.
      */
-    public double DEFAULT_RADIUS = 13_000;
+    public double DEFAULT_RADIUS_METERS = 13_000;
     
     /**
      * Adds a Store to the repository.

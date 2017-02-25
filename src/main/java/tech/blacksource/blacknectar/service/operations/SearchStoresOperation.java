@@ -181,7 +181,7 @@ public class SearchStoresOperation implements Route
     {
         if (!hasRadiusParameter(queryParameters))
         {
-            request.withRadius(StoreRepository.DEFAULT_RADIUS);
+            request.withRadius(StoreRepository.DEFAULT_RADIUS_METERS);
             return;
         }
 

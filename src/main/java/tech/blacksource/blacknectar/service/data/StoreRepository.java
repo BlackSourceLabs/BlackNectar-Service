@@ -47,9 +47,9 @@ public interface StoreRepository
     /**
      * The default radius, in meters, used in queries where a radius is not provided.
      * <p>
-     * 5 Kilometers.
+     * A little more than 8 miles.
      */
-    public double DEFAULT_RADIUS = 5_000;
+    public double DEFAULT_RADIUS = 13_000;
     
     /**
      * Adds a Store to the repository.

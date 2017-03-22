@@ -50,11 +50,11 @@ Search for Stores using the specified query parameters.
 
 ### Store (object)
 + store_id: `5ceaf0fe-cd7b-4ff8-904e-3a6c1be9fbf6` (string, required) - The unique identifier for the Store
-+ store_name: Angelica's Market (string, required) - The name of the Store.
++ store_name: `Angelica's Market` (string, required) - The name of the Store.
 + is_farmers_market: false (boolean, required) - Tells whether the store is a Farmer's Market or not.
 + address (Address, required)
 + location (Location, required)
-+ main_image_url (string, optional) - If present, contains a URL to a picture of the Store.
++ main_image_url: `http://www.portagewibid.org/wp-content/uploads/2014/11/Farmersmarket.jpg` (string, optional) - If present, contains a URL to a picture of the Store.
 
 ### Address (object)
 + address_line_1: 243 E 53rd St (string, required) - The first part of the address.
@@ -66,7 +66,7 @@ Search for Stores using the specified query parameters.
 + local_zip_code: 0401 (number, optional) - The Local 4-Digit Zip Code.
 
 ### Location (object)
-+ latitude: 33.994267 (number, required)
++ latitude: `33.994267` (number, required)
 + longitude: `-118.27029` (number, required)
 
 
@@ -104,6 +104,7 @@ Get a list of all states supported by the EBT API.
 Get a States' features, sign-in requirements, and sign-up requirements.
 
 + Response 200 (application/json) 
+    + Attributes (array[Field])
 
         Get the features available to a particular state
 
@@ -128,6 +129,7 @@ Check if a user has an account with the state website.
 Create an account with the State Website.
 Note that each website has different account requirements.
 
++ Response 200 (application/json)
 
 
 ## Balance [/ebt/{state}/balance]
@@ -135,14 +137,14 @@ Note that each website has different account requirements.
 ### View Balance [POST]
 View an EBT Card's Balance. Credentials must be passed into the method body.
 
-
++ Response 200 (application/json)
 
 ## Transactions [/ebt/{state}/transactions]
 
 ### View Transaction History [POST]
 View an EBT Card's Transaction History. Credentials must be passed into the method body.
 
-
++ Response 200 (application/json)
 
 
 ## Data Structures
@@ -150,3 +152,18 @@ View an EBT Card's Transaction History. Credentials must be passed into the meth
 ### Field
 
 + name: `user-id` (string, required) - The unique name of the field. Each field will have a different name.
++ type: `USERNAME` (string, required) - Information about what type of data this field is intended to capture.
++ description: `A unique user ID` (string, optional) - A short human-readable description of the field.
++ is_required: `true` (boolean, required) - Whether this field is required or optional
+
+
+### StringRequirements
+
+Describes requirements on the values that are to be entered into the Field
+
++ min_length: `4` (number, required) - The value must have at least this many characters
++ max_length: `35` (number, required) - The value cannot have more than this many characters
++ character_requirements (CharacterRequirements, required) - Describes requirements on the characters
+
+### CharacterRequirements
+Describes requirements on the Characters inside of a String

@@ -136,7 +136,9 @@ Create an account with the State Website.
 Note that each website has different account requirements.
 
 + Request (application/json)
-    + Attributes (array[FieldValue], required) - Values for each of the State's required fields
+    + Attributes (array[FieldValue], required)
+    
+        Values for each of the State's required fields
 
 + Response 200 (application/json)
 
@@ -150,7 +152,9 @@ Note that each website has different account requirements.
 View an EBT Card's Balance. Credentials must be passed into the method body.
 
 + Request (application/json)
-    + Attributes (array[FieldValue], required) - Values necessary to login to the State account
+    + Attributes (array[FieldValue], required)
+    
+        Values necessary to login to the State account
 
 + Response 200 (application/json)
 
@@ -164,7 +168,9 @@ View an EBT Card's Balance. Credentials must be passed into the method body.
 View an EBT Card's Transaction History. Credentials must be passed into the method body.
 
 + Request (application/json)
-    + Attributes (array[FieldValue], required) - Values necessary to login to the State account
+    + Attributes (array[FieldValue], required)
+        
+        Values necessary to login to the State account
 
 + Response 200 (application/json)
 
@@ -175,7 +181,7 @@ View an EBT Card's Transaction History. Credentials must be passed into the meth
 
 + sign_in_requirements (array[Field], required) - Fields required in order to sign in
 + sign_up_requirements (array[Field], required) - Fields required in order to create an account
-+ features: (WebsiteFeature, required) - Features supported by the state
++ features (WebsiteFeature, required) - Features supported by the state
 
 
 ### WebsiteFeature (enum[string])
@@ -205,7 +211,7 @@ View an EBT Card's Transaction History. Credentials must be passed into the meth
 + requires_lower_case: `true` (boolean, required) - Whether the string requires at least 1 lower case letter
 + requires_upper_case: `false` (boolean, required) - Whether the string requires at least 1 upper case letter
 + requires_number: `true` (boolean, required) - Whether the string requries at least 1 number
-+ requires_special_character: `false` (boolean, true) - Whether the string requires at least 1 special character. This is common with Password fields.
++ requires_special_character: `false` (boolean, required) - Whether the string requires at least 1 special character. This is common with Password fields.
 
 
 ### FieldValue (object)
@@ -222,7 +228,7 @@ View an EBT Card's Transaction History. Credentials must be passed into the meth
 + amount: `490.20` (number, required) - The amount of the Transaction
 + address: `1000 Santa Monica Blvd Santa Monica, CA` - The address where the Transaction was recorded
 + retailer: `VONS` - The name of the retail company
-+ transaction_type: (enum[string], required)
++ transaction_type: `CHARGE` (enum[string], required)
     + CHARGE
     + DEPOSIT
 + type: `FOOD` (string, required) - Additional information about the type of the transaction.

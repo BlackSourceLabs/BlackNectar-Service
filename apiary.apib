@@ -117,14 +117,16 @@ Get a States' features, sign-in requirements, and sign-up requirements.
 ## Check State Account [/ebt/{state}/check]
 
 ### Check State Account Exists [POST]
-Check if a user has an account with the state website.
+Check if a user has an account with the state website. The request must include values for each of the required sign-in fields.
 
-+ Attributes (array[FieldValue], required)
++ Request (application/json)
+    
+    + Attributes (array[FieldValue], required)
 
 + Response 200 (application/json)
     
     + Attributes (object)
-        + exist
+        + exists: `true` (boolean, required) - True if the account exists, false otherwise
 
 
 ## Create State Account [/ebt/{state}/create]

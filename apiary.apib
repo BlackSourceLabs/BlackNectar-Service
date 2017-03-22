@@ -127,7 +127,7 @@ Check if a user has an account with the state website. The request must include 
     
     + Attributes (object)
         + exists: `true` (boolean, required) - True if the account exists, false otherwise
-
+        + message (string, optional) - A detailed message in case the operation failed
 
 ## Create State Account [/ebt/{state}/create]
 
@@ -144,7 +144,7 @@ Note that each website has different account requirements.
 
     + Attributes (object, required)
         + success: `true` (boolean, required) - Whether the operation succeeded or not
-
+        + message (string, optional) - A detailed message in case the operation failed
 
 ## Balance [/ebt/{state}/balance]
 

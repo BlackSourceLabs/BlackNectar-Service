@@ -215,4 +215,14 @@ View an EBT Card's Transaction History. Credentials must be passed into the meth
 
 
 ### Transaction (object)
-+
+
++ timestamp (object, required) - The timestamp of the transaction
+    + seconds: 1474869861 (number, required) - Number of seconds since epoch
+    + nanos: `0` (number, optional) - The nanoseconds component
++ amount: `490.20` (number, required) - The amount of the Transaction
++ address: `1000 Santa Monica Blvd Santa Monica, CA` - The address where the Transaction was recorded
++ retailer: `VONS` - The name of the retail company
++ transaction_type: (enum[string], required)
+    + CHARGE
+    + DEPOSIT
++ type: `FOOD` (string, required) - Additional information about the type of the transaction.

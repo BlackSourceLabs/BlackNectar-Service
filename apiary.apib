@@ -149,7 +149,7 @@ View an EBT Card's Transaction History. Credentials must be passed into the meth
 
 ## Data Structures
 
-### Field
+### Field (object)
 
 + name: `user-id` (string, required) - The unique name of the field. Each field will have a different name.
 + type: `USERNAME` (string, required) - Information about what type of data this field is intended to capture.
@@ -157,13 +157,13 @@ View an EBT Card's Transaction History. Credentials must be passed into the meth
 + is_required: `true` (boolean, required) - Whether this field is required or optional.
 + requirements (StringRequirements, required) - Details any requirements on the value that this field accepts.
 
-### StringRequirements
+### StringRequirements (object)
 
 + min_length: `4` (number, required) - The value must have at least this many characters
 + max_length: `35` (number, required) - The value cannot have more than this many characters
 + character_requirements (CharacterRequirements, required) - Describes requirements on the characters
 
-### CharacterRequirements
+### CharacterRequirements (object)
 
 + requires_lower_case: `true` (boolean, required) - Whether the string requires at least 1 lower case letter
 + requires_upper_case: `false` (boolean, required) - Whether the string requires at least 1 upper case letter

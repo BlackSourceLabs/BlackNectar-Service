@@ -77,24 +77,27 @@ Search for Stores using the specified query parameters.
 
 Manage a User's Account information, including their EBT Card and personal Profile.
 
-# EBT
+# EBT API
 
 Get an EBT Card's Balance and Transaction History.
 
-## States [/account/ebt]
+## EBT [/account/ebt]
+
 ### Get Supported States [GET]
-Get a list of all states supported by this API.
+Get a list of all states supported by the EBT API.
 
 + Response 200 (application/json)
 
-## State Features [/account/ebt/{state}]
-
-Get a list of features supported by a particular state.
+## State EBT [/account/ebt/{state}]
 
 + Parameters
     + state: `NY` (string, required)      - The two-digit abbreviation of the state.
 
++ Response 200 (application/json)
+
+
 ### Get Features [GET]
+Get a list of features supported by a particular state.
 
 + Response 200 (application/json) 
 

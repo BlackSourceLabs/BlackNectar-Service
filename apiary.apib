@@ -73,11 +73,8 @@ Search for Stores using the specified query parameters.
 <!--ACOUNT API -->
 <!--========================================================-->
 
-# Group Account
+# Group EBT
 
-Manage a User's Account information, including their EBT Card and personal Profile.
-
-# EBT API
 
 Get an EBT Card's Balance and Transaction History.
 
@@ -88,13 +85,17 @@ Get a list of all states supported by the EBT API.
 
 + Response 200 (application/json)
 
-## State EBT [/account/ebt/{state}]
+        [
+            "AZ",
+            "CA",
+            "NY",
+            "NJ"
+        ]
+
+## State [/account/ebt/{state}]
 
 + Parameters
     + state: `NY` (string, required)      - The two-digit abbreviation of the state.
-
-+ Response 200 (application/json)
-
 
 ### Get Features [GET]
 Get a list of features supported by a particular state.
@@ -106,3 +107,9 @@ Get a list of features supported by a particular state.
 + Response 404 (application/json) 
 
         Thrown when acessing a state that does not exist
+        
+
+### Exists[POST]
+Check if a user has an account with the state website.
+
++ Response 200 (application/json)

@@ -104,7 +104,7 @@ Get a list of all states supported by the EBT API.
 Get a States' features, sign-in requirements, and sign-up requirements.
 
 + Response 200 (application/json) 
-    + Attributes (array[Field])
+    + Attributes (StateFeatures)
 
         Get the features available to a particular state
 
@@ -148,6 +148,20 @@ View an EBT Card's Transaction History. Credentials must be passed into the meth
 
 
 ## Data Structures
+
+### StateFeatures(object) - An Overview of supported features and requirements for a State
+
++ sign_in_requirements (array[Field], required) - Fields required in order to sign in
++ sign_up_requirements (array[Field], required) - Fields required in order to create an account
++ features: (WebsiteFeature, required) - Features supported by the state
+
+
+### WebsiteFeature (enum[string])
+
++ BALANCE - The State supports the "/balance/" api and allows users to get their EBT Balance.
++ TRANSACTION - The State supports the "/transactions/" api and allows users to view their Transaction history.
+      
+
 
 ### Field (object)
 

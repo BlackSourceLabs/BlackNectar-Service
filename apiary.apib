@@ -135,7 +135,13 @@ Check if a user has an account with the state website. The request must include 
 Create an account with the State Website.
 Note that each website has different account requirements.
 
++ Request (application/json)
+    + Attributes (array[FieldValue], required) - Values for each of the State's required fields
+
 + Response 200 (application/json)
+
+    + Attributes (object)
+        + success: `true` - Whether the operation succeeded or not
 
 
 ## Balance [/ebt/{state}/balance]
@@ -143,12 +149,22 @@ Note that each website has different account requirements.
 ### View Balance [POST]
 View an EBT Card's Balance. Credentials must be passed into the method body.
 
++ Request (application/json)
+    + Attributes (array[FieldValue], required) - Values necessary to login to the State account
+
 + Response 200 (application/json)
+
+    + Attributes (object)
+        + cash_balance: `93.04` (number, required) - The amount of cash money left on the EBT Card
+        + food_balance: `31.30` (number, required) - The amount of food money left on the EBT Card
 
 ## Transactions [/ebt/{state}/transactions]
 
 ### View Transaction History [POST]
 View an EBT Card's Transaction History. Credentials must be passed into the method body.
+
++ Request (application/json)
+    + Attributes (array[FieldValue], required) - Values necessary to login to the State account
 
 + Response 200 (application/json)
 
@@ -196,3 +212,7 @@ View an EBT Card's Transaction History. Credentials must be passed into the meth
 
 + name: `user-id` (string, required) - The name of the field. This should be pulled from the Field's `name` parameter.
 + value: `cordhernandez` (string, required) - The value of the field. The value should always be a String.
+
+
+### Transaction (object)
++

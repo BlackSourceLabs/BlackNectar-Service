@@ -14,7 +14,7 @@ for Stores in the United States that support EBT (Electronic Benefits Transfer) 
 
 ## Search Stores [/stores{?limit,searchTerm,latitude,longitude,radius,zipCode}]
 
-Search for available EBT Stores.U
+Search for available EBT Stores.
 
 + Parameters
     
@@ -63,3 +63,37 @@ Search for Stores using the specified query parameters.
 ### Location
 + latitude: 33.994267 (number, required)
 + longitude: `-118.27029` (number, required)
+
+
+<!--EBT API -->
+
+# Group Account
+
+Manage a User's Account information, including their EBT Card and personal Profile.
+
+# EBT
+
+Get an EBT Card's Balance and Transaction History.
+
+## States [/account/ebt]
+### Get Supported States [GET]
+Get a list of all states supported by this API.
+
++ Response 200 (application/json)
+
+## State Features [/account/ebt/{state}]
+
+Get a list of features supported by a particular state.
+
++ Parameters
+    + state: `NY` (string, required)      - The two-digit abbreviation of the state.
+
+### Get Features [GET]
+
++ Response 200 (application/json) 
+
+        Get the features available to a particular state
+
++ Response 404 (application/json) 
+
+        Thrown when acessing a state that does not exist

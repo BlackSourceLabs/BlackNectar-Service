@@ -48,7 +48,7 @@ Search for Stores using the specified query parameters.
 
 ## Data Structures
 
-### Store
+### Store (object)
 + store_id: `5ceaf0fe-cd7b-4ff8-904e-3a6c1be9fbf6` (string, required) - The unique identifier for the Store
 + store_name: Angelica's Market (string, required) - The name of the Store.
 + is_farmers_market: false (boolean, required) - Tells whether the store is a Farmer's Market or not.
@@ -56,7 +56,7 @@ Search for Stores using the specified query parameters.
 + location (Location, required)
 + main_image_url (string, optional) - If present, contains a URL to a picture of the Store.
 
-### Address
+### Address (object)
 + address_line_1: 243 E 53rd St (string, required) - The first part of the address.
 + address_line_2: Suite #200 (string, optional) - The second part of the address present on some stores.
 + city: Los Angeles (string, required)
@@ -65,7 +65,7 @@ Search for Stores using the specified query parameters.
 + zip_code: `90210` (number, required) - The 5-Digit Zip Code.
 + local_zip_code: 0401 (number, optional) - The Local 4-Digit Zip Code.
 
-### Location
+### Location (object)
 + latitude: 33.994267 (number, required)
 + longitude: `-118.27029` (number, required)
 
@@ -148,3 +148,5 @@ View an EBT Card's Transaction History. Credentials must be passed into the meth
 ## Data Structures
 
 ### Field
+
++ name: `user-id` (string, required) - The unique name of the field. Each field will have a different name.

@@ -86,12 +86,12 @@ Get a list of all states supported by the EBT API.
 
 + Response 200 (application/json)
 
-        [
-            "AZ",
-            "CA",
-            "NY",
-            "NJ"
-        ]
+    + Attributes (array)
+    
+        + (object) - A State supported by the system
+        
+            + id: `CA` - The short two-digit code for the state. This is what is used as a path parameter in all API calls
+            + name: `California` - The long human-displayable name of the state.
 
 
 
@@ -119,8 +119,9 @@ Get a States' features, sign-in requirements, and sign-up requirements.
 ### Check State Account Exists [POST]
 Check if a user has an account with the state website.
 
-+ Response 200 (application/json)
++ Attributes (array[FieldValue])
 
++ Response 200 (application/json)
 
 
 ## Create State Account [/ebt/{state}/create]
@@ -184,3 +185,9 @@ View an EBT Card's Transaction History. Credentials must be passed into the meth
 + requires_upper_case: `false` (boolean, required) - Whether the string requires at least 1 upper case letter
 + requires_number: `true` (boolean, required) - Whether the string requries at least 1 number
 + requires_special_character: `false` (boolean, true) - Whether the string requires at least 1 special character. This is common with Password fields.
+
+
+### FieldValue (object)
+
++ name: `user-id` (string, required) - The name of the field. This should be pulled from the Field's `name` parameter.
++ value: `cordhernandez` (string, required) - The value of the field. The value should always be a String.

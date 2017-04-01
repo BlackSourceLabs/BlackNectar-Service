@@ -16,22 +16,24 @@
 
 package tech.blacksource.blacknectar.service;
 
- import com.google.inject.Guice;
- import com.google.inject.Injector;
  import javax.inject.Inject;
- import org.slf4j.Logger;
- import org.slf4j.LoggerFactory;
- import spark.ExceptionHandler;
- import spark.Service;
- import tech.aroma.client.Aroma;
- import tech.aroma.client.Priority;
- import tech.blacksource.blacknectar.service.operations.GetSampleStoreOperation;
- import tech.blacksource.blacknectar.service.operations.SayHelloOperation;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import spark.ExceptionHandler;
+import spark.Service;
+import tech.aroma.client.Aroma;
+import tech.aroma.client.Priority;
+import tech.blacksource.blacknectar.service.operations.GetSampleStoreOperation;
+import tech.blacksource.blacknectar.service.operations.SayHelloOperation;
+ import tech.blacksource.blacknectar.service.operations.ebt.GetStatesOperation;
  import tech.blacksource.blacknectar.service.operations.stores.SearchStoresOperation;
 
- import static com.google.common.base.Strings.isNullOrEmpty;
- import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
- import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
  *
@@ -52,6 +54,7 @@ public final class Server
     private final Aroma aroma;
     private final SayHelloOperation sayHelloOperation;
     private final GetSampleStoreOperation getSampleStoreOperation;
+    private final GetStatesOperation getStatesOperation;
     private final SearchStoresOperation searchStoresOperation;
     private final ExceptionHandler exceptionHandler;
 
@@ -59,15 +62,17 @@ public final class Server
     Server(Aroma aroma,
            SayHelloOperation sayHelloOperation,
            GetSampleStoreOperation getSampleStoreOperation,
+           GetStatesOperation getStatesOperation,
            SearchStoresOperation searchStoresOperation,
            ExceptionHandler exceptionHandler)
     {
-        checkThat(aroma, sayHelloOperation, getSampleStoreOperation, searchStoresOperation, exceptionHandler)
+        checkThat(aroma, sayHelloOperation, getSampleStoreOperation, getStatesOperation, searchStoresOperation, exceptionHandler)
             .are(notNull());
         
         this.aroma = aroma;
         this.sayHelloOperation = sayHelloOperation;
         this.getSampleStoreOperation = getSampleStoreOperation;
+        this.getStatesOperation = getStatesOperation;
         this.searchStoresOperation = searchStoresOperation;
         this.exceptionHandler = exceptionHandler;
     }
@@ -147,6 +152,11 @@ public final class Server
         service.get("/stores", this.searchStoresOperation);
         service.get("/sample-store", this.getSampleStoreOperation);
         service.get("/", this.sayHelloOperation);
+
+        service.path("/ebt", () ->
+        {
+            service.get("", this.getStatesOperation);
+        });
     }
     
     private void setupSecurity(Service service)

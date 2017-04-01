@@ -16,13 +16,11 @@
 
 package tech.blacksource.blacknectar.service.algorithms;
 
-import java.util.List;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
+import tech.aroma.client.Priority;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.redroma.google.places.GooglePlacesAPI;
@@ -31,6 +29,9 @@ import tech.redroma.google.places.data.Place;
 import tech.redroma.google.places.exceptions.GooglePlacesException;
 import tech.redroma.google.places.requests.NearbySearchRequest;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
+
+import javax.inject.Inject;
+import java.util.List;
 
 import static tech.blacksource.blacknectar.service.stores.Store.validStore;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.CONCRETE_BEHAVIOR;
@@ -143,8 +144,8 @@ class GooglePlacesStoreSearchAlgorithm implements StoreSearchAlgorithm<Place>
         LOG.error("Failed to execute Google Place Search for store: [{}]", store, ex);
         
         aroma.begin().titled("Google API Failed")
-            .text("Failed to execute Google Place Search. \n\nStore:\n{}\n\nRequest:\n{}\n\n{}", store, request, ex)
-            .withUrgency(Urgency.HIGH)
+            .withBody("Failed to execute Google Place Search. \n\nStore:\n{}\n\nRequest:\n{}\n\n{}", store, request, ex)
+            .withPriority(Priority.HIGH)
             .send();
     }
     
@@ -153,8 +154,8 @@ class GooglePlacesStoreSearchAlgorithm implements StoreSearchAlgorithm<Place>
         LOG.warn("No matches found for store: [{}]", store);
         
         aroma.begin().titled("No Places Found")
-            .text("No Google Places found for Store:\n\n{}\n\nFor Request:\n{}", store, request)
-            .withUrgency(Urgency.MEDIUM)
+            .withBody("No Google Places found for Store:\n\n{}\n\nFor Request:\n{}", store, request)
+            .withPriority(Priority.MEDIUM)
             .send();
     }
     
@@ -163,8 +164,8 @@ class GooglePlacesStoreSearchAlgorithm implements StoreSearchAlgorithm<Place>
         LOG.warn("No matches found for store: [{}]", store);
         
         aroma.begin().titled("No Store Matches")
-            .text("No Google Places found matching store:\n\n{}\n\nAmong results:\n{}", store, places)
-            .withUrgency(Urgency.MEDIUM)
+            .withBody("No Google Places found matching store:\n\n{}\n\nAmong results:\n{}", store, places)
+            .withPriority(Priority.MEDIUM)
             .send();
     }
     
@@ -173,8 +174,8 @@ class GooglePlacesStoreSearchAlgorithm implements StoreSearchAlgorithm<Place>
         LOG.debug("Store {} matched with Place | {}", store, place);
         
         aroma.begin().titled("Google Places Match Found")
-            .text("Store \n\n{}\n\nMatched with:\n\n{}", store, place)
-            .withUrgency(Urgency.LOW)
+            .withBody("Store \n\n{}\n\nMatched with:\n\n{}", store, place)
+            .withPriority(Priority.LOW)
             .send();
     }
 }

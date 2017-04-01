@@ -16,22 +16,21 @@
 
 package tech.blacksource.blacknectar.service.data;
 
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
-import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
-import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
-import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
+import tech.aroma.client.Priority;
+import tech.blacksource.blacknectar.service.exceptions.*;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
+
+import javax.inject.Inject;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
 
 import static tech.blacksource.blacknectar.service.stores.Store.validStore;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
@@ -89,7 +88,7 @@ final class SQLStoreRepository implements StoreRepository
         }
 
         aroma.begin().titled("SQL Store Inserted")
-            .text("Inserted {} store: \n\n{}", inserted, store)
+            .withBody("Inserted {} store: \n\n{}", inserted, store)
             .send();
         LOG.debug("Successfully inserted {} store", inserted);
     }
@@ -141,8 +140,8 @@ final class SQLStoreRepository implements StoreRepository
         LOG.trace("SQL query to get all stores with limit {} turned up {} stores", limit, stores.size());
 
         aroma.begin().titled("SQL Query Complete")
-            .text("Query to get all stores with limit {} turned up {} stores", limit, stores.size())
-            .withUrgency(Urgency.LOW)
+            .withBody("Query to get all stores with limit {} turned up {} stores", limit, stores.size())
+            .withPriority(Priority.LOW)
             .send();
 
         return stores;
@@ -362,8 +361,8 @@ final class SQLStoreRepository implements StoreRepository
         LOG.error(message, storeId, ex);
 
         aroma.begin().titled("SQL Delete Store Failed")
-            .text(message, storeId, ex)
-            .withUrgency(Urgency.HIGH)
+            .withBody(message, storeId, ex)
+            .withPriority(Priority.HIGH)
             .send();
     }
 
@@ -372,16 +371,16 @@ final class SQLStoreRepository implements StoreRepository
         String message = "Found {} stores for Search Request {}";
         LOG.debug(message, stores.size(), request);
         aroma.begin().titled("SQL Complete")
-            .text(message, stores.size(), request)
-            .withUrgency(Urgency.LOW)
+            .withBody(message, stores.size(), request)
+            .withPriority(Priority.LOW)
             .send();
     }
 
     private void makeNoteOfSQLError(String message, Object... args)
     {
         aroma.begin().titled("SQL Failed")
-            .text(message, args)
-            .withUrgency(Urgency.HIGH)
+            .withBody(message, args)
+            .withPriority(Priority.HIGH)
             .send();
 
         LOG.error(message, args);

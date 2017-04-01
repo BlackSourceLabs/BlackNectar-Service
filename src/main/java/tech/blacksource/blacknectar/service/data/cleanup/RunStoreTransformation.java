@@ -16,17 +16,18 @@
 
 package tech.blacksource.blacknectar.service.data.cleanup;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.Callable;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
+import tech.aroma.client.Priority;
 import tech.blacksource.blacknectar.service.data.StoreRepository;
 import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
 import tech.blacksource.blacknectar.service.stores.Store;
+
+import javax.inject.Inject;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.Callable;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
@@ -73,8 +74,8 @@ public class RunStoreTransformation implements Callable<Void>
 
         LOG.info("Script completed in {}ms", end - start);
         aroma.begin().titled("Stores Updated")
-            .text("Successfully cleaned store numbers in {}ms", end - start)
-            .withUrgency(Urgency.MEDIUM)
+            .withBody("Successfully cleaned store numbers in {}ms", end - start)
+            .withPriority(Priority.MEDIUM)
             .send();
 
         return null;
@@ -122,8 +123,8 @@ public class RunStoreTransformation implements Callable<Void>
         LOG.error(message, ex);
 
         aroma.begin().titled("Data Cleanup Failed")
-            .text(message, ex)
-            .withUrgency(Urgency.HIGH)
+            .withBody(message, ex)
+            .withPriority(Priority.HIGH)
             .send();
     }
 
@@ -133,8 +134,8 @@ public class RunStoreTransformation implements Callable<Void>
         LOG.info(message, store, updatedStore);
 
         aroma.begin().titled("Updating Store")
-            .text("Old Store:\n{}\n\nNew Store:\n{}", store, updatedStore)
-            .withUrgency(Urgency.LOW)
+            .withBody("Old Store:\n{}\n\nNew Store:\n{}", store, updatedStore)
+            .withPriority(Priority.LOW)
             .send();
     }
 
@@ -156,8 +157,8 @@ public class RunStoreTransformation implements Callable<Void>
         LOG.error(message, updatedStore, ex);
 
         aroma.begin().titled("Store Update Failed")
-            .text("Failed to update store:\n{}\n\n{}", updatedStore, ex)
-            .withUrgency(Urgency.HIGH)
+            .withBody("Failed to update store:\n{}\n\n{}", updatedStore, ex)
+            .withPriority(Priority.HIGH)
             .send();
 
     }
@@ -167,8 +168,8 @@ public class RunStoreTransformation implements Callable<Void>
         String message = "Failed to try to transform store: {}";
         LOG.error(message, store, ex);
         aroma.begin().titled("Script Operation Failed")
-            .text(message, store, ex)
-            .withUrgency(Urgency.HIGH)
+            .withBody(message, store, ex)
+            .withPriority(Priority.HIGH)
             .send();
     }
 

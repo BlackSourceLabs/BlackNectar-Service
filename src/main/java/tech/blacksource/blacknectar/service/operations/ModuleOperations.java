@@ -22,6 +22,7 @@ import com.google.inject.AbstractModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.blacksource.blacknectar.service.images.ModuleImageLoader;
+import tech.blacksource.blacknectar.service.operations.stores.SearchStoresOperation;
 import tech.blacksource.blacknectar.service.stores.ModuleStores;
 
 /**

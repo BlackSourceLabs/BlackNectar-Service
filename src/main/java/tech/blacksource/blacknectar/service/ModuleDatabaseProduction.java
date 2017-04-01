@@ -19,16 +19,17 @@ package tech.blacksource.blacknectar.service;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
-import javax.inject.Singleton;
-import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
+import tech.aroma.client.Priority;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 import tech.sirwellington.alchemy.arguments.FailedAssertionException;
+
+import javax.inject.Singleton;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 
@@ -90,8 +91,8 @@ public final class ModuleDatabaseProduction extends AbstractModule
             String message = "Failed to create connection to PostgreSQL. Defaulting to SQLite.";
             LOG.error(message, ex);
             aroma.begin().titled("SQL Connection Failed")
-                .text(message, ex)
-                .withUrgency(Urgency.HIGH)
+                .withBody(message, ex)
+                .withPriority(Priority.HIGH)
                 .send();
 
             throw ex;

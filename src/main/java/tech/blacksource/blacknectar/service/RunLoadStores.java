@@ -18,17 +18,18 @@ package tech.blacksource.blacknectar.service;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicInteger;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
+import tech.aroma.client.Priority;
 import tech.blacksource.blacknectar.service.data.StoreRepository;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.blacksource.blacknectar.service.stores.StoreDataSource;
+
+import javax.inject.Inject;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
@@ -85,15 +86,15 @@ public final class RunLoadStores implements Callable<Void>
                 LOG.error("Failed to save store: {}", store, ex);
                 
                 aroma.begin().titled("Script Failed")
-                    .text("Could not save store: {}", store, ex)
-                    .withUrgency(Urgency.MEDIUM)
+                    .withBody("Could not save store: {}", store, ex)
+                    .withPriority(Priority.MEDIUM)
                     .send();
             }
         });
         
         LOG.info("Successfully saved {} stores", counter.get());
         aroma.begin().titled("RunLoadStores Complete")
-            .text("Finished loading {} stores", counter.get())
+            .withBody("Finished loading {} stores", counter.get())
             .send();
 
         return null;

@@ -16,21 +16,23 @@
 
 package tech.blacksource.blacknectar.service;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import spark.ExceptionHandler;
-import spark.Service;
-import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
-import tech.blacksource.blacknectar.service.operations.*;
+ import com.google.inject.Guice;
+ import com.google.inject.Injector;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
+ import spark.ExceptionHandler;
+ import spark.Service;
+ import tech.aroma.client.Aroma;
+ import tech.aroma.client.Priority;
+ import tech.blacksource.blacknectar.service.operations.GetSampleStoreOperation;
+ import tech.blacksource.blacknectar.service.operations.SayHelloOperation;
+ import tech.blacksource.blacknectar.service.operations.stores.SearchStoresOperation;
 
-import javax.inject.Inject;
+ import javax.inject.Inject;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
-import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+ import static com.google.common.base.Strings.isNullOrEmpty;
+ import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
  *
@@ -91,8 +93,8 @@ public final class Server
             if (AROMA != null)
             {
                 AROMA.begin().titled("Server Launch Failed")
-                    .text("Could not create Guice Injector: {}", ex)
-                    .withUrgency(Urgency.HIGH)
+                    .withBody("Could not create Guice Injector: {}", ex)
+                    .withPriority(Priority.HIGH)
                     .send();
             }
 
@@ -136,8 +138,8 @@ public final class Server
         
         aroma.begin()
             .titled("Service Launched")
-            .text("At port {}", port)
-            .withUrgency(Urgency.LOW)
+            .withBody("At port {}", port)
+            .withPriority(Priority.LOW)
             .send();
     }
     
@@ -159,14 +161,14 @@ public final class Server
             service.secure(keystore, keystorePassword, null, null);
             
             AROMA.begin().titled("SSL Enabled")
-                .withUrgency(Urgency.LOW)
+                .withPriority(Priority.LOW)
                 .send();
         }
         else 
         {
             AROMA.begin().titled("SSL Disabled")
-                .text("Could not load Keystore File [{}] and Password [{}]", keystore, keystorePasswordFile)
-                .withUrgency(Urgency.MEDIUM)
+                .withBody("Could not load Keystore File [{}] and Password [{}]", keystore, keystorePasswordFile)
+                .withPriority(Priority.MEDIUM)
                 .send();
             
         }

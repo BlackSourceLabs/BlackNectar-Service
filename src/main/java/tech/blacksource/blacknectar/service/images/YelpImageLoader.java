@@ -16,20 +16,21 @@
 
 package tech.blacksource.blacknectar.service.images;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-import java.util.Objects;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
+import tech.aroma.client.Priority;
 import tech.blacksource.blacknectar.service.algorithms.StoreSearchAlgorithm;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.redroma.yelp.YelpAPI;
 import tech.redroma.yelp.YelpBusiness;
+
+import javax.inject.Inject;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
+import java.util.Objects;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static tech.blacksource.blacknectar.service.stores.Store.validStore;
@@ -106,8 +107,8 @@ final class YelpImageLoader implements ImageLoader
         LOG.error("Failed to parse URL: [{}]", url, ex);
         
         aroma.begin().titled("URL Parse Failed")
-            .text("Could not parse URL: [{}]", url, ex)
-            .withUrgency(Urgency.LOW)
+            .withBody("Could not parse URL: [{}]", url, ex)
+            .withPriority(Priority.LOW)
             .send();
     }
 

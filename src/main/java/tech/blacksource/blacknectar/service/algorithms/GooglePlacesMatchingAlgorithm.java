@@ -16,17 +16,18 @@
 
 package tech.blacksource.blacknectar.service.algorithms;
 
-import java.util.Objects;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
+import tech.aroma.client.Priority;
 import tech.blacksource.blacknectar.service.stores.Address;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.redroma.google.places.data.Place;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 import tech.sirwellington.alchemy.arguments.Checks;
+
+import javax.inject.Inject;
+import java.util.Objects;
 
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.CONCRETE_BEHAVIOR;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
@@ -119,8 +120,8 @@ final class GooglePlacesMatchingAlgorithm implements StoreMatchingAlgorithm<Plac
         LOG.debug("Place matches store by name: {}", place);
 
         aroma.begin().titled("Matched By Name")
-            .text("Google Place matches store by name.\n\nStore:\n{}\n\nPlace:\n{}", store, place)
-            .withUrgency(Urgency.LOW)
+            .withBody("Google Place matches store by name.\n\nStore:\n{}\n\nPlace:\n{}", store, place)
+            .withPriority(Priority.LOW)
             .send();
     }
 
@@ -129,8 +130,8 @@ final class GooglePlacesMatchingAlgorithm implements StoreMatchingAlgorithm<Plac
         LOG.debug("Place matches store by address: {}", place);
 
         aroma.begin().titled("Matched By Address")
-            .text("Google Place matches store by address.\n\nStore:\n{}\n\nPlace:\n{}", store, place)
-            .withUrgency(Urgency.LOW)
+            .withBody("Google Place matches store by address.\n\nStore:\n{}\n\nPlace:\n{}", store, place)
+            .withPriority(Priority.LOW)
             .send();
     }
 

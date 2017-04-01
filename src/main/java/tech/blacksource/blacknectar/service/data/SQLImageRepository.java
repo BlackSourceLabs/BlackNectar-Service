@@ -16,22 +16,20 @@
 
 package tech.blacksource.blacknectar.service.data;
 
-import java.util.List;
-import java.util.UUID;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
-import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
-import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
-import tech.blacksource.blacknectar.service.exceptions.DoesNotExistException;
-import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
+import tech.aroma.client.Priority;
+import tech.blacksource.blacknectar.service.exceptions.*;
 import tech.blacksource.blacknectar.service.images.Image;
 import tech.blacksource.blacknectar.service.images.ImageRepository;
+
+import javax.inject.Inject;
+import java.util.List;
+import java.util.UUID;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
@@ -155,8 +153,8 @@ final class SQLImageRepository implements ImageRepository
         LOG.error(message, image, ex);
         
         aroma.begin().titled("SQL Image Save Failed")
-            .text(message, image, ex)
-            .withUrgency(Urgency.MEDIUM)
+            .withBody(message, image, ex)
+            .withPriority(Priority.MEDIUM)
             .send();
     }
 
@@ -222,8 +220,8 @@ final class SQLImageRepository implements ImageRepository
         LOG.error(message, storeId, imageId, ex);
         
         aroma.begin().titled("SQL Image Get Failed")
-            .text(message, storeId, imageId, ex)
-            .withUrgency(Urgency.MEDIUM)
+            .withBody(message, storeId, imageId, ex)
+            .withPriority(Priority.MEDIUM)
             .send();
     }
 
@@ -232,8 +230,8 @@ final class SQLImageRepository implements ImageRepository
         String message = "Failed to get images for Store: [{}]";
         LOG.error(message, storeId, ex);
         aroma.begin().titled("SQL Image Get Failed")
-            .text(message, storeId, ex)
-            .withUrgency(Urgency.MEDIUM)
+            .withBody(message, storeId, ex)
+            .withPriority(Priority.MEDIUM)
             .send();
     }
 
@@ -243,8 +241,8 @@ final class SQLImageRepository implements ImageRepository
         LOG.error(message, storeId, ex);
        
         aroma.begin().titled("SQL Store Image Check Failed")
-            .text(message, storeId, ex)
-            .withUrgency(Urgency.MEDIUM)
+            .withBody(message, storeId, ex)
+            .withPriority(Priority.MEDIUM)
             .send();
     }
 
@@ -254,8 +252,8 @@ final class SQLImageRepository implements ImageRepository
         LOG.error(message, storeId, imageId, ex);
        
         aroma.begin().titled("SQL Image Delete Failed")
-            .text(message, storeId, imageId, ex)
-            .withUrgency(Urgency.MEDIUM)
+            .withBody(message, storeId, imageId, ex)
+            .withPriority(Priority.MEDIUM)
             .send();
     }
 

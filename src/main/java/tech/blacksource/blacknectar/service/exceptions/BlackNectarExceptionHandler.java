@@ -19,17 +19,16 @@ package tech.blacksource.blacknectar.service.exceptions;
 
 
 import com.google.common.base.Strings;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spark.ExceptionHandler;
-import spark.Request;
-import spark.Response;
+import spark.*;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
+import tech.aroma.client.Priority;
 import tech.redroma.yelp.exceptions.YelpException;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 import tech.sirwellington.alchemy.arguments.FailedAssertionException;
+
+import javax.inject.Inject;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
@@ -71,8 +70,8 @@ public final class BlackNectarExceptionHandler implements ExceptionHandler
             LOG.error("Received BadArgumentException");
             
             aroma.begin().titled("Received Bad Argument")
-                .text("From IP: [{}] | {}", ip, ex)
-                .withUrgency(Urgency.MEDIUM)
+                .withBody("From IP: [{}] | {}", ip, ex)
+                .withPriority(Priority.MEDIUM)
                 .send();
             
             response.status(BAD_ARGUMENT);
@@ -82,8 +81,8 @@ public final class BlackNectarExceptionHandler implements ExceptionHandler
             LOG.error("Internal Operation failed", ex);
             
             aroma.begin().titled("Operation Failed")
-                .text("From IP [{}] | {}", ip, ex)
-                .withUrgency(Urgency.HIGH)
+                .withBody("From IP [{}] | {}", ip, ex)
+                .withPriority(Priority.HIGH)
                 .send();
             
             response.status(((BlackNectarAPIException) ex).getStatusCode());
@@ -94,8 +93,8 @@ public final class BlackNectarExceptionHandler implements ExceptionHandler
             
             aroma.begin()
                 .titled("Yelp API Call Failed")
-                .text("Failed to make Yelp API Call from request: {}", request, ex)
-                .withUrgency(Urgency.HIGH)
+                .withBody("Failed to make Yelp API Call from request: {}", request, ex)
+                .withPriority(Priority.HIGH)
                 .send();
             
             response.status(INTERNAL_ERROR);
@@ -105,8 +104,8 @@ public final class BlackNectarExceptionHandler implements ExceptionHandler
             LOG.error("Unexpected Exception", ex);
             
             aroma.begin().titled("Operation Failed")
-                .text("Unexpected Exception occured From IP: [{}] | {}", ip, ex)
-                .withUrgency(Urgency.HIGH)
+                .withBody("Unexpected Exception occured From IP: [{}] | {}", ip, ex)
+                .withPriority(Priority.HIGH)
                 .send();
             
             response.status(INTERNAL_ERROR);

@@ -24,7 +24,7 @@ import spark.ExceptionHandler;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.service.operations.GetSampleStoreOperation;
 import tech.blacksource.blacknectar.service.operations.SayHelloOperation;
-import tech.blacksource.blacknectar.service.operations.SearchStoresOperation;
+import tech.blacksource.blacknectar.service.operations.stores.SearchStoresOperation;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
 import static org.mockito.Answers.RETURNS_MOCKS;

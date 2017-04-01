@@ -18,16 +18,15 @@
 package tech.blacksource.blacknectar.service.operations;
 
 
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spark.Request;
-import spark.Response;
-import spark.Route;
+import spark.*;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
+import tech.aroma.client.Priority;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
+
+import javax.inject.Inject;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
@@ -61,8 +60,8 @@ public class SayHelloOperation implements Route
         LOG.info("Received GET request from IP [{}]", request.ip());
         
         aroma.begin().titled("Request Received")
-            .text("From IP [{}]", request.ip())
-            .withUrgency(Urgency.LOW)
+            .withBody("From IP [{}]", request.ip())
+            .withPriority(Priority.LOW)
             .send();
         
         response.status(200);

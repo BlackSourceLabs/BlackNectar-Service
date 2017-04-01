@@ -18,16 +18,15 @@ package tech.blacksource.blacknectar.service;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.ExceptionHandler;
 import spark.Service;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Urgency;
-import tech.blacksource.blacknectar.service.operations.GetSampleStoreOperation;
-import tech.blacksource.blacknectar.service.operations.SayHelloOperation;
-import tech.blacksource.blacknectar.service.operations.SearchStoresOperation;
+import tech.blacksource.blacknectar.service.operations.*;
+
+import javax.inject.Inject;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
@@ -130,7 +129,7 @@ public final class Server
         setupRoutes(https);
     }
 
-    void setupPort(Service service, int port)
+    private void setupPort(Service service, int port)
     {
         LOG.info("Starting server at {}", port);
         service.port(port);
@@ -142,14 +141,14 @@ public final class Server
             .send();
     }
     
-    void setupRoutes(Service service)
+    private void setupRoutes(Service service)
     {
         service.get("/stores", this.searchStoresOperation);
         service.get("/sample-store", this.getSampleStoreOperation);
         service.get("/", this.sayHelloOperation);
     }
     
-    void setupSecurity(Service service)
+    private void setupSecurity(Service service)
     {
         String keystore = "./secrets/BlackSource.jks";
         String keystorePasswordFile = "./secrets/keystore-password.txt";
@@ -173,7 +172,7 @@ public final class Server
         }
     }
     
-    void setupExceptionHandler(Service service)
+    private void setupExceptionHandler(Service service)
     {
         service.exception(Exception.class, exceptionHandler);
     }

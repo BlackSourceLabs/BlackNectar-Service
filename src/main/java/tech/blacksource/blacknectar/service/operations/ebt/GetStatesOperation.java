@@ -66,7 +66,7 @@ public class GetStatesOperation implements Route
             JsonObject object = new JsonObject();
 
             object.addProperty("id", state.getAbbreviation().name());
-            object.addProperty("name", state.name());
+            object.addProperty("name", state.getTitleCased());
 
             return object;
         }

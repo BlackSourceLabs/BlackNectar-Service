@@ -1,5 +1,7 @@
 package tech.blacksource.blacknectar.service.operations.ebt;
 
+import javax.inject.Inject;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
@@ -21,6 +23,7 @@ public class GetStatesOperation implements Route
 
     private final StateWebsiteFactory stateWebsites;
 
+    @Inject
     GetStatesOperation(StateWebsiteFactory stateWebsites)
     {
         checkThat(stateWebsites).is(notNull());

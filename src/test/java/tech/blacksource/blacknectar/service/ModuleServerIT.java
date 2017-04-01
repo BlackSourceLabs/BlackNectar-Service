@@ -21,14 +21,12 @@ import com.google.inject.Injector;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import tech.aroma.client.Aroma;
 import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-import static org.mockito.Answers.RETURNS_MOCKS;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
 
 /**
  *
@@ -39,10 +37,9 @@ import static org.mockito.Answers.RETURNS_MOCKS;
 public class ModuleServerIT
 {
 
-    @Mock(answer = RETURNS_MOCKS)
-    private Aroma fakeAroma;
-    
     private ModuleServer instance;
+
+    private ModuleDatabaseTesting databaseModule;
 
     @Before
     public void setUp() throws Exception
@@ -60,13 +57,14 @@ public class ModuleServerIT
 
     private void setupMocks() throws Exception
     {
+        databaseModule = new ModuleDatabaseTesting();
 
     }
 
     @Test
     public void testBindings()
     {
-        Injector injector = Guice.createInjector(instance);
+        Injector injector = Guice.createInjector(databaseModule, instance);
 
         Server server = injector.getInstance(Server.class);
         assertThat(server, notNullValue());

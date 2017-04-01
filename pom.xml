@@ -160,6 +160,16 @@
             <version>1.3-SNAPSHOT</version>
         </dependency>
 
+
+        <!--=======================-->
+        <!--EBT LIBRARY-->
+        <!--=======================-->
+        <dependency>
+            <groupId>tech.blacksource.blacknectar</groupId>
+            <artifactId>ebt-balance</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
         <!--=======================-->
         <!--LOGGING-->
         <!--=======================-->

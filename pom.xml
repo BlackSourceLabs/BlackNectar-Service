@@ -166,7 +166,7 @@
         <!--=======================-->
         <dependency>
             <groupId>tech.blacksource.blacknectar</groupId>
-            <artifactId>ebt-balance</artifactId>
+            <artifactId>ebt-state-websites</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 

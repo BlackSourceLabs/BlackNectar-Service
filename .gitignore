@@ -18,3 +18,8 @@ Certificates/
 /nbproject/
 secrets/
 api-keys/
+
+
+# IntelliJ
+.idea/
+*.iml

@@ -16,6 +16,8 @@
 
 package tech.blacksource.blacknectar.service.algorithms;
 
+import java.util.List;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
@@ -29,9 +31,6 @@ import tech.redroma.google.places.data.Place;
 import tech.redroma.google.places.exceptions.GooglePlacesException;
 import tech.redroma.google.places.requests.NearbySearchRequest;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
-
-import javax.inject.Inject;
-import java.util.List;
 
 import static tech.blacksource.blacknectar.service.stores.Store.validStore;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.CONCRETE_BEHAVIOR;

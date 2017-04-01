@@ -17,6 +17,7 @@
 package tech.blacksource.blacknectar.service.operations.stores;
 
 import com.google.gson.JsonArray;
+import java.util.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -35,8 +36,6 @@ import tech.blacksource.blacknectar.service.operations.stores.SearchStoresOperat
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.test.junit.runners.*;
-
-import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.is;

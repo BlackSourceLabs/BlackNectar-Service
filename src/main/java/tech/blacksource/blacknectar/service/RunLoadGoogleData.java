@@ -19,6 +19,9 @@ package tech.blacksource.blacknectar.service;
 import com.google.gson.Gson;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import java.util.*;
+import java.util.concurrent.Callable;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -31,10 +34,6 @@ import tech.blacksource.blacknectar.service.data.StoreRepository;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.redroma.google.places.GooglePlacesAPI;
 import tech.redroma.google.places.data.*;
-
-import javax.inject.Inject;
-import java.util.*;
-import java.util.concurrent.Callable;
 
 import static java.util.stream.Collectors.toList;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;

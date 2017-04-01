@@ -18,6 +18,7 @@ package tech.blacksource.blacknectar.service;
 
  import com.google.inject.Guice;
  import com.google.inject.Injector;
+ import javax.inject.Inject;
  import org.slf4j.Logger;
  import org.slf4j.LoggerFactory;
  import spark.ExceptionHandler;
@@ -27,8 +28,6 @@ package tech.blacksource.blacknectar.service;
  import tech.blacksource.blacknectar.service.operations.GetSampleStoreOperation;
  import tech.blacksource.blacknectar.service.operations.SayHelloOperation;
  import tech.blacksource.blacknectar.service.operations.stores.SearchStoresOperation;
-
- import javax.inject.Inject;
 
  import static com.google.common.base.Strings.isNullOrEmpty;
  import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;

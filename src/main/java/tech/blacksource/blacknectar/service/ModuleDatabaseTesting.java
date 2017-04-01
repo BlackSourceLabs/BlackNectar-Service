@@ -18,6 +18,10 @@ package tech.blacksource.blacknectar.service;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import java.sql.Connection;
+import java.sql.SQLException;
+import javax.inject.Singleton;
+import javax.sql.DataSource;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,11 +29,6 @@ import tech.aroma.client.Aroma;
 import tech.aroma.client.Priority;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 import tech.sirwellington.alchemy.arguments.FailedAssertionException;
-
-import javax.inject.Singleton;
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 

@@ -17,6 +17,8 @@
 package tech.blacksource.blacknectar.service.operations.stores;
 
 import com.google.gson.JsonArray;
+import java.util.*;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.sets.Sets;
@@ -32,9 +34,6 @@ import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 import tech.sirwellington.alchemy.arguments.assertions.CollectionAssertions;
-
-import javax.inject.Inject;
-import java.util.*;
 
 import static tech.blacksource.blacknectar.service.BlackNectarAssertions.argumentWithSaneLength;
 import static tech.blacksource.blacknectar.service.data.MediaTypes.APPLICATION_JSON;

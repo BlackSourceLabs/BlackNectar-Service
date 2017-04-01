@@ -16,6 +16,10 @@
  */
 package tech.blacksource.blacknectar.service.images;
 
+import java.net.URL;
+import java.util.List;
+import java.util.Objects;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
@@ -30,11 +34,6 @@ import tech.redroma.google.places.data.Place;
 import tech.redroma.google.places.exceptions.GooglePlacesException;
 import tech.redroma.google.places.requests.GetPhotoRequest;
 import tech.sirwellington.alchemy.annotations.access.Internal;
-
-import javax.inject.Inject;
-import java.net.URL;
-import java.util.List;
-import java.util.Objects;
 
 import static java.util.stream.Collectors.toList;
 import static tech.blacksource.blacknectar.service.stores.Store.validStore;

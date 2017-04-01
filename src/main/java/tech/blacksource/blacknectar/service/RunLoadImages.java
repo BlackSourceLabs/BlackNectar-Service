@@ -17,6 +17,15 @@
 package tech.blacksource.blacknectar.service;
 
 import com.google.common.collect.Queues;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.*;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import javax.imageio.ImageIO;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -29,16 +38,6 @@ import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.annotations.arguments.*;
 import tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern;
 import tech.sirwellington.alchemy.http.AlchemyHttp;
-
-import javax.imageio.ImageIO;
-import javax.inject.Inject;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.net.*;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 import static java.util.Objects.isNull;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern.Role.CLIENT;

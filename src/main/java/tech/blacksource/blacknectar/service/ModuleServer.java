@@ -18,6 +18,9 @@ package tech.blacksource.blacknectar.service;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import java.sql.*;
+import javax.inject.Singleton;
+import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -32,10 +35,6 @@ import tech.redroma.google.places.GooglePlacesAPI;
 import tech.redroma.yelp.YelpAPI;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.http.AlchemyHttp;
-
-import javax.inject.Singleton;
-import javax.sql.DataSource;
-import java.sql.*;
 
 /**
  *

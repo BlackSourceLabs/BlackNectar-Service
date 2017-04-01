@@ -19,6 +19,11 @@ package tech.blacksource.blacknectar.service.stores;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.io.Resources;
+import java.io.IOException;
+import java.net.URL;
+import java.util.*;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
@@ -27,12 +32,6 @@ import tech.aroma.client.Priority;
 import tech.blacksource.blacknectar.service.Server;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
-
-import javax.inject.Inject;
-import java.io.IOException;
-import java.net.URL;
-import java.util.*;
-import java.util.stream.Collectors;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;

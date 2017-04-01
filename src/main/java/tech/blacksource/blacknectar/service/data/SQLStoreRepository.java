@@ -16,6 +16,10 @@
 
 package tech.blacksource.blacknectar.service.data;
 
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -26,11 +30,6 @@ import tech.aroma.client.Priority;
 import tech.blacksource.blacknectar.service.exceptions.*;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
-
-import javax.inject.Inject;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
 
 import static tech.blacksource.blacknectar.service.stores.Store.validStore;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;

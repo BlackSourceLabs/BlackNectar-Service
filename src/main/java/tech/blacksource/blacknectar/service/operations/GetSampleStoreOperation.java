@@ -19,6 +19,7 @@ package tech.blacksource.blacknectar.service.operations;
 
 
 import com.google.gson.JsonArray;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.*;
@@ -27,8 +28,6 @@ import tech.aroma.client.Priority;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
-
-import javax.inject.Inject;
 
 import static tech.blacksource.blacknectar.service.data.MediaTypes.APPLICATION_JSON;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;

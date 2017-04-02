@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tech.blacksource.blacknectar.service;
+package tech.blacksource.blacknectar.service.scripts;
 
 import com.google.gson.Gson;
 import com.google.inject.Guice;
@@ -28,6 +28,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Priority;
+import tech.blacksource.blacknectar.service.ModuleDatabaseTesting;
+import tech.blacksource.blacknectar.service.ModuleServer;
 import tech.blacksource.blacknectar.service.algorithms.StoreSearchAlgorithm;
 import tech.blacksource.blacknectar.service.data.SQLQueries;
 import tech.blacksource.blacknectar.service.data.StoreRepository;

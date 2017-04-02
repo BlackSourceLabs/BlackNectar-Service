@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tech.blacksource.blacknectar.service;
+package tech.blacksource.blacknectar.service.scripts;
 
 import com.google.common.collect.Queues;
 import com.google.inject.Guice;
@@ -27,6 +27,8 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.client.Aroma;
+import tech.blacksource.blacknectar.service.ModuleDatabaseProduction;
+import tech.blacksource.blacknectar.service.ModuleServer;
 import tech.blacksource.blacknectar.service.data.StoreRepository;
 import tech.blacksource.blacknectar.service.images.Google;
 import tech.blacksource.blacknectar.service.images.ImageLoader;

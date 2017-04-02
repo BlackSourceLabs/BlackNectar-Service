@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tech.blacksource.blacknectar.service;
+package tech.blacksource.blacknectar.service.scripts;
 
 import com.google.common.collect.Queues;
 import java.awt.image.BufferedImage;

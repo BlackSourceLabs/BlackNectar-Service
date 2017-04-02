@@ -26,10 +26,6 @@ import spark.ExceptionHandler;
 import spark.Service;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Priority;
-import tech.blacksource.blacknectar.service.operations.GetSampleStoreOperation;
-import tech.blacksource.blacknectar.service.operations.SayHelloOperation;
- import tech.blacksource.blacknectar.service.operations.ebt.GetStatesOperation;
- import tech.blacksource.blacknectar.service.operations.stores.SearchStoresOperation;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static tech.sirwellington.alchemy.arguments.Arguments.*;
@@ -48,33 +44,20 @@ public final class Server
     //STATIC VARIABLES
     private final static Logger LOG = LoggerFactory.getLogger(Server.class);
     
-    public static Aroma AROMA;
-    
-    //INSTANCE VARIABLES
     private final Aroma aroma;
-    private final SayHelloOperation sayHelloOperation;
-    private final GetSampleStoreOperation getSampleStoreOperation;
-    private final GetStatesOperation getStatesOperation;
-    private final SearchStoresOperation searchStoresOperation;
     private final ExceptionHandler exceptionHandler;
+    private final Routes routes;
+
 
     @Inject
-    Server(Aroma aroma,
-           SayHelloOperation sayHelloOperation,
-           GetSampleStoreOperation getSampleStoreOperation,
-           GetStatesOperation getStatesOperation,
-           SearchStoresOperation searchStoresOperation,
-           ExceptionHandler exceptionHandler)
+    Server(Aroma aroma, ExceptionHandler exceptionHandler, Routes routes)
     {
-        checkThat(aroma, sayHelloOperation, getSampleStoreOperation, getStatesOperation, searchStoresOperation, exceptionHandler)
-            .are(notNull());
-        
+        checkThat(aroma, exceptionHandler, routes)
+                .are(notNull());
+
         this.aroma = aroma;
-        this.sayHelloOperation = sayHelloOperation;
-        this.getSampleStoreOperation = getSampleStoreOperation;
-        this.getStatesOperation = getStatesOperation;
-        this.searchStoresOperation = searchStoresOperation;
         this.exceptionHandler = exceptionHandler;
+        this.routes = routes;
     }
     
 
@@ -84,19 +67,21 @@ public final class Server
         Injector injector;
         Server server;
 
+        Aroma aroma = null;
+
         try
         {
             injector = Guice.createInjector(new ModuleServer(), new ModuleDatabaseProduction());
-            AROMA = injector.getInstance(Aroma.class);
+            aroma = injector.getInstance(Aroma.class);
             server = injector.getInstance(Server.class);
         }
         catch (RuntimeException ex)
         {
             LOG.error("Server Launch Failed", ex);
 
-            if (AROMA != null)
+            if (aroma != null)
             {
-                AROMA.begin().titled("Server Launch Failed")
+                aroma.begin().titled("Server Launch Failed")
                     .withBody("Could not create Guice Injector: {}", ex)
                     .withPriority(Priority.HIGH)
                     .send();
@@ -139,24 +124,13 @@ public final class Server
     {
         LOG.info("Starting server at {}", port);
         service.port(port);
-        
-        aroma.begin()
-            .titled("Service Launched")
-            .withBody("At port {}", port)
-            .withPriority(Priority.LOW)
-            .send();
+
+        aroma.sendLowPriorityMessage("Service Launched", "At Port {}", port);
     }
     
     private void setupRoutes(Service service)
     {
-        service.get("/stores", this.searchStoresOperation);
-        service.get("/sample-store", this.getSampleStoreOperation);
-        service.get("/", this.sayHelloOperation);
-
-        service.path("/ebt", () ->
-        {
-            service.get("", this.getStatesOperation);
-        });
+        routes.setupRoutes(service);
     }
     
     private void setupSecurity(Service service)
@@ -168,14 +142,12 @@ public final class Server
         if (!isNullOrEmpty(keystorePassword))
         {
             service.secure(keystore, keystorePassword, null, null);
-            
-            AROMA.begin().titled("SSL Enabled")
-                .withPriority(Priority.LOW)
-                .send();
+
+            aroma.sendLowPriorityMessage("SSL Enabled");
         }
         else 
         {
-            AROMA.begin().titled("SSL Disabled")
+            aroma.begin().titled("SSL Disabled")
                 .withBody("Could not load Keystore File [{}] and Password [{}]", keystore, keystorePasswordFile)
                 .withPriority(Priority.MEDIUM)
                 .send();

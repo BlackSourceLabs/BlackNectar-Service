@@ -22,14 +22,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import spark.ExceptionHandler;
 import tech.aroma.client.Aroma;
-import tech.blacksource.blacknectar.service.operations.GetSampleStoreOperation;
-import tech.blacksource.blacknectar.service.operations.SayHelloOperation;
-import tech.blacksource.blacknectar.service.operations.ebt.GetStatesOperation;
-import tech.blacksource.blacknectar.service.operations.stores.SearchStoresOperation;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
 import static org.mockito.Answers.RETURNS_MOCKS;
-import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
  *
@@ -40,21 +38,12 @@ public class ServerTest
 {
     @Mock(answer = RETURNS_MOCKS)
     private Aroma aroma;
-    
-    @Mock
-    private SayHelloOperation sayHelloOperation;
-    
-    @Mock
-    private GetSampleStoreOperation getSampleStoreOperation;
-
-    @Mock
-    private GetStatesOperation getStatesOperation;
-    
-    @Mock
-    private SearchStoresOperation searchStoresOperation;
 
     @Mock
     private ExceptionHandler exceptionHandler;
+
+    @Mock
+    private Routes routes;
 
     private Server instance;
 
@@ -64,7 +53,7 @@ public class ServerTest
         setupData();
         setupMocks();
         
-        instance = new Server(aroma, sayHelloOperation, getSampleStoreOperation, getStatesOperation, searchStoresOperation, exceptionHandler);
+        instance = new Server(aroma, exceptionHandler, routes);
 
     }
 
@@ -79,11 +68,16 @@ public class ServerTest
     @Test
     public void  testConstructor()
     {
-        assertThrows(() -> new Server(null, sayHelloOperation, getSampleStoreOperation, getStatesOperation, searchStoresOperation, exceptionHandler));
-        assertThrows(() -> new Server(aroma, null, getSampleStoreOperation, getStatesOperation, searchStoresOperation, exceptionHandler));
-        assertThrows(() -> new Server(aroma, sayHelloOperation, null,getStatesOperation,  searchStoresOperation, exceptionHandler));
-        assertThrows(() -> new Server(aroma, sayHelloOperation, getSampleStoreOperation, null, searchStoresOperation, exceptionHandler));
-        assertThrows(() -> new Server(aroma, sayHelloOperation, getSampleStoreOperation, getStatesOperation, null, exceptionHandler));
-        assertThrows(() -> new Server(aroma, sayHelloOperation, getSampleStoreOperation, getStatesOperation, searchStoresOperation, null));
+        assertThrows(() -> new Server(null, exceptionHandler, routes)).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(() -> new Server(aroma, null, routes)).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(() -> new Server(aroma, exceptionHandler, null)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void testSetupNonSecure() throws Exception
+    {
+        instance.setupNonSecureServer();
+
+        verify(routes, atLeastOnce()).setupRoutes(any());
     }
 }

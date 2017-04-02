@@ -17,6 +17,7 @@
 package tech.blacksource.blacknectar.service;
 
 import javax.sql.DataSource;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

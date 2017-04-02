@@ -16,12 +16,13 @@
 
 package tech.blacksource.blacknectar.service.scripts;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.client.Aroma;
@@ -31,7 +32,7 @@ import tech.blacksource.blacknectar.service.data.StoreRepository;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.blacksource.blacknectar.service.stores.StoreDataSource;
 
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**

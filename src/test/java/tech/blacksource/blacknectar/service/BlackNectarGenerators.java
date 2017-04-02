@@ -19,26 +19,19 @@ package tech.blacksource.blacknectar.service;
 
 
 import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.blacksource.blacknectar.service.images.Image;
-import tech.blacksource.blacknectar.service.stores.Address;
-import tech.blacksource.blacknectar.service.stores.Location;
-import tech.blacksource.blacknectar.service.stores.Store;
+import tech.blacksource.blacknectar.service.stores.*;
 import tech.sirwellington.alchemy.generator.AlchemyGenerator;
 import tech.sirwellington.alchemy.generator.StringGenerators;
 
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.BooleanGenerators.booleans;
 import static tech.sirwellington.alchemy.generator.NetworkGenerators.httpUrls;
-import static tech.sirwellington.alchemy.generator.NumberGenerators.doubles;
-import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
-import static tech.sirwellington.alchemy.generator.NumberGenerators.positiveIntegers;
-import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
-import static tech.sirwellington.alchemy.generator.StringGenerators.alphanumericString;
-import static tech.sirwellington.alchemy.generator.StringGenerators.hexadecimalString;
-import static tech.sirwellington.alchemy.generator.StringGenerators.numericString;
-import static tech.sirwellington.alchemy.generator.StringGenerators.uuids;
+import static tech.sirwellington.alchemy.generator.NumberGenerators.*;
+import static tech.sirwellington.alchemy.generator.StringGenerators.*;
 
 /**
  *

@@ -18,6 +18,7 @@ package tech.blacksource.blacknectar.service;
 
 import java.sql.Connection;
 import javax.sql.DataSource;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,7 +27,7 @@ import tech.aroma.client.Aroma;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.*;
 import static org.mockito.Answers.RETURNS_MOCKS;
 

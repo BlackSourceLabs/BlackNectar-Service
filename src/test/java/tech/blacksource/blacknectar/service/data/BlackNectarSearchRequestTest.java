@@ -21,22 +21,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.sirwellington.alchemy.generator.NumberGenerators;
-import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
-import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
-import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
-import tech.sirwellington.alchemy.test.junit.runners.Repeat;
+import tech.sirwellington.alchemy.test.junit.runners.*;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.locations;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
-import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
-import static tech.sirwellington.alchemy.generator.NumberGenerators.negativeIntegers;
-import static tech.sirwellington.alchemy.generator.NumberGenerators.positiveDoubles;
-import static tech.sirwellington.alchemy.generator.NumberGenerators.positiveIntegers;
+import static tech.sirwellington.alchemy.generator.NumberGenerators.*;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
-import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
  *

@@ -16,9 +16,10 @@
 
 package tech.blacksource.blacknectar.service.algorithms;
 
-import com.google.common.base.Strings;
 import java.util.Objects;
 import javax.inject.Inject;
+
+import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.client.Aroma;
@@ -28,7 +29,7 @@ import tech.redroma.yelp.YelpBusiness;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.CONCRETE_BEHAVIOR;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**

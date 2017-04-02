@@ -16,24 +16,24 @@
 
 package tech.blacksource.blacknectar.service.stores;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Strings;
-import com.google.common.io.Resources;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
+
+import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
+import com.google.common.io.Resources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Priority;
-import tech.blacksource.blacknectar.service.Server;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
@@ -101,7 +101,7 @@ final class FileStoreDataSource implements StoreDataSource
         {
             LOG.error("Failed to load resource at {}", FILENAME, ex);
 
-            Server.AROMA.begin()
+            aroma.begin()
                 .titled("Operation Failed")
                 .withBody("Could not load CSV file at {}", FILENAME, ex)
                 .withPriority(Priority.HIGH)

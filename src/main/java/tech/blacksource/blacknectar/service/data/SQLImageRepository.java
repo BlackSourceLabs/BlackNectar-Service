@@ -19,6 +19,7 @@ package tech.blacksource.blacknectar.service.data;
 import java.util.List;
 import java.util.UUID;
 import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -30,7 +31,7 @@ import tech.blacksource.blacknectar.service.exceptions.*;
 import tech.blacksource.blacknectar.service.images.Image;
 import tech.blacksource.blacknectar.service.images.ImageRepository;
 
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 

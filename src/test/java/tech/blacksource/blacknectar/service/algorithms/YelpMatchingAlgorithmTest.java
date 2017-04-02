@@ -24,10 +24,7 @@ import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.service.stores.Address;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.redroma.yelp.YelpBusiness;
-import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
-import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
-import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
-import tech.sirwellington.alchemy.test.junit.runners.Repeat;
+import tech.sirwellington.alchemy.test.junit.runners.*;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -35,7 +32,7 @@ import static org.mockito.Answers.RETURNS_MOCKS;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.BooleanGenerators.booleans;
-import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
  *

@@ -16,12 +16,11 @@
 
 package tech.blacksource.blacknectar.service.data;
 
-import com.google.common.base.Objects;
 import java.util.List;
 import java.util.Optional;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+
+import com.google.common.base.Objects;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.jdbc.core.JdbcTemplate;
 import sir.wellington.alchemy.collections.lists.Lists;
@@ -34,18 +33,8 @@ import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
@@ -53,7 +42,7 @@ import static tech.sirwellington.alchemy.generator.NumberGenerators.doubles;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
 import static tech.sirwellington.alchemy.generator.StringGenerators.uuids;
-import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
  *

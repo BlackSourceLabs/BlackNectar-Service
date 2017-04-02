@@ -16,14 +16,15 @@
 
 package tech.blacksource.blacknectar.service.scripts;
 
-import com.google.common.collect.Queues;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
+
+import com.google.common.collect.Queues;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.client.Aroma;
@@ -34,7 +35,7 @@ import tech.blacksource.blacknectar.service.images.Google;
 import tech.blacksource.blacknectar.service.images.ImageLoader;
 import tech.blacksource.blacknectar.service.stores.Store;
 
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**

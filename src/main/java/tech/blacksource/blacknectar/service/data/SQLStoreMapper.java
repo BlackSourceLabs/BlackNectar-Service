@@ -16,18 +16,17 @@
 
 package tech.blacksource.blacknectar.service.data;
 
-import com.google.inject.ImplementedBy;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 import javax.inject.Inject;
+
+import com.google.inject.ImplementedBy;
 import org.springframework.jdbc.core.RowMapper;
-import tech.blacksource.blacknectar.service.stores.Address;
-import tech.blacksource.blacknectar.service.stores.Location;
-import tech.blacksource.blacknectar.service.stores.Store;
+import tech.blacksource.blacknectar.service.stores.*;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**

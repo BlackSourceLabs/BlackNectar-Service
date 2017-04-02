@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.UUID;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,36 +32,24 @@ import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
-import tech.blacksource.blacknectar.service.stores.Address;
-import tech.blacksource.blacknectar.service.stores.Location;
-import tech.blacksource.blacknectar.service.stores.Store;
-import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
-import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
-import tech.sirwellington.alchemy.test.junit.runners.Repeat;
+import tech.blacksource.blacknectar.service.stores.*;
+import tech.sirwellington.alchemy.test.junit.runners.*;
 
 import static java.lang.String.format;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 import static org.mockito.Answers.RETURNS_MOCKS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.locations;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
-import static tech.sirwellington.alchemy.generator.NumberGenerators.doubles;
-import static tech.sirwellington.alchemy.generator.NumberGenerators.integers;
-import static tech.sirwellington.alchemy.generator.NumberGenerators.negativeIntegers;
+import static tech.sirwellington.alchemy.generator.NumberGenerators.*;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
-import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
  *

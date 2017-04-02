@@ -16,9 +16,7 @@
 
 package tech.blacksource.blacknectar.service.algorithms;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
-import com.google.inject.TypeLiteral;
+import com.google.inject.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.client.Aroma;

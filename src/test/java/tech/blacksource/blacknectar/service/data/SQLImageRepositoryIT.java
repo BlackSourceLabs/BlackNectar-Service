@@ -18,9 +18,8 @@ package tech.blacksource.blacknectar.service.data;
 
 import java.util.List;
 import java.util.UUID;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.jdbc.core.JdbcTemplate;
 import sir.wellington.alchemy.collections.lists.Lists;
@@ -33,15 +32,11 @@ import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
 import static java.util.stream.Collectors.toList;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.images;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
-import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
  *

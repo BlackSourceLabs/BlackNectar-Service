@@ -23,8 +23,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
 
 /**
  *

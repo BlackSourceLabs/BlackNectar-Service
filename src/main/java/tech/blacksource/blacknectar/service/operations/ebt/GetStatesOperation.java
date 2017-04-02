@@ -9,13 +9,16 @@ import org.slf4j.LoggerFactory;
 import spark.*;
 import tech.blacksource.blacknectar.ebt.balance.State;
 import tech.blacksource.blacknectar.ebt.balance.StateWebsiteFactory;
+import tech.blacksource.blacknectar.service.JSON;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
- * Created by Commander on 4/1/2017.
+ * Responsible for retrieving all of the states supported by the EBT API.
+ *
+ * @author SirWellington
  */
 public class GetStatesOperation implements Route
 {
@@ -38,14 +41,11 @@ public class GetStatesOperation implements Route
                 .throwing(BadArgumentException.class)
                 .are(notNull());
 
-        JsonArray array = new JsonArray();
-
-        stateWebsites.getSupportedStates().stream()
-                     .map(StateJson::new)
-                     .map(StateJson::asJson)
-                     .forEach(array::add);
-
-        return array;
+        return stateWebsites.getSupportedStates()
+                            .stream()
+                            .map(StateJson::new)
+                            .map(StateJson::asJson)
+                            .collect(JSON.collectArray());
     }
 
     static class StateJson

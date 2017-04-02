@@ -17,13 +17,12 @@
 package tech.blacksource.blacknectar.service.stores;
 
 import java.util.Set;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import sir.wellington.alchemy.collections.sets.Sets;
-import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
-import tech.sirwellington.alchemy.test.junit.runners.GenerateInteger;
-import tech.sirwellington.alchemy.test.junit.runners.Repeat;
+import tech.sirwellington.alchemy.test.junit.runners.*;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;

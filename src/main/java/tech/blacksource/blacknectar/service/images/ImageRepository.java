@@ -16,18 +16,17 @@
 
 package tech.blacksource.blacknectar.service.images;
 
-import com.google.inject.ImplementedBy;
 import java.util.List;
 import java.util.UUID;
+
+import com.google.inject.ImplementedBy;
 import sir.wellington.alchemy.collections.lists.Lists;
-import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
-import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
-import tech.blacksource.blacknectar.service.exceptions.DoesNotExistException;
+import tech.blacksource.blacknectar.service.exceptions.*;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.validUUID;

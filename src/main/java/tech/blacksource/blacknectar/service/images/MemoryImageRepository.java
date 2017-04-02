@@ -16,20 +16,17 @@
 
 package tech.blacksource.blacknectar.service.images;
 
+import java.util.*;
+
 import com.google.common.base.Objects;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import sir.wellington.alchemy.collections.maps.Maps;
-import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
-import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
-import tech.blacksource.blacknectar.service.exceptions.DoesNotExistException;
+import tech.blacksource.blacknectar.service.exceptions.*;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 

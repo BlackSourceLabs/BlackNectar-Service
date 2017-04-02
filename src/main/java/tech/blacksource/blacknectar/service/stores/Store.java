@@ -16,10 +16,11 @@
 
 package tech.blacksource.blacknectar.service.stores;
 
-import com.google.gson.JsonObject;
-import com.google.gson.annotations.SerializedName;
 import java.util.Objects;
 import java.util.UUID;
+
+import com.google.gson.JsonObject;
+import com.google.gson.annotations.SerializedName;
 import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 import tech.sirwellington.alchemy.annotations.concurrency.Immutable;
@@ -33,7 +34,7 @@ import static tech.blacksource.blacknectar.service.stores.Address.validAddress;
 import static tech.blacksource.blacknectar.service.stores.Location.validLocation;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern.Role.BUILDER;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern.Role.PRODUCT;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.NetworkAssertions.validURL;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;

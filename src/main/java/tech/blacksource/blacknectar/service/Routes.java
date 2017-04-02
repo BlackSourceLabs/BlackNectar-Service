@@ -28,7 +28,6 @@ interface Routes
     {
         private static final Logger LOG = LoggerFactory.getLogger(Impl.class);
 
-
         private final SayHelloOperation sayHelloOperation;
         private final GetSampleStoreOperation getSampleStoreOperation;
         private final GetStatesOperation getStatesOperation;

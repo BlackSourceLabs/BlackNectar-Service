@@ -16,11 +16,12 @@
 
 package tech.blacksource.blacknectar.service;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
 import java.sql.*;
 import javax.inject.Singleton;
 import javax.sql.DataSource;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;

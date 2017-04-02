@@ -24,10 +24,8 @@ import tech.sirwellington.alchemy.test.junit.runners.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static org.mockito.Mockito.*;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 @RunWith(AlchemyTestRunner.class)
 @Repeat(25)

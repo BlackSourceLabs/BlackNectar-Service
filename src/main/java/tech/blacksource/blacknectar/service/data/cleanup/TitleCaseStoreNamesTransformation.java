@@ -18,13 +18,14 @@ package tech.blacksource.blacknectar.service.data.cleanup;
 
 import java.util.List;
 import java.util.StringTokenizer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.blacksource.blacknectar.service.stores.Store;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 

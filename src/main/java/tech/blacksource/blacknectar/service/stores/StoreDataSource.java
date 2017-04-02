@@ -16,8 +16,9 @@
 
 package tech.blacksource.blacknectar.service.stores;
 
-import com.google.inject.ImplementedBy;
 import java.util.List;
+
+import com.google.inject.ImplementedBy;
 import tech.aroma.client.Aroma;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 

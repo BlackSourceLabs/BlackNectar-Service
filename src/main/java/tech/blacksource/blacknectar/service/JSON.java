@@ -16,15 +16,14 @@
 
 package tech.blacksource.blacknectar.service;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import tech.sirwellington.alchemy.annotations.access.NonInstantiable;
+ import java.util.function.*;
+ import java.util.stream.Collector;
+
+ import com.google.gson.JsonArray;
+ import com.google.gson.JsonElement;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
+ import tech.sirwellington.alchemy.annotations.access.NonInstantiable;
 
 /**
  *

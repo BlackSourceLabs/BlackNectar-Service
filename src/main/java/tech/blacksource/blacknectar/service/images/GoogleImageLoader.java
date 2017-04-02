@@ -20,6 +20,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
@@ -37,7 +38,7 @@ import tech.sirwellington.alchemy.annotations.access.Internal;
 
 import static java.util.stream.Collectors.toList;
 import static tech.blacksource.blacknectar.service.stores.Store.validStore;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**

@@ -16,9 +16,7 @@
 
 package tech.blacksource.blacknectar.service.data.cleanup;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import com.google.inject.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.blacksource.blacknectar.service.ModuleDatabaseProduction;

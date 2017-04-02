@@ -16,8 +16,9 @@
 
 package tech.blacksource.blacknectar.service.operations.stores;
 
-import com.google.gson.JsonArray;
 import java.util.*;
+
+import com.google.gson.JsonArray;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -42,8 +43,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_MOCKS;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static sir.wellington.alchemy.collections.sets.Sets.toSet;
 import static tech.blacksource.blacknectar.service.BlackNectarAssertions.MAX_QUERY_PARAMETER_ARGUMENT_LENGTH;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.images;
@@ -55,7 +55,7 @@ import static tech.sirwellington.alchemy.generator.GeolocationGenerators.latitud
 import static tech.sirwellington.alchemy.generator.GeolocationGenerators.longitudes;
 import static tech.sirwellington.alchemy.generator.NetworkGenerators.ip4Addresses;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
-import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateInteger.Type.RANGE;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.ALPHANUMERIC;
 

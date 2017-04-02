@@ -16,17 +16,17 @@
 
 package tech.blacksource.blacknectar.service.stores;
 
-import com.google.gson.JsonObject;
-import tech.sirwellington.alchemy.annotations.access.Internal;
-import tech.sirwellington.alchemy.annotations.concurrency.Immutable;
-import tech.sirwellington.alchemy.annotations.concurrency.ThreadSafe;
-import tech.sirwellington.alchemy.annotations.objects.Pojo;
-import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
+ import com.google.gson.JsonObject;
+ import tech.sirwellington.alchemy.annotations.access.Internal;
+ import tech.sirwellington.alchemy.annotations.concurrency.Immutable;
+ import tech.sirwellington.alchemy.annotations.concurrency.ThreadSafe;
+ import tech.sirwellington.alchemy.annotations.objects.Pojo;
+ import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
-import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
-import static tech.sirwellington.alchemy.arguments.assertions.GeolocationAssertions.validLatitude;
-import static tech.sirwellington.alchemy.arguments.assertions.GeolocationAssertions.validLongitude;
+ import static tech.sirwellington.alchemy.arguments.Arguments.*;
+ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+ import static tech.sirwellington.alchemy.arguments.assertions.GeolocationAssertions.validLatitude;
+ import static tech.sirwellington.alchemy.arguments.assertions.GeolocationAssertions.validLongitude;
 
 /**
  * A {@link Location} represents a Global Geo-Coordinate.

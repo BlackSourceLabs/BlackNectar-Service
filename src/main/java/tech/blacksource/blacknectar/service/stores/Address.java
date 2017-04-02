@@ -16,8 +16,9 @@
 
 package tech.blacksource.blacknectar.service.stores;
 
-import com.google.gson.JsonObject;
 import java.util.Objects;
+
+import com.google.gson.JsonObject;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 import tech.sirwellington.alchemy.annotations.arguments.Optional;
@@ -30,7 +31,7 @@ import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern.Role.BUILDER;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern.Role.PRODUCT;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.AddressAssertions.validZipCode;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;

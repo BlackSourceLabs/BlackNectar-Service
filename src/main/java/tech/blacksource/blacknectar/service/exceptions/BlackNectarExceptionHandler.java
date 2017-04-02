@@ -18,8 +18,9 @@
 package tech.blacksource.blacknectar.service.exceptions;
 
 
-import com.google.common.base.Strings;
 import javax.inject.Inject;
+
+import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.*;
@@ -29,7 +30,7 @@ import tech.redroma.yelp.exceptions.YelpException;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 import tech.sirwellington.alchemy.arguments.FailedAssertionException;
 
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**

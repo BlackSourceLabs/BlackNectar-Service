@@ -16,18 +16,17 @@
 
 package tech.blacksource.blacknectar.service.data;
 
-import com.google.inject.ImplementedBy;
 import java.net.MalformedURLException;
-import java.sql.ResultSet;
-import java.sql.SQLDataException;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.UUID;
 import javax.inject.Inject;
+
+import com.google.inject.ImplementedBy;
 import org.springframework.jdbc.core.RowMapper;
 import tech.blacksource.blacknectar.service.images.Image;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 

@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package tech.blacksource.blacknectar.service;
+package tech.blacksource.blacknectar.service.scripts;
 
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,10 +32,7 @@ import tech.blacksource.blacknectar.service.images.Image;
 import tech.blacksource.blacknectar.service.images.ImageLoader;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.http.AlchemyHttp;
-import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
-import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
-import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
-import tech.sirwellington.alchemy.test.junit.runners.Repeat;
+import tech.sirwellington.alchemy.test.junit.runners.*;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;

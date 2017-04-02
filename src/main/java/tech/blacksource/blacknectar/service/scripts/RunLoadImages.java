@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package tech.blacksource.blacknectar.service;
+package tech.blacksource.blacknectar.service.scripts;
 
 import com.google.common.collect.Queues;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Queue;
-import java.util.UUID;
+import java.net.*;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import javax.imageio.ImageIO;
@@ -37,13 +31,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
+import tech.aroma.client.Priority;
 import tech.blacksource.blacknectar.service.data.SQLQueries;
 import tech.blacksource.blacknectar.service.images.ImageLoader;
 import tech.blacksource.blacknectar.service.stores.Store;
-import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
-import tech.sirwellington.alchemy.annotations.arguments.Positive;
-import tech.sirwellington.alchemy.annotations.arguments.Required;
+import tech.sirwellington.alchemy.annotations.arguments.*;
 import tech.sirwellington.alchemy.annotations.designs.patterns.BuilderPattern;
 import tech.sirwellington.alchemy.http.AlchemyHttp;
 
@@ -278,8 +270,8 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         LOG.info(message, source, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores, store);
 
         aroma.begin().titled("Image Saved")
-            .text(message, source, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores, store)
-            .withUrgency(Urgency.LOW)
+            .withBody(message, source, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores, store)
+            .withPriority(Priority.LOW)
             .send();
 
     }
@@ -293,8 +285,8 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         LOG.debug(message, source, imageUrl, store);
 
         aroma.begin().titled("Image Saved")
-            .text(message, source, imageUrl, store)
-            .withUrgency(Urgency.LOW)
+            .withBody(message, source, imageUrl, store)
+            .withPriority(Priority.LOW)
             .send();
     }
 
@@ -306,8 +298,8 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         LOG.error(message, source, store, ex);
 
         aroma.begin().titled("Image Load Failed")
-            .text(message, source, store, ex)
-            .withUrgency(Urgency.HIGH)
+            .withBody(message, source, store, ex)
+            .withPriority(Priority.HIGH)
             .send();
     }
 
@@ -318,8 +310,8 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         LOG.error(message, ex);
 
         aroma.begin().titled("Script Interrupted")
-            .text(message, ex)
-            .withUrgency(Urgency.MEDIUM)
+            .withBody(message, ex)
+            .withPriority(Priority.MEDIUM)
             .send();
     }
 
@@ -335,8 +327,8 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         LOG.error(message, totalStoresProcessed, totalStores, source, store);
 
         aroma.begin().titled("Store Image Load Failed")
-            .text(message, totalStoresProcessed, totalStores, source, store)
-            .withUrgency(Urgency.MEDIUM)
+            .withBody(message, totalStoresProcessed, totalStores, source, store)
+            .withPriority(Priority.MEDIUM)
             .send();
     }
 
@@ -349,8 +341,8 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         LOG.info(message, source, runtimeHours, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores);
 
         aroma.begin().titled("Script Finished")
-            .text(message, source, runtimeHours, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores)
-            .withUrgency(Urgency.MEDIUM)
+            .withBody(message, source, runtimeHours, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores)
+            .withPriority(Priority.MEDIUM)
             .send();
     }
 

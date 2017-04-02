@@ -21,7 +21,9 @@ package tech.blacksource.blacknectar.service.operations;
 import com.google.inject.AbstractModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.blacksource.blacknectar.ebt.balance.StateWebsiteFactory;
 import tech.blacksource.blacknectar.service.images.ModuleImageLoader;
+import tech.blacksource.blacknectar.service.operations.stores.SearchStoresOperation;
 import tech.blacksource.blacknectar.service.stores.ModuleStores;
 
 /**
@@ -41,6 +43,8 @@ public final class ModuleOperations extends AbstractModule
         bind(GetSampleStoreOperation.class);
         bind(SayHelloOperation.class);
         bind(SearchStoresOperation.class);
+
+        bind(StateWebsiteFactory.class).toInstance(StateWebsiteFactory.create());
     }
 
 }

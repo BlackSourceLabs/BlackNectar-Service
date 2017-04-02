@@ -24,7 +24,8 @@ import spark.ExceptionHandler;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.service.operations.GetSampleStoreOperation;
 import tech.blacksource.blacknectar.service.operations.SayHelloOperation;
-import tech.blacksource.blacknectar.service.operations.SearchStoresOperation;
+import tech.blacksource.blacknectar.service.operations.ebt.GetStatesOperation;
+import tech.blacksource.blacknectar.service.operations.stores.SearchStoresOperation;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
 import static org.mockito.Answers.RETURNS_MOCKS;
@@ -45,10 +46,13 @@ public class ServerTest
     
     @Mock
     private GetSampleStoreOperation getSampleStoreOperation;
+
+    @Mock
+    private GetStatesOperation getStatesOperation;
     
     @Mock
     private SearchStoresOperation searchStoresOperation;
-    
+
     @Mock
     private ExceptionHandler exceptionHandler;
 
@@ -60,7 +64,7 @@ public class ServerTest
         setupData();
         setupMocks();
         
-        instance = new Server(aroma, sayHelloOperation, getSampleStoreOperation, searchStoresOperation, exceptionHandler);
+        instance = new Server(aroma, sayHelloOperation, getSampleStoreOperation, getStatesOperation, searchStoresOperation, exceptionHandler);
 
     }
 
@@ -75,10 +79,11 @@ public class ServerTest
     @Test
     public void  testConstructor()
     {
-        assertThrows(() -> new Server(null, sayHelloOperation, getSampleStoreOperation, searchStoresOperation, exceptionHandler));
-        assertThrows(() -> new Server(aroma, null, getSampleStoreOperation, searchStoresOperation, exceptionHandler));
-        assertThrows(() -> new Server(aroma, sayHelloOperation, null, searchStoresOperation, exceptionHandler));
-        assertThrows(() -> new Server(aroma, sayHelloOperation, getSampleStoreOperation, null, exceptionHandler));
-        assertThrows(() -> new Server(aroma, sayHelloOperation, getSampleStoreOperation, searchStoresOperation, null));
+        assertThrows(() -> new Server(null, sayHelloOperation, getSampleStoreOperation, getStatesOperation, searchStoresOperation, exceptionHandler));
+        assertThrows(() -> new Server(aroma, null, getSampleStoreOperation, getStatesOperation, searchStoresOperation, exceptionHandler));
+        assertThrows(() -> new Server(aroma, sayHelloOperation, null,getStatesOperation,  searchStoresOperation, exceptionHandler));
+        assertThrows(() -> new Server(aroma, sayHelloOperation, getSampleStoreOperation, null, searchStoresOperation, exceptionHandler));
+        assertThrows(() -> new Server(aroma, sayHelloOperation, getSampleStoreOperation, getStatesOperation, null, exceptionHandler));
+        assertThrows(() -> new Server(aroma, sayHelloOperation, getSampleStoreOperation, getStatesOperation, searchStoresOperation, null));
     }
 }

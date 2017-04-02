@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-package tech.blacksource.blacknectar.service.operations;
+package tech.blacksource.blacknectar.service.operations.stores;
 
 import com.google.gson.JsonArray;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.sets.Sets;
-import spark.QueryParamsMap;
-import spark.Request;
-import spark.Response;
-import spark.Route;
+import spark.*;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
+import tech.aroma.client.Priority;
 import tech.blacksource.blacknectar.service.JSON;
 import tech.blacksource.blacknectar.service.data.BlackNectarSearchRequest;
 import tech.blacksource.blacknectar.service.data.StoreRepository;
@@ -50,10 +45,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.GeolocationAsserti
 import static tech.sirwellington.alchemy.arguments.assertions.GeolocationAssertions.validLongitude;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThanOrEqualTo;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.lessThanOrEqualTo;
-import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.decimalString;
-import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.integerString;
-import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
-import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.stringWithLengthGreaterThanOrEqualTo;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.*;
 
 /**
  * This operation allows searching for Stores. It takes the query parameters and constructs a {@link BlackNectarSearchRequest}
@@ -330,8 +322,8 @@ public class SearchStoresOperation implements Route
         LOG.info("Received GET request to search stores from IP [{}]", request.ip());
 
         aroma.begin().titled("Request Received")
-            .text("To get stores from IP [{}] with query params: [{}]", request.ip(), request.queryString())
-            .withUrgency(Urgency.LOW)
+            .withBody("To get stores from IP [{}] with query params: [{}]", request.ip(), request.queryString())
+            .withPriority(Priority.LOW)
             .send();
     }
 
@@ -342,8 +334,8 @@ public class SearchStoresOperation implements Route
         LOG.debug(message, request.queryString(), delay, jsonArray.size());
 
         aroma.begin().titled("Request Complete")
-            .text(message, request.queryString(), delay, jsonArray.size())
-            .withUrgency(Urgency.LOW)
+            .withBody(message, request.queryString(), delay, jsonArray.size())
+            .withPriority(Priority.LOW)
             .send();
     }
 

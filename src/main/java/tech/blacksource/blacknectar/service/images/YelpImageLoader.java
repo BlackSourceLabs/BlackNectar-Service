@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
+import tech.aroma.client.Priority;
 import tech.blacksource.blacknectar.service.algorithms.StoreSearchAlgorithm;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.redroma.yelp.YelpAPI;
@@ -106,8 +106,8 @@ final class YelpImageLoader implements ImageLoader
         LOG.error("Failed to parse URL: [{}]", url, ex);
         
         aroma.begin().titled("URL Parse Failed")
-            .text("Could not parse URL: [{}]", url, ex)
-            .withUrgency(Urgency.LOW)
+            .withBody("Could not parse URL: [{}]", url, ex)
+            .withPriority(Priority.LOW)
             .send();
     }
 

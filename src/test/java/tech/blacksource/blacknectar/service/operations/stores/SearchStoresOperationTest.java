@@ -14,40 +14,28 @@
  * limitations under the License.
  */
 
-package tech.blacksource.blacknectar.service.operations;
+package tech.blacksource.blacknectar.service.operations.stores;
 
 import com.google.gson.JsonArray;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import java.util.*;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import sir.wellington.alchemy.collections.lists.Lists;
 import sir.wellington.alchemy.collections.maps.Maps;
 import sir.wellington.alchemy.collections.sets.Sets;
-import spark.QueryParamsMap;
-import spark.Request;
-import spark.Response;
+import spark.*;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.service.JSON;
 import tech.blacksource.blacknectar.service.data.BlackNectarSearchRequest;
 import tech.blacksource.blacknectar.service.data.StoreRepository;
-import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
-import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
-import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
+import tech.blacksource.blacknectar.service.exceptions.*;
 import tech.blacksource.blacknectar.service.images.Image;
 import tech.blacksource.blacknectar.service.images.ImageRepository;
-import tech.blacksource.blacknectar.service.operations.SearchStoresOperation.QueryKeys;
+import tech.blacksource.blacknectar.service.operations.stores.SearchStoresOperation.QueryKeys;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
-import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
-import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
-import tech.sirwellington.alchemy.test.junit.runners.GenerateInteger;
-import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
-import tech.sirwellington.alchemy.test.junit.runners.Repeat;
+import tech.sirwellington.alchemy.test.junit.runners.*;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.is;

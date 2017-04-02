@@ -80,8 +80,8 @@ public class BlackNectarExceptionHandlerTest
     {
         when(aroma.begin()).thenReturn(request);
         when(request.titled(anyString())).thenReturn(request);
-        when(request.text(anyString(), anyVararg())).thenReturn(request);
-        when(request.withUrgency(anyObject())).thenReturn(request);
+        when(request.withBody(anyString(), anyVararg())).thenReturn(request);
+        when(request.withPriority(anyObject())).thenReturn(request);
     }
 
     @Test
@@ -114,6 +114,6 @@ public class BlackNectarExceptionHandlerTest
         
         verify(aroma, atLeastOnce()).begin();
         verify(request, atLeastOnce()).send();
-        verify(request, atLeastOnce()).text(anyString(), anyObject(), eq(ex));
+        verify(request, atLeastOnce()).withBody(anyString(), anyObject(), eq(ex));
     }
 }

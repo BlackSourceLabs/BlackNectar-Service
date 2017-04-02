@@ -160,6 +160,22 @@
             <version>1.3-SNAPSHOT</version>
         </dependency>
 
+
+        <!--=======================-->
+        <!--EBT LIBRARY-->
+        <!--=======================-->
+        <dependency>
+            <groupId>tech.blacksource.blacknectar</groupId>
+            <artifactId>ebt-state-websites</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-util</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
         <!--=======================-->
         <!--LOGGING-->
         <!--=======================-->

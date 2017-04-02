@@ -22,7 +22,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
+import tech.aroma.client.Priority;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.redroma.yelp.YelpBusiness;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
@@ -65,8 +65,8 @@ final class YelpMatchingAlgorithm implements StoreMatchingAlgorithm<YelpBusiness
         if (haveTheSameName(business, store))
         {
             aroma.begin().titled("Yelp Match")
-                .text("Businessess have the same name. \n\nYelp:\n{}\n\nBlackNectar:\n{}", business, store)
-                .withUrgency(Urgency.LOW)
+                .withBody("Businessess have the same name. \n\nYelp:\n{}\n\nBlackNectar:\n{}", business, store)
+                .withPriority(Priority.LOW)
                 .send();
 
             return true;
@@ -75,8 +75,8 @@ final class YelpMatchingAlgorithm implements StoreMatchingAlgorithm<YelpBusiness
         if (haveTheSameAddressLine(business, store))
         {
             aroma.begin().titled("Yelp Match")
-                .text("Businessess have the same address. \n\nYelp:\n{}\n\nBlackNectar:\n{}", business, store)
-                .withUrgency(Urgency.LOW)
+                .withBody("Businessess have the same address. \n\nYelp:\n{}\n\nBlackNectar:\n{}", business, store)
+                .withPriority(Priority.LOW)
                 .send();
 
             return true;

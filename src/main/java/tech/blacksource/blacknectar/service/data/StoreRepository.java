@@ -22,9 +22,7 @@ import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
-import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
-import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
-import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
+import tech.blacksource.blacknectar.service.exceptions.*;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
@@ -167,7 +165,7 @@ public interface StoreRepository
      */
     static StoreRepository newSQLService(@Required JdbcTemplate database) throws SQLException
     {
-        return newSQLService(Aroma.create(), database);
+        return newSQLService(Aroma.createNoOpInstance(), database);
     }
     
     /**

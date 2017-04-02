@@ -16,6 +16,8 @@
 
 package tech.blacksource.blacknectar.service;
 
+ import javax.inject.Inject;
+
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.slf4j.Logger;
@@ -23,13 +25,14 @@ import org.slf4j.LoggerFactory;
 import spark.ExceptionHandler;
 import spark.Service;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
-import tech.blacksource.blacknectar.service.operations.*;
-
-import javax.inject.Inject;
+import tech.aroma.client.Priority;
+import tech.blacksource.blacknectar.service.operations.GetSampleStoreOperation;
+import tech.blacksource.blacknectar.service.operations.SayHelloOperation;
+ import tech.blacksource.blacknectar.service.operations.ebt.GetStatesOperation;
+ import tech.blacksource.blacknectar.service.operations.stores.SearchStoresOperation;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
@@ -51,6 +54,7 @@ public final class Server
     private final Aroma aroma;
     private final SayHelloOperation sayHelloOperation;
     private final GetSampleStoreOperation getSampleStoreOperation;
+    private final GetStatesOperation getStatesOperation;
     private final SearchStoresOperation searchStoresOperation;
     private final ExceptionHandler exceptionHandler;
 
@@ -58,15 +62,17 @@ public final class Server
     Server(Aroma aroma,
            SayHelloOperation sayHelloOperation,
            GetSampleStoreOperation getSampleStoreOperation,
+           GetStatesOperation getStatesOperation,
            SearchStoresOperation searchStoresOperation,
            ExceptionHandler exceptionHandler)
     {
-        checkThat(aroma, sayHelloOperation, getSampleStoreOperation, searchStoresOperation, exceptionHandler)
+        checkThat(aroma, sayHelloOperation, getSampleStoreOperation, getStatesOperation, searchStoresOperation, exceptionHandler)
             .are(notNull());
         
         this.aroma = aroma;
         this.sayHelloOperation = sayHelloOperation;
         this.getSampleStoreOperation = getSampleStoreOperation;
+        this.getStatesOperation = getStatesOperation;
         this.searchStoresOperation = searchStoresOperation;
         this.exceptionHandler = exceptionHandler;
     }
@@ -91,8 +97,8 @@ public final class Server
             if (AROMA != null)
             {
                 AROMA.begin().titled("Server Launch Failed")
-                    .text("Could not create Guice Injector: {}", ex)
-                    .withUrgency(Urgency.HIGH)
+                    .withBody("Could not create Guice Injector: {}", ex)
+                    .withPriority(Priority.HIGH)
                     .send();
             }
 
@@ -136,8 +142,8 @@ public final class Server
         
         aroma.begin()
             .titled("Service Launched")
-            .text("At port {}", port)
-            .withUrgency(Urgency.LOW)
+            .withBody("At port {}", port)
+            .withPriority(Priority.LOW)
             .send();
     }
     
@@ -146,6 +152,11 @@ public final class Server
         service.get("/stores", this.searchStoresOperation);
         service.get("/sample-store", this.getSampleStoreOperation);
         service.get("/", this.sayHelloOperation);
+
+        service.path("/ebt", () ->
+        {
+            service.get("", this.getStatesOperation);
+        });
     }
     
     private void setupSecurity(Service service)
@@ -159,14 +170,14 @@ public final class Server
             service.secure(keystore, keystorePassword, null, null);
             
             AROMA.begin().titled("SSL Enabled")
-                .withUrgency(Urgency.LOW)
+                .withPriority(Priority.LOW)
                 .send();
         }
         else 
         {
             AROMA.begin().titled("SSL Disabled")
-                .text("Could not load Keystore File [{}] and Password [{}]", keystore, keystorePasswordFile)
-                .withUrgency(Urgency.MEDIUM)
+                .withBody("Could not load Keystore File [{}] and Password [{}]", keystore, keystorePasswordFile)
+                .withPriority(Priority.MEDIUM)
                 .send();
             
         }

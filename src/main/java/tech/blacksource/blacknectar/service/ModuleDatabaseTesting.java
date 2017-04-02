@@ -26,7 +26,7 @@ import org.postgresql.ds.PGSimpleDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
+import tech.aroma.client.Priority;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 import tech.sirwellington.alchemy.arguments.FailedAssertionException;
 
@@ -67,8 +67,8 @@ public final class ModuleDatabaseTesting extends AbstractModule
             String message = "Failed to create connection to PostgreSQL.";
             LOG.error(message, ex);
             aroma.begin().titled("SQL Connection Failed")
-                .text(message, ex)
-                .withUrgency(Urgency.HIGH)
+                .withBody(message, ex)
+                .withPriority(Priority.HIGH)
                 .send();
 
             throw ex;

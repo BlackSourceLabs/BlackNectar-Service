@@ -26,7 +26,7 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
+import tech.aroma.client.Priority;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 import tech.sirwellington.alchemy.arguments.FailedAssertionException;
 
@@ -90,8 +90,8 @@ public final class ModuleDatabaseProduction extends AbstractModule
             String message = "Failed to create connection to PostgreSQL. Defaulting to SQLite.";
             LOG.error(message, ex);
             aroma.begin().titled("SQL Connection Failed")
-                .text(message, ex)
-                .withUrgency(Urgency.HIGH)
+                .withBody(message, ex)
+                .withPriority(Priority.HIGH)
                 .send();
 
             throw ex;

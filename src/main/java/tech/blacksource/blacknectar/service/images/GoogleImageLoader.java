@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
+import tech.aroma.client.Priority;
 import tech.blacksource.blacknectar.service.algorithms.StoreSearchAlgorithm;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.stores.Store;
@@ -124,8 +124,8 @@ final class GoogleImageLoader implements ImageLoader
         LOG.info("Matching store has no photos: {}", place);
 
         aroma.begin().titled("No Image Found")
-            .text("Google Place has no image.\n\nStore:\n{}\n\nPlace:\n{}", store, place)
-            .withUrgency(Urgency.LOW);
+            .withBody("Google Place has no image.\n\nStore:\n{}\n\nPlace:\n{}", store, place)
+            .withPriority(Priority.LOW);
     }
 
     private void makeNoteThatGooglePhotoCallFailed(Photo photo, Place place, GooglePlacesException ex)
@@ -133,8 +133,8 @@ final class GoogleImageLoader implements ImageLoader
         LOG.error("API call to Google Places failed", ex);
 
         aroma.begin().titled("Image Load Failed")
-            .text("API Call to Google failed.\nPhoto: {}\n\nPlace:\n{}\n\n{}", photo, place, ex)
-            .withUrgency(Urgency.HIGH);
+            .withBody("API Call to Google failed.\nPhoto: {}\n\nPlace:\n{}\n\n{}", photo, place, ex)
+            .withPriority(Priority.HIGH);
     }
 
 }

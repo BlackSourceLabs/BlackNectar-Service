@@ -18,9 +18,7 @@ package tech.blacksource.blacknectar.service;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import javax.inject.Singleton;
 import javax.sql.DataSource;
 import org.slf4j.Logger;
@@ -28,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import spark.ExceptionHandler;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
+import tech.aroma.client.Priority;
 import tech.blacksource.blacknectar.service.algorithms.ModuleAlgorithms;
 import tech.blacksource.blacknectar.service.data.ModuleBlackNectarService;
 import tech.blacksource.blacknectar.service.exceptions.BlackNectarExceptionHandler;
@@ -91,8 +89,8 @@ public final class ModuleServer extends AbstractModule
         catch (RuntimeException ex)
         {
             aroma.begin().titled("Yelp Setup Failed")
-                .text("Failed to setup the Yelp API Client", ex)
-                .withUrgency(Urgency.HIGH)
+                .withBody("Failed to setup the Yelp API Client", ex)
+                .withPriority(Priority.HIGH)
                 .send();
 
             return YelpAPI.NO_OP;
@@ -114,8 +112,8 @@ public final class ModuleServer extends AbstractModule
             LOG.error("Failed to initialized Google Places API", ex);
 
             aroma.begin().titled("Initialization Failed")
-                .text("Failed to initialized Google Places API", ex)
-                .withUrgency(Urgency.HIGH)
+                .withBody("Failed to initialized Google Places API", ex)
+                .withPriority(Priority.HIGH)
                 .send();
 
             return GooglePlacesAPI.NO_OP;

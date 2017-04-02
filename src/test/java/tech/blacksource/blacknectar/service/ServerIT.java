@@ -37,7 +37,7 @@ public class ServerIT
     @Before
     public void setUp() throws Exception
     {
-        Injector injector = Guice.createInjector(new ModuleServer());
+        Injector injector = Guice.createInjector(new ModuleDatabaseTesting(), new ModuleServer());
         instance = injector.getInstance(Server.class);
     }
 

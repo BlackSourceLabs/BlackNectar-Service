@@ -21,17 +21,14 @@ import com.google.common.base.Strings;
 import com.google.common.io.Resources;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
+import tech.aroma.client.Priority;
 import tech.blacksource.blacknectar.service.Server;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
@@ -106,8 +103,8 @@ final class FileStoreDataSource implements StoreDataSource
 
             Server.AROMA.begin()
                 .titled("Operation Failed")
-                .text("Could not load CSV file at {}", FILENAME, ex)
-                .withUrgency(Urgency.HIGH)
+                .withBody("Could not load CSV file at {}", FILENAME, ex)
+                .withPriority(Priority.HIGH)
                 .send();
 
             return "";
@@ -123,8 +120,8 @@ final class FileStoreDataSource implements StoreDataSource
 
             aroma.begin()
                 .titled("Operation Failed")
-                .text("Could not load URL into String: [{}]", url.toString(), ex)
-                .withUrgency(Urgency.HIGH)
+                .withBody("Could not load URL into String: [{}]", url.toString(), ex)
+                .withPriority(Priority.HIGH)
                 .send();
 
             return "";
@@ -183,8 +180,8 @@ final class FileStoreDataSource implements StoreDataSource
 
             aroma.begin()
                 .titled("Conversion Failed")
-                .text("Failed to convert to Geo-Point: [{}, {}]", latitudeString, longitudeString, ex)
-                .withUrgency(Urgency.MEDIUM)
+                .withBody("Failed to convert to Geo-Point: [{}, {}]", latitudeString, longitudeString, ex)
+                .withPriority(Priority.MEDIUM)
                 .send();
 
             throw ex;

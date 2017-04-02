@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package tech.blacksource.blacknectar.service;
+package tech.blacksource.blacknectar.service.scripts;
 
 import com.google.gson.Gson;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Callable;
 import javax.inject.Inject;
 import org.slf4j.Logger;
@@ -29,16 +27,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
+import tech.aroma.client.Priority;
+import tech.blacksource.blacknectar.service.ModuleDatabaseTesting;
+import tech.blacksource.blacknectar.service.ModuleServer;
 import tech.blacksource.blacknectar.service.algorithms.StoreSearchAlgorithm;
 import tech.blacksource.blacknectar.service.data.SQLQueries;
 import tech.blacksource.blacknectar.service.data.StoreRepository;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.redroma.google.places.GooglePlacesAPI;
-import tech.redroma.google.places.data.Photo;
-import tech.redroma.google.places.data.Place;
-import tech.redroma.google.places.data.PlaceDetails;
-import tech.redroma.google.places.data.Types;
+import tech.redroma.google.places.data.*;
 
 import static java.util.stream.Collectors.toList;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
@@ -249,8 +246,8 @@ public class RunLoadGoogleData implements Callable<Void>
         LOG.debug(message, totalStores);
 
         aroma.begin().titled("Script Began")
-            .text(message, totalStores)
-            .withUrgency(Urgency.LOW)
+            .withBody(message, totalStores)
+            .withPriority(Priority.LOW)
             .send();
     }
 
@@ -262,8 +259,8 @@ public class RunLoadGoogleData implements Callable<Void>
         LOG.info(message, failed, processed, remaining, totalStores, store);
         
         aroma.begin().titled("Store Skipped")
-            .text(message, failed, processed, remaining, totalStores, store)
-            .withUrgency(Urgency.MEDIUM)
+            .withBody(message, failed, processed, remaining, totalStores, store)
+            .withPriority(Priority.MEDIUM)
             .send();
     }
     
@@ -274,8 +271,8 @@ public class RunLoadGoogleData implements Callable<Void>
         LOG.info(message, completed, failed, totalStores);
         
         aroma.begin().titled("Script Complete")
-            .text(message, completed, failed, totalStores)
-            .withUrgency(Urgency.HIGH)
+            .withBody(message, completed, failed, totalStores)
+            .withPriority(Priority.HIGH)
             .send();
     }
     
@@ -286,8 +283,8 @@ public class RunLoadGoogleData implements Callable<Void>
         
         LOG.info(message, completed, processed, remaining, totalStores);
         aroma.begin().titled("Google Place Saved")
-            .text(message, completed, processed, remaining, totalStores)
-            .withUrgency(Urgency.LOW)
+            .withBody(message, completed, processed, remaining, totalStores)
+            .withPriority(Priority.LOW)
             .send();
     }
     
@@ -298,8 +295,8 @@ public class RunLoadGoogleData implements Callable<Void>
         
         LOG.warn(message, failed, processed, remaining, totalStores);
         aroma.begin().titled("Database Insert Failed")
-            .text(message, failed, processed, remaining, totalStores)
-            .withUrgency(Urgency.MEDIUM)
+            .withBody(message, failed, processed, remaining, totalStores)
+            .withPriority(Priority.MEDIUM)
             .send();
     }
     
@@ -310,8 +307,8 @@ public class RunLoadGoogleData implements Callable<Void>
         LOG.error(message, store, ex);
         
         aroma.begin().titled("Script Error")
-            .text(message, store, ex)
-            .withUrgency(Urgency.HIGH)
+            .withBody(message, store, ex)
+            .withPriority(Priority.HIGH)
             .send();
     }
 

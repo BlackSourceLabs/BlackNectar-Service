@@ -22,11 +22,9 @@ import com.google.gson.JsonArray;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spark.Request;
-import spark.Response;
-import spark.Route;
+import spark.*;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
+import tech.aroma.client.Priority;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
@@ -64,8 +62,8 @@ public class GetSampleStoreOperation implements Route
         LOG.info("Received GET request to GET a Sample Store from IP [{}]", request.ip());
 
         aroma.begin().titled("Request Received")
-            .text("Request to get sample store from IP [{}]", request.ip())
-            .withUrgency(Urgency.LOW)
+            .withBody("Request to get sample store from IP [{}]", request.ip())
+            .withPriority(Priority.LOW)
             .send();
 
         response.status(200);
@@ -82,8 +80,8 @@ public class GetSampleStoreOperation implements Route
         catch (Exception ex)
         {
             aroma.begin().titled("Request Failed")
-                .text("Could not load Store, {}", ex)
-                .withUrgency(Urgency.HIGH)
+                .withBody("Could not load Store, {}", ex)
+                .withPriority(Priority.HIGH)
                 .send();
 
             return new JsonArray();

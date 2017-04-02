@@ -22,13 +22,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
-import tech.aroma.client.Urgency;
+import tech.aroma.client.Priority;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
-import tech.redroma.yelp.Coordinate;
-import tech.redroma.yelp.YelpAPI;
-import tech.redroma.yelp.YelpBusiness;
-import tech.redroma.yelp.YelpSearchRequest;
+import tech.redroma.yelp.*;
 import tech.redroma.yelp.exceptions.YelpException;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 
@@ -153,8 +150,8 @@ final class YelpStoreSearchAlgorithm implements StoreSearchAlgorithm<YelpBusines
         String message = "Could not find a Yelp Store close to: \n\n{}";
         LOG.debug(message, store);
         aroma.begin().titled("Yelp Match Failed")
-            .text(message, store)
-            .withUrgency(Urgency.LOW)
+            .withBody(message, store)
+            .withPriority(Priority.LOW)
             .send();
     }
     
@@ -165,8 +162,8 @@ final class YelpStoreSearchAlgorithm implements StoreSearchAlgorithm<YelpBusines
         LOG.debug(message, business, store);
         
         aroma.begin().titled("Store Picked")
-            .text("Business: {}\n\n For Store: \n\n{}", business, store)
-            .withUrgency(Urgency.LOW)
+            .withBody("Business: {}\n\n For Store: \n\n{}", business, store)
+            .withPriority(Priority.LOW)
             .send();
     }
     
@@ -175,8 +172,8 @@ final class YelpStoreSearchAlgorithm implements StoreSearchAlgorithm<YelpBusines
         LOG.debug("Found no Yelp Results for store: {}", store);
         
         aroma.begin().titled("No Yelp Matches")
-            .text("Found no Yelp Results to match store: \n\n{}", store)
-            .withUrgency(Urgency.LOW)
+            .withBody("Found no Yelp Results to match store: \n\n{}", store)
+            .withPriority(Priority.LOW)
             .send();
     }
     
@@ -187,8 +184,8 @@ final class YelpStoreSearchAlgorithm implements StoreSearchAlgorithm<YelpBusines
         LOG.error(message, ex);
         
         aroma.begin().titled("Yelp Call Failed")
-            .text("{}\n\nFor Request:\n{}", message, request, ex)
-            .withUrgency(Urgency.HIGH)
+            .withBody("{}\n\nFor Request:\n{}", message, request, ex)
+            .withPriority(Priority.HIGH)
             .send();
     }
 }

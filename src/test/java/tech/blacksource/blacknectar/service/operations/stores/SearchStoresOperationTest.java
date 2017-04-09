@@ -28,8 +28,7 @@ import sir.wellington.alchemy.collections.sets.Sets;
 import spark.*;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.service.JSON;
-import tech.blacksource.blacknectar.service.data.BlackNectarSearchRequest;
-import tech.blacksource.blacknectar.service.data.StoreRepository;
+import tech.blacksource.blacknectar.service.data.*;
 import tech.blacksource.blacknectar.service.exceptions.*;
 import tech.blacksource.blacknectar.service.images.Image;
 import tech.blacksource.blacknectar.service.images.ImageRepository;
@@ -179,7 +178,8 @@ public class SearchStoresOperationTest
             .collect(JSON.collectArray());
 
         assertThat(array, is(expected));
-        
+
+        verify(response).type(MediaTypes.APPLICATION_JSON);
     }
 
     @Test
@@ -195,6 +195,7 @@ public class SearchStoresOperationTest
         JsonArray jsonResponse = instance.handle(request, response);
 
         assertThat(jsonResponse, is(expectedResponse));
+        verify(response).type(MediaTypes.APPLICATION_JSON);
 
     }
 

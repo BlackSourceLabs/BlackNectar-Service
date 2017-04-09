@@ -17,6 +17,7 @@ import spark.Request;
 import spark.Response;
 import tech.blacksource.blacknectar.ebt.balance.State;
 import tech.blacksource.blacknectar.ebt.balance.StateWebsiteFactory;
+import tech.blacksource.blacknectar.service.data.MediaTypes;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.sirwellington.alchemy.generator.*;
 import tech.sirwellington.alchemy.test.junit.runners.*;
@@ -93,6 +94,7 @@ public class GetStatesOperationTest
         assertThat(Sets.copyOf(result), is(Sets.copyOf(expected)));
 
         verify(websiteFactory, never()).getConnectionToState(any());
+        verify(response).type(MediaTypes.APPLICATION_JSON);
 
     }
 

@@ -55,7 +55,7 @@ final class GetStateInfoOperation implements Route
 
         if (state == null)
         {
-            LOG.info("Unknown state abbreviation: {}, trying to parse as full-name");
+            makeNoteOfUnknownStateAbbreviation(stateParameter);
             state = State.fromText(stateParameter);
         }
 
@@ -70,11 +70,28 @@ final class GetStateInfoOperation implements Route
 
         StateWebsite stateWebsite = websiteFactory.getConnectionToState(state);
 
-        return stateWebsite.getFeatures()
-                           .stream()
-                           .map(StateWebsite.Feature::toString)
-                           .map(JsonPrimitive::new)
-                           .collect(JSON.collectArray());
+        JsonArray result = stateWebsite.getFeatures()
+                                       .stream()
+                                       .map(StateWebsite.Feature::toString)
+                                       .map(JsonPrimitive::new)
+                                       .collect(JSON.collectArray());
+        makeNoteOfFeatures(state, result);
+
+        return result;
+    }
+
+
+    private void makeNoteOfUnknownStateAbbreviation(String stateParameter)
+    {
+        LOG.info("Unknown state abbreviation: {}, trying to parse as full-name", stateParameter);
+        aroma.sendMediumPriorityMessage("Unknown State Abbreviation", "Trying to parse {} as full-name instead", stateParameter);
+    }
+
+    private void makeNoteOfFeatures(State state, JsonArray result)
+    {
+        String message = "Found {} features for state '{}'";
+        LOG.debug(message, result.size(), state.getTitleCased());
+        aroma.sendLowPriorityMessage("Get State Features", message, result.size(), state.getTitleCased());
     }
 
     private AlchemyAssertion<State> supportedState()

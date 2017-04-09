@@ -24,7 +24,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
 /**
  * Created by Commander on 4/8/2017.
  */
-final class GetStateInfoOperation implements Route
+public final class GetStateInfoOperation implements Route
 {
     private final static Logger LOG = LoggerFactory.getLogger(GetStateInfoOperation.class);
 

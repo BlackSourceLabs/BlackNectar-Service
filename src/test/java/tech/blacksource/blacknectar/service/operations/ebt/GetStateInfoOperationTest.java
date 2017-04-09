@@ -42,8 +42,6 @@ public class GetStateInfoOperationTest
     @GenerateEnum
     private State state;
 
-    private String stateParameter;
-
     private Set<StateWebsite.Feature> features;
 
     private GetStateInfoOperation instance;
@@ -77,7 +75,7 @@ public class GetStateInfoOperationTest
 
         when(stateWebsite.getFeatures()).thenReturn(this.features);
 
-        stateParameter = state.getAbbreviation().toString().toLowerCase();
+        String stateParameter = state.getAbbreviation().toString().toLowerCase();
         when(request.params(Parameters.EBT.STATE)).thenReturn(stateParameter);
     }
 

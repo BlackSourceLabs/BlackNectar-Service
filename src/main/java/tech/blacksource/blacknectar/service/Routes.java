@@ -34,9 +34,15 @@ interface Routes
         private final SearchStoresOperation searchStoresOperation;
 
         @Inject
-        Impl(SayHelloOperation sayHelloOperation, GetSampleStoreOperation getSampleStoreOperation, GetStatesOperation getStatesOperation, SearchStoresOperation searchStoresOperation)
+        Impl(SayHelloOperation sayHelloOperation,
+             GetSampleStoreOperation getSampleStoreOperation,
+             GetStatesOperation getStatesOperation,
+             SearchStoresOperation searchStoresOperation)
         {
-            checkThat(sayHelloOperation, getSampleStoreOperation, getStatesOperation, searchStoresOperation)
+            checkThat(sayHelloOperation,
+                      getSampleStoreOperation,
+                      getStatesOperation,
+                      searchStoresOperation)
                     .are(notNull());
 
             this.sayHelloOperation = sayHelloOperation;

@@ -11,6 +11,7 @@ import spark.*;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.ebt.balance.*;
 import tech.blacksource.blacknectar.service.JSON;
+import tech.blacksource.blacknectar.service.data.MediaTypes;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.exceptions.UnsupportedStateException;
 import tech.blacksource.blacknectar.service.operations.Parameters;
@@ -75,7 +76,9 @@ public class GetStateInfoOperation implements Route
                                        .map(StateWebsite.Feature::toString)
                                        .map(JsonPrimitive::new)
                                        .collect(JSON.collectArray());
+
         makeNoteOfFeatures(state, result);
+        response.type(MediaTypes.APPLICATION_JSON);
 
         return result;
     }

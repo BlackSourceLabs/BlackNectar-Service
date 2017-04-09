@@ -14,6 +14,7 @@ import spark.Response;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.ebt.balance.*;
 import tech.blacksource.blacknectar.service.JSON;
+import tech.blacksource.blacknectar.service.data.MediaTypes;
 import tech.blacksource.blacknectar.service.exceptions.*;
 import tech.blacksource.blacknectar.service.operations.Parameters;
 import tech.sirwellington.alchemy.generator.*;
@@ -92,6 +93,7 @@ public class GetStateInfoOperationTest
     {
         JsonElement result = instance.handle(request, response);
         checkResultIsExpected(result);
+        verify(response).type(MediaTypes.APPLICATION_JSON);
     }
 
     @DontRepeat
@@ -142,6 +144,8 @@ public class GetStateInfoOperationTest
         JsonElement result = instance.handle(request, response);
 
         checkResultIsExpected(result);
+        verify(response).type(MediaTypes.APPLICATION_JSON);
+
     }
 
     @DontRepeat

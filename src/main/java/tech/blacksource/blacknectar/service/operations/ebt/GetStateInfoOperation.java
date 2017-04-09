@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sir.wellington.alchemy.collections.sets.Sets;
 import spark.*;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.ebt.balance.*;
@@ -92,16 +93,16 @@ public class GetStateInfoOperation implements Route
 
     private void makeNoteOfFeatures(State state, JsonArray result)
     {
-        String message = "Found {} features for state '{}'";
-        LOG.debug(message, result.size(), state.getTitleCased());
-        aroma.sendLowPriorityMessage("Get State Features", message, result.size(), state.getTitleCased());
+        String message = "Found {} features for state '{}': {}";
+        LOG.debug(message, result.size(), state.getTitleCased(), result);
+        aroma.sendLowPriorityMessage("Get State Features", message, result.size(), state.getTitleCased(), result);
     }
 
     private AlchemyAssertion<State> supportedState()
     {
         return state ->
         {
-            Set<State> supportedStates = websiteFactory.getSupportedStates();
+            Set<State> supportedStates = Sets.nullToEmpty(websiteFactory.getSupportedStates());
 
             checkThat(supportedStates)
                     .usingMessage("State is unsupported: " + state)

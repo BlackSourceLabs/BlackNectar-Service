@@ -133,7 +133,7 @@ public class GetStateInfoOperationTest
                 .isInstanceOf(BadArgumentException.class);
     }
 
-    @Repeat
+    @Repeat(50)
     @Test
     public void testWhenFullStateNameUsedAsParameter() throws Exception
     {

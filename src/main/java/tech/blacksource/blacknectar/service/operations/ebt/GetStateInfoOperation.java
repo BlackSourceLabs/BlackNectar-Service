@@ -47,6 +47,24 @@ public class GetStateInfoOperation implements Route
     {
         checkThat(request, response).are(notNull());
 
+        State state = getStateFromRequest(request);
+
+        checkThat(state)
+                .throwing(UnsupportedStateException.class)
+                .is(supportedState());
+
+        StateWebsite stateWebsite = websiteFactory.getConnectionToState(state);
+
+        JsonArray result = getFeaturesFor(stateWebsite);
+
+        makeNoteOfFeatures(state, result);
+        response.type(MediaTypes.APPLICATION_JSON);
+
+        return result;
+    }
+
+    private State getStateFromRequest(Request request)
+    {
         String stateParameter = request.params(Parameters.EBT.STATE);
         checkThat(stateParameter)
                 .throwing(BadArgumentException.class)
@@ -66,24 +84,18 @@ public class GetStateInfoOperation implements Route
                 .usingMessage("Unknown State: " + stateParameter)
                 .is(notNull());
 
-        checkThat(state)
-                .throwing(UnsupportedStateException.class)
-                .is(supportedState());
-
-        StateWebsite stateWebsite = websiteFactory.getConnectionToState(state);
-
-        JsonArray result = stateWebsite.getFeatures()
-                                       .stream()
-                                       .map(StateWebsite.Feature::toString)
-                                       .map(JsonPrimitive::new)
-                                       .collect(JSON.collectArray());
-
-        makeNoteOfFeatures(state, result);
-        response.type(MediaTypes.APPLICATION_JSON);
-
-        return result;
+        return state;
     }
 
+
+    private JsonArray getFeaturesFor(StateWebsite stateWebsite)
+    {
+        return stateWebsite.getFeatures()
+                           .stream()
+                           .map(StateWebsite.Feature::toString)
+                           .map(JsonPrimitive::new)
+                           .collect(JSON.collectArray());
+    }
 
     private void makeNoteOfUnknownStateAbbreviation(String stateParameter)
     {

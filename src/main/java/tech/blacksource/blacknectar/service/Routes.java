@@ -6,8 +6,8 @@ import com.google.inject.ImplementedBy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Service;
-import tech.blacksource.blacknectar.service.operations.GetSampleStoreOperation;
-import tech.blacksource.blacknectar.service.operations.SayHelloOperation;
+import tech.blacksource.blacknectar.service.operations.*;
+import tech.blacksource.blacknectar.service.operations.ebt.GetStateInfoOperation;
 import tech.blacksource.blacknectar.service.operations.ebt.GetStatesOperation;
 import tech.blacksource.blacknectar.service.operations.stores.SearchStoresOperation;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
@@ -31,17 +31,27 @@ interface Routes
         private final SayHelloOperation sayHelloOperation;
         private final GetSampleStoreOperation getSampleStoreOperation;
         private final GetStatesOperation getStatesOperation;
+        private final GetStateInfoOperation getStateInfoOperation;
         private final SearchStoresOperation searchStoresOperation;
 
         @Inject
-        Impl(SayHelloOperation sayHelloOperation, GetSampleStoreOperation getSampleStoreOperation, GetStatesOperation getStatesOperation, SearchStoresOperation searchStoresOperation)
+        Impl(SayHelloOperation sayHelloOperation,
+             GetSampleStoreOperation getSampleStoreOperation,
+             GetStatesOperation getStatesOperation,
+             GetStateInfoOperation getStateInfoOperation,
+             SearchStoresOperation searchStoresOperation)
         {
-            checkThat(sayHelloOperation, getSampleStoreOperation, getStatesOperation, searchStoresOperation)
+            checkThat(sayHelloOperation,
+                      getSampleStoreOperation,
+                      getStatesOperation,
+                      getStateInfoOperation,
+                      searchStoresOperation)
                     .are(notNull());
 
             this.sayHelloOperation = sayHelloOperation;
             this.getSampleStoreOperation = getSampleStoreOperation;
             this.getStatesOperation = getStatesOperation;
+            this.getStateInfoOperation = getStateInfoOperation;
             this.searchStoresOperation = searchStoresOperation;
         }
 
@@ -58,6 +68,8 @@ interface Routes
             service.path("/ebt", () ->
             {
                 service.get("", this.getStatesOperation);
+
+                service.get("/" + Parameters.EBT.STATE, this.getStateInfoOperation);
             });
 
         }

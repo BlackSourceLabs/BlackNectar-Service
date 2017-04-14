@@ -65,7 +65,7 @@ public class BlackNectarAssertionsTest
     @Test
     public void testCannotInstantiate() throws Exception
     {
-        assertThrows(() -> BlackNectarAssertions.class.newInstance());
+        assertThrows(BlackNectarAssertions.class::newInstance);
     }
     
     

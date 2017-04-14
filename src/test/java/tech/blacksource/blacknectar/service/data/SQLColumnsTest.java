@@ -52,7 +52,7 @@ public class SQLColumnsTest
     @Test
     public void testCannotInstatiate() throws Exception
     {
-        assertThrows(() -> new SQLColumns());
+        assertThrows(SQLColumns::new);
     }
 
 }

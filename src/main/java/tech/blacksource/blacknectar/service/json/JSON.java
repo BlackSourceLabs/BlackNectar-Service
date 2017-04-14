@@ -36,8 +36,8 @@ public final class JSON
 
     public static Collector<JsonElement, JsonArray, JsonArray> collectArray()
     {
-        Supplier<JsonArray> supplier = () -> new JsonArray();
-        BiConsumer<JsonArray, JsonElement> accumulator = (array, object) -> array.add(object);
+        Supplier<JsonArray> supplier = JsonArray::new;
+        BiConsumer<JsonArray, JsonElement> accumulator = JsonArray::add;
         BinaryOperator<JsonArray> combiner = (first, second) ->
         {
             JsonArray result = new JsonArray();

@@ -120,8 +120,7 @@ final class TitleCaseStoreNamesTransformation implements StoreTransformation
 
     private boolean notAKeyword(String token)
     {
-        return KEYWORDS.stream()
-            .noneMatch(keyword -> token.contains(keyword));
+        return KEYWORDS.stream().noneMatch(token::contains);
     }
     
     private boolean allUpperCase(String token)

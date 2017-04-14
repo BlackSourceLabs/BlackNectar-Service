@@ -75,7 +75,7 @@ final class MemoryImageRepository implements ImageRepository
         return storeImages.stream()
             .filter(img -> Objects.equal(img.getImageId(), imageId))
             .findAny()
-            .orElseThrow(() -> new DoesNotExistException());
+            .orElseThrow(DoesNotExistException::new);
     }
 
     @Override

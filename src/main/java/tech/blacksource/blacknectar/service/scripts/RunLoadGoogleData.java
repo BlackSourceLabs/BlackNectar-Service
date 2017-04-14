@@ -225,7 +225,7 @@ public class RunLoadGoogleData implements Callable<Void>
     {
         List<String> list = types.stream()
             .filter(Objects::nonNull)
-            .map(t -> t.toString())
+            .map(Enum::toString)
             .collect(toList());
         
         return String.join(",", list);

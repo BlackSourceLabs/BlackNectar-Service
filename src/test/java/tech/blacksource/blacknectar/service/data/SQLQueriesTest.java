@@ -42,8 +42,7 @@ public class SQLQueriesTest
     @Test
     public void testConstructor() throws Exception
     {
-        assertThrows(() -> new SQLQueries())
-            .isInstanceOf(IllegalAccessException.class);
+        assertThrows(SQLQueries::new).isInstanceOf(IllegalAccessException.class);
     }
     
     @Test

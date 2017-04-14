@@ -9,7 +9,8 @@ import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
- * Created by Commander on 4/14/2017.
+ *
+ * @author SirWellington
  */
 final class StateJson
 {

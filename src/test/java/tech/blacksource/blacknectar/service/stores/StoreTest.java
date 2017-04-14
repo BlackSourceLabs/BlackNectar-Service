@@ -109,7 +109,7 @@ public class StoreTest
     {
         Store.Builder builder = Store.Builder.newInstance();
         
-        assertThrows(() -> builder.build());
+        assertThrows(builder::build);
     }
     
     @DontRepeat

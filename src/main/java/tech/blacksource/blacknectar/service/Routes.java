@@ -16,7 +16,8 @@ import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
- * Created by Commander on 4/1/2017.
+ *
+ * @author SirWellington
  */
 @FunctionalInterface
 @ImplementedBy(Routes.Impl.class)

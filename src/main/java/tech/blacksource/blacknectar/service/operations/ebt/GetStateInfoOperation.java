@@ -16,9 +16,10 @@
 
 package tech.blacksource.blacknectar.service.operations.ebt;
 
-import com.google.gson.*;
 import java.util.Set;
 import javax.inject.Inject;
+
+import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.sets.Sets;
@@ -38,7 +39,8 @@ import static tech.sirwellington.alchemy.arguments.assertions.CollectionAssertio
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
- * Created by Commander on 4/8/2017.
+ *
+ * @author SirWellington
  */
 public class GetStateInfoOperation implements Route
 {

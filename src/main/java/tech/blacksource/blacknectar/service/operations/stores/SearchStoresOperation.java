@@ -90,7 +90,7 @@ public class SearchStoresOperation implements Route
             .are(notNull());
 
         checkThat(request)
-            .throwing(ex -> new BadArgumentException(ex))
+            .throwing(BadArgumentException::new)
             .is(validRequest());
 
         long begin = System.currentTimeMillis();

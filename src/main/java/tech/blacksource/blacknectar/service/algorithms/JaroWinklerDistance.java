@@ -96,7 +96,7 @@ final class JaroWinklerDistance implements StringDistanceAlgorithm
             {
                 common.append(first.charAt(i));
             }
-            else 
+            else
             {
                 break;
             }

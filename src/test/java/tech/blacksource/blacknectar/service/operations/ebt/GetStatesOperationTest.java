@@ -16,12 +16,11 @@
 
 package tech.blacksource.blacknectar.service.operations.ebt;
 
+import java.util.*;
+
 import com.google.common.collect.Maps;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,9 +34,7 @@ import tech.blacksource.blacknectar.ebt.balance.StateWebsiteFactory;
 import tech.blacksource.blacknectar.service.data.MediaTypes;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.json.EBTJsonSerializer;
-import tech.sirwellington.alchemy.generator.AlchemyGenerator;
-import tech.sirwellington.alchemy.generator.CollectionGenerators;
-import tech.sirwellington.alchemy.generator.EnumGenerators;
+import tech.sirwellington.alchemy.generator.*;
 import tech.sirwellington.alchemy.test.junit.runners.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;

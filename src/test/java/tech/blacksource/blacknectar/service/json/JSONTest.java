@@ -16,9 +16,10 @@
 
 package tech.blacksource.blacknectar.service.json;
 
+import java.util.List;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
-import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import sir.wellington.alchemy.collections.lists.Lists;

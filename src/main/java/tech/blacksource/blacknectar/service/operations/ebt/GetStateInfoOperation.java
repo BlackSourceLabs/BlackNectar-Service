@@ -39,7 +39,6 @@ import static tech.sirwellington.alchemy.arguments.assertions.CollectionAssertio
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
- *
  * @author SirWellington
  */
 public class GetStateInfoOperation implements Route

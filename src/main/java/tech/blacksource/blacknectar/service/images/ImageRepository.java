@@ -21,7 +21,8 @@ import java.util.UUID;
 
 import com.google.inject.ImplementedBy;
 import sir.wellington.alchemy.collections.lists.Lists;
-import tech.blacksource.blacknectar.service.exceptions.*;
+import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
+import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
 import tech.blacksource.blacknectar.service.stores.Store;
 import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 import tech.sirwellington.alchemy.annotations.arguments.Required;

@@ -16,9 +16,10 @@
 
 package tech.blacksource.blacknectar.service.operations.ebt;
 
-import com.google.gson.*;
 import java.util.List;
 import java.util.Set;
+
+import com.google.gson.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +30,7 @@ import spark.Response;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.ebt.balance.*;
 import tech.blacksource.blacknectar.service.data.MediaTypes;
-import tech.blacksource.blacknectar.service.exceptions.*;
+import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.json.JSON;
 import tech.blacksource.blacknectar.service.operations.Parameters;
 import tech.sirwellington.alchemy.generator.*;

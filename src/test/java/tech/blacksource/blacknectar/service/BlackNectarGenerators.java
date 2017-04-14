@@ -18,9 +18,10 @@
 package tech.blacksource.blacknectar.service;
 
 
-import com.google.gson.JsonObject;
 import java.util.List;
 import java.util.UUID;
+
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.blacksource.blacknectar.service.images.Image;
@@ -85,7 +86,7 @@ public class BlackNectarGenerators
                 .withStoreCode(one(numericString(4)))
                 .withMainImageURL(one(httpUrls()).toString())
                 .isFarmersMarket(one(booleans()))
-                .build(); 
+                .build();
         };
     }
 

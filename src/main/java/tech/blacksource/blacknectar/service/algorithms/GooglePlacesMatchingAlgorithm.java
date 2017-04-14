@@ -57,11 +57,11 @@ final class GooglePlacesMatchingAlgorithm implements StoreMatchingAlgorithm<Plac
     @Override
     public boolean matchesStore(Place candidate, Store store)
     {
-        
+
         checkThat(candidate, store)
-            .usingMessage("arguments cannot be null")
-            .are(notNull());
-        
+                .usingMessage("arguments cannot be null")
+                .are(notNull());
+
         if (namesMatch(candidate.name, store.getName()))
         {
             makeNoteThatNamesMatch(candidate, store);
@@ -92,7 +92,7 @@ final class GooglePlacesMatchingAlgorithm implements StoreMatchingAlgorithm<Plac
         {
             return true;
         }
-        
+
         return first.contains(second) || second.contains(first);
     }
 
@@ -119,20 +119,22 @@ final class GooglePlacesMatchingAlgorithm implements StoreMatchingAlgorithm<Plac
     {
         LOG.debug("Place matches store by name: {}", place);
 
-        aroma.begin().titled("Matched By Name")
-            .withBody("Google Place matches store by name.\n\nStore:\n{}\n\nPlace:\n{}", store, place)
-            .withPriority(Priority.LOW)
-            .send();
+        aroma.begin()
+             .titled("Matched By Name")
+             .withBody("Google Place matches store by name.\n\nStore:\n{}\n\nPlace:\n{}", store, place)
+             .withPriority(Priority.LOW)
+             .send();
     }
 
     private void makeNoteThatAddressesMatch(Place place, Store store)
     {
         LOG.debug("Place matches store by address: {}", place);
 
-        aroma.begin().titled("Matched By Address")
-            .withBody("Google Place matches store by address.\n\nStore:\n{}\n\nPlace:\n{}", store, place)
-            .withPriority(Priority.LOW)
-            .send();
+        aroma.begin()
+             .titled("Matched By Address")
+             .withBody("Google Place matches store by address.\n\nStore:\n{}\n\nPlace:\n{}", store, place)
+             .withPriority(Priority.LOW)
+             .send();
     }
 
 }

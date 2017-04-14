@@ -11,7 +11,7 @@ import sir.wellington.alchemy.collections.sets.Sets;
 import spark.*;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.ebt.balance.*;
-import tech.blacksource.blacknectar.service.JSON;
+import tech.blacksource.blacknectar.service.json.JSON;
 import tech.blacksource.blacknectar.service.data.MediaTypes;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.exceptions.UnsupportedStateException;

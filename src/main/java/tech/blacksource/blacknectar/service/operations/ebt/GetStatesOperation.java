@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import spark.*;
 import tech.blacksource.blacknectar.ebt.balance.State;
 import tech.blacksource.blacknectar.ebt.balance.StateWebsiteFactory;
-import tech.blacksource.blacknectar.service.JSON;
+import tech.blacksource.blacknectar.service.json.JSON;
 import tech.blacksource.blacknectar.service.data.MediaTypes;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 

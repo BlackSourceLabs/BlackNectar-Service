@@ -13,7 +13,7 @@ import spark.Request;
 import spark.Response;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.ebt.balance.*;
-import tech.blacksource.blacknectar.service.JSON;
+import tech.blacksource.blacknectar.service.json.JSON;
 import tech.blacksource.blacknectar.service.data.MediaTypes;
 import tech.blacksource.blacknectar.service.exceptions.*;
 import tech.blacksource.blacknectar.service.operations.Parameters;

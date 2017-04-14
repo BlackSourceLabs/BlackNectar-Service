@@ -14,7 +14,7 @@
   * limitations under the License.
   */
 
-package tech.blacksource.blacknectar.service;
+package tech.blacksource.blacknectar.service.json;
 
  import java.util.function.*;
  import java.util.stream.Collector;

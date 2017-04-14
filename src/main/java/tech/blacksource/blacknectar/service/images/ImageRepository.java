@@ -56,9 +56,9 @@ public interface ImageRepository
      * @return
      * @throws BlackNectarAPIException
      */
-    Image getImage(@Required UUID storeId, @NonEmpty String imageId) throws DoesNotExistException, BlackNectarAPIException;
+    Image getImage(@Required UUID storeId, @NonEmpty String imageId) throws BlackNectarAPIException;
 
-    default Image getImage(@NonEmpty String storeId, @NonEmpty String imageId) throws DoesNotExistException, BlackNectarAPIException
+    default Image getImage(@NonEmpty String storeId, @NonEmpty String imageId) throws BlackNectarAPIException
     {
         checkThat(storeId)
             .throwing(BadArgumentException.class)

@@ -204,11 +204,7 @@ public final class Address implements JSONRepresentable
         {
             return false;
         }
-        if (!Objects.equals(this.localZipCode, other.localZipCode))
-        {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.localZipCode, other.localZipCode);
     }
 
     @Override

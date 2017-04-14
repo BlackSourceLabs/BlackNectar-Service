@@ -23,6 +23,6 @@ package tech.blacksource.blacknectar.service.data;
  */
 public interface MediaTypes 
 {
-    final static String APPLICATION_JSON = "application/json";
-    final static String TEXT_PLAIN = "text/plain";
+    String APPLICATION_JSON = "application/json";
+    String TEXT_PLAIN = "text/plain";
 }

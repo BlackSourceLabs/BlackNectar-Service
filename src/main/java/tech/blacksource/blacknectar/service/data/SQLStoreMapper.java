@@ -52,9 +52,9 @@ interface SQLStoreMapper extends RowMapper<Store>
     @Override
     Store mapRow(ResultSet results, int rowNum) throws SQLException;
     
-    static SQLStoreMapper INSTANCE = new Impl(new SQLTools.Impl());
+    SQLStoreMapper INSTANCE = new Impl(new SQLTools.Impl());
     
-    static class Impl implements SQLStoreMapper
+    class Impl implements SQLStoreMapper
     {
         
         private final SQLTools sqlTools;

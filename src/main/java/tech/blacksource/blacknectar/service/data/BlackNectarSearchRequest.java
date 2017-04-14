@@ -190,11 +190,7 @@ public class BlackNectarSearchRequest
         {
             return false;
         }
-        if (!Objects.equals(this.center, other.center))
-        {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.center, other.center);
     }
 
     @Override

@@ -121,11 +121,7 @@ public final class Location implements JSONRepresentable
         {
             return false;
         }
-        if (Double.doubleToLongBits(this.longitude) != Double.doubleToLongBits(other.longitude))
-        {
-            return false;
-        }
-        return true;
+        return Double.doubleToLongBits(this.longitude) == Double.doubleToLongBits(other.longitude);
     }
     
     @Override

@@ -76,7 +76,7 @@ final class SQLImageRepository implements ImageRepository
     }
 
     @Override
-    public Image getImage(UUID storeId, String imageId) throws DoesNotExistException, BlackNectarAPIException
+    public Image getImage(UUID storeId, String imageId) throws BlackNectarAPIException
     {
         checkNotNull(storeId);
         checkNotEmpty(imageId);

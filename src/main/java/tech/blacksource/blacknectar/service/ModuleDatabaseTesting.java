@@ -57,7 +57,7 @@ public final class ModuleDatabaseTesting extends AbstractModule
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
         dataSource.setUrl(url);
 
-        try (Connection connection = dataSource.getConnection();)
+        try (Connection connection = dataSource.getConnection())
         {
             checkThat(connection)
                 .throwing(SQLException.class)

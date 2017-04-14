@@ -37,6 +37,6 @@ public interface StoreTransformation extends Function<Store, Store>
      * @return
      */
     @Override
-    public Store apply(@Required Store store);
+    Store apply(@Required Store store);
 
 }

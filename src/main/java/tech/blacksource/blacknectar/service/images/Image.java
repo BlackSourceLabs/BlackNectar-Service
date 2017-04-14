@@ -212,11 +212,7 @@ public final class Image
         {
             return false;
         }
-        if (!Objects.equals(this.url, other.url))
-        {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.url, other.url);
     }
 
     @Override

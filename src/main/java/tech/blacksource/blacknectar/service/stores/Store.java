@@ -238,11 +238,7 @@ public class Store implements JSONRepresentable
         {
             return false;
         }
-        if (!Objects.equals(this.address, other.address))
-        {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.address, other.address);
     }
 
     @Override

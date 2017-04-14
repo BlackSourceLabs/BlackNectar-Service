@@ -98,7 +98,7 @@ public final class SQLQueries
         }
         catch (IOException ex)
         {
-            LOG.error("Failed to load SQL at: {}", path, ex);;
+            LOG.error("Failed to load SQL at: {}", path, ex);
             throw new RuntimeException("Could not load query at: " + path, ex);
         }
     }

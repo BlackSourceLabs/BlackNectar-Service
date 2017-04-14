@@ -48,9 +48,9 @@ public interface SQLImageMapper extends RowMapper<Image>
      * @throws SQLException
      */
     @Override
-    public Image mapRow(ResultSet results, int rowNum) throws SQLException;
+    Image mapRow(ResultSet results, int rowNum) throws SQLException;
 
-    static class Impl implements SQLImageMapper
+    class Impl implements SQLImageMapper
     {
 
         private final SQLTools sqlTools;

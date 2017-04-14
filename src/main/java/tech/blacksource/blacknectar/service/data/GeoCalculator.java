@@ -73,7 +73,7 @@ public interface GeoCalculator
      * This Singleton {@link GeoCalculator} computes the distance between two points
      * using the Harvesine formula.
      */
-    static GeoCalculator HARVESINE = new HarvesineCalculator();
+    GeoCalculator HARVESINE = new HarvesineCalculator();
     
     /**
      * Uses the <a href="https://rosettacode.org/wiki/Haversine_formula">Harvesine Formula</a> to calculate
@@ -84,7 +84,7 @@ public interface GeoCalculator
      * 
      * @see <a href="https://rosettacode.org/wiki/Haversine_formula">https://rosettacode.org/wiki/Haversine_formula</a>
      */
-    static class HarvesineCalculator implements GeoCalculator
+    class HarvesineCalculator implements GeoCalculator
     {
 
         private static final double RADIUS_OF_EARTH_IN_KILOMETERS = 6372.8;

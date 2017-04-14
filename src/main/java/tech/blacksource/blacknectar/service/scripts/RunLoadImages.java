@@ -414,11 +414,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
             {
                 return false;
             }
-            if (!Objects.equals(this.stores, other.stores))
-            {
-                return false;
-            }
-            return true;
+            return Objects.equals(this.stores, other.stores);
         }
 
         @Override

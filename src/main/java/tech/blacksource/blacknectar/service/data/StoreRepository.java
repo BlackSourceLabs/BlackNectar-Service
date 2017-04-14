@@ -48,7 +48,7 @@ public interface StoreRepository
      * <p>
      * A little more than 8 miles.
      */
-    public double DEFAULT_RADIUS_METERS = 13_000;
+    double DEFAULT_RADIUS_METERS = 13_000;
     
     /**
      * Adds a Store to the repository.
@@ -56,7 +56,7 @@ public interface StoreRepository
      * @param store The store to add.
      * @throws BadArgumentException If the argument is null or invalid.
      */
-    public void addStore(@Required Store store) throws BlackNectarAPIException;
+    void addStore(@Required Store store) throws BlackNectarAPIException;
     
     /**
      * Checks whether the repository contains a Store with the specified Store ID.
@@ -65,7 +65,7 @@ public interface StoreRepository
      * @return
      * @throws BlackNectarAPIException 
      */
-    public boolean containsStore(@NonEmpty String storeId) throws BlackNectarAPIException;
+    boolean containsStore(@NonEmpty String storeId) throws BlackNectarAPIException;
 
     /**
      * Get all of the EBT stores in the country.

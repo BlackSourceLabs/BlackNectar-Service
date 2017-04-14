@@ -18,8 +18,9 @@
 package tech.blacksource.blacknectar.service;
 
 
+import com.google.gson.JsonObject;
+import java.util.List;
 import java.util.UUID;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.blacksource.blacknectar.service.images.Image;
@@ -29,6 +30,7 @@ import tech.sirwellington.alchemy.generator.StringGenerators;
 
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.BooleanGenerators.booleans;
+import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.generator.NetworkGenerators.httpUrls;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.*;
 import static tech.sirwellington.alchemy.generator.StringGenerators.*;
@@ -101,6 +103,20 @@ public class BlackNectarGenerators
                 .withContentType(one(alphabeticString()))
                 .withImageType(one(alphabeticString()))
                 .build();
+        };
+    }
+    
+    public static AlchemyGenerator<JsonObject> jsonObjects()
+    {
+        List<String> fields = listOf(alphabeticString());
+        
+        return () ->
+        {
+            JsonObject object = new JsonObject();
+            
+            fields.forEach(field -> object.addProperty(field, one(alphanumericString())));
+            
+            return object;
         };
     }
 }

@@ -1,31 +1,37 @@
 package tech.blacksource.blacknectar.service.operations.ebt;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import com.google.common.collect.Maps;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import org.hamcrest.Matchers;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import sir.wellington.alchemy.collections.lists.Lists;
 import sir.wellington.alchemy.collections.sets.Sets;
 import spark.Request;
 import spark.Response;
+import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.ebt.balance.State;
 import tech.blacksource.blacknectar.ebt.balance.StateWebsiteFactory;
 import tech.blacksource.blacknectar.service.data.MediaTypes;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
-import tech.sirwellington.alchemy.generator.*;
+import tech.blacksource.blacknectar.service.json.EBTJsonSerializer;
+import tech.sirwellington.alchemy.generator.AlchemyGenerator;
+import tech.sirwellington.alchemy.generator.CollectionGenerators;
+import tech.sirwellington.alchemy.generator.EnumGenerators;
 import tech.sirwellington.alchemy.test.junit.runners.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Matchers.any;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
+import static tech.blacksource.blacknectar.service.BlackNectarGenerators.jsonObjects;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 @RunWith(AlchemyTestRunner.class)
@@ -33,10 +39,19 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 public class GetStatesOperationTest
 {
 
+    private Aroma aroma;
+    
+    @Mock
+    private EBTJsonSerializer jsonSerializer;
+    
     @Mock
     private StateWebsiteFactory websiteFactory;
 
     private Set<State> states;
+    
+    private Map<State, JsonObject> jsonMap;
+    
+    private JsonArray expected;
 
     @Mock
     private Request request;
@@ -49,18 +64,30 @@ public class GetStatesOperationTest
     @Before
     public void setUp()
     {
+        setupData();
+        setupMocks();
+
+        instance = new GetStatesOperation(aroma, jsonSerializer, websiteFactory);
+    }
+
+    private void setupData()
+    {
         AlchemyGenerator<State> stateGenerator = EnumGenerators.enumValueOf(State.class);
         List<State> statesList = CollectionGenerators.listOf(stateGenerator, 10);
         this.states = Sets.copyOf(statesList);
-
-        setupMocks();
-
-        instance = new GetStatesOperation(websiteFactory);
+        
+        this.jsonMap = Maps.newLinkedHashMap();
+        
+        this.states.forEach(s -> jsonMap.put(s, one(jsonObjects())));
     }
 
     private void setupMocks()
     {
+        aroma = Aroma.createNoOpInstance();
+
         when(websiteFactory.getSupportedStates()).thenReturn(states);
+        
+        jsonMap.forEach((state, json) -> when(jsonSerializer.serializeState(state)).thenReturn(json));
     }
 
 
@@ -68,34 +95,33 @@ public class GetStatesOperationTest
     @Test
     public void testConstructor()
     {
-        assertThrows(() -> new GetStatesOperation(null));
+        assertThrows(() -> new GetStatesOperation(null, jsonSerializer, websiteFactory));
+        assertThrows(() -> new GetStatesOperation(aroma, null, websiteFactory));
+        assertThrows(() -> new GetStatesOperation(aroma, jsonSerializer, null));
     }
 
     @Test
     public void handle() throws Exception
     {
-        JsonArray array = instance.handle(request, response);
-        assertThat(array, Matchers.notNullValue());
-        assertThat(array.size(), Matchers.greaterThan(0));
-
-        List<JsonObject> expected = states.stream()
-                .map(GetStatesOperation.StateJson::new)
-                .map(GetStatesOperation.StateJson::asJson)
-                .collect(Collectors.toList());
-
-        List<JsonObject> result = Lists.create();
-
-        for (int i = 0; i < array.size(); ++i)
-        {
-            JsonObject object = array.get(i).getAsJsonObject();
-            result.add(object);
-        }
-
-        assertThat(Sets.copyOf(result), is(Sets.copyOf(expected)));
+        JsonArray result = instance.handle(request, response);
+        assertThat(result, notNullValue());
+        assertThat(result.size(), greaterThan(0));
+        assertThat(result.size(), is(states.size()));
+        
+        jsonMap.values().forEach(json -> assertTrue(result.contains(json)));
 
         verify(websiteFactory, never()).getConnectionToState(any());
         verify(response).type(MediaTypes.APPLICATION_JSON);
-
+    }
+    
+    @Test
+    public void testHandleWhenNoStatesSupported() throws Exception
+    {
+        when(websiteFactory.getSupportedStates()).thenReturn(Sets.emptySet());
+        
+        JsonArray result = instance.handle(request, response);
+        assertThat(result, notNullValue());
+        assertThat(result.size(), is(0));
     }
 
     @Test

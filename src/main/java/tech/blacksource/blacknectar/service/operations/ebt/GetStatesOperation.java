@@ -1,17 +1,17 @@
+
 package tech.blacksource.blacknectar.service.operations.ebt;
 
-import javax.inject.Inject;
-
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.*;
-import tech.blacksource.blacknectar.ebt.balance.State;
+import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.ebt.balance.StateWebsiteFactory;
-import tech.blacksource.blacknectar.service.json.JSON;
 import tech.blacksource.blacknectar.service.data.MediaTypes;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
+import tech.blacksource.blacknectar.service.json.EBTJsonSerializer;
+import tech.blacksource.blacknectar.service.json.JSON;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
@@ -23,15 +23,21 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
  */
 public class GetStatesOperation implements Route
 {
+
     private final static Logger LOG = LoggerFactory.getLogger(GetStatesOperation.class);
 
+    private Aroma aroma;
+    private final EBTJsonSerializer jsonSerializer;
     private final StateWebsiteFactory stateWebsites;
 
     @Inject
-    GetStatesOperation(StateWebsiteFactory stateWebsites)
+    GetStatesOperation(Aroma aroma, EBTJsonSerializer jsonSerializer, StateWebsiteFactory stateWebsites)
     {
-        checkThat(stateWebsites).is(notNull());
+        checkThat(aroma, jsonSerializer, stateWebsites)
+            .are(notNull());
 
+        this.aroma = aroma;
+        this.jsonSerializer = jsonSerializer;
         this.stateWebsites = stateWebsites;
     }
 
@@ -39,44 +45,28 @@ public class GetStatesOperation implements Route
     public JsonArray handle(Request request, Response response) throws Exception
     {
         checkThat(request, response)
-                .throwing(BadArgumentException.class)
-                .are(notNull());
+            .throwing(BadArgumentException.class)
+            .are(notNull());
 
         response.type(MediaTypes.APPLICATION_JSON);
 
-        return stateWebsites.getSupportedStates()
-                            .stream()
-                            .map(StateJson::new)
-                            .map(StateJson::asJson)
-                            .collect(JSON.collectArray());
+        JsonArray results = stateWebsites.getSupportedStates()
+                                         .stream()
+                                         .map(jsonSerializer::serializeState)
+                                         .collect(JSON.collectArray());
+        
+        makeNoteOfResults(request, results);
+        
+        return results;
     }
 
-    static class StateJson
+    private void makeNoteOfResults(Request request, JsonArray results)
     {
-        private final State state;
-        private final JsonObject json;
-
-        StateJson(State state)
-        {
-            checkThat(state).is(notNull());
-
-            this.state = state;
-            this.json = toJson();
-        }
-
-        private JsonObject toJson()
-        {
-            JsonObject object = new JsonObject();
-
-            object.addProperty("id", state.getAbbreviation().name());
-            object.addProperty("name", state.getTitleCased());
-
-            return object;
-        }
-
-        JsonObject asJson()
-        {
-            return json;
-        }
+        String message = "Found {} states for request {} from IP [{}]";
+        
+        LOG.debug(message, results.size(), request, request.ip());
+        
+        aroma.sendLowPriorityMessage("Get States Called", message, results.size(), request, request.ip());
     }
+
 }

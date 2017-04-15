@@ -148,6 +148,10 @@ To view a States sign-in requirements, make sure to `GET` `/ebt/{state}/`
     + Attributes (array[FieldValue], required)
         
         Values for each of the State's required sign-in fields.
+        
++ Response 200 (application/json)
+    + Attributes (OperationResult, required)
+
 
 ---------------------------------
 
@@ -163,10 +167,7 @@ Note that each website has different account requirements.
         Values for each of the State's required fields
 
 + Response 200 (application/json)
-
-    + Attributes (object, required)
-        + success: `true` (boolean, required) - Whether the operation succeeded or not
-        + message (string, optional) - A detailed message in case the operation failed
+    + Attributes (OperationResult, required)
 
 
 ---------------------------------
@@ -183,9 +184,7 @@ View an EBT Card's Balance. Credentials must be passed into the method body.
 
 + Response 200 (application/json)
 
-    + Attributes (object)
-        + cash_balance: `93.04` (number, required) - The amount of cash money left on the EBT Card
-        + food_balance: `31.30` (number, required) - The amount of food money left on the EBT Card
+    + Attributes (Balance)
 
 ---------------------------------
 
@@ -223,7 +222,6 @@ View an EBT Card's Transaction History. Credentials must be passed into the meth
 + TRANSACTION - The State supports the "/transactions/" api and allows users to view their Transaction history.
       
 
-
 ### Field (object)
 
 + name: `user-id` (string, required) - The unique name of the field. Each field will have a different name.
@@ -251,6 +249,10 @@ View an EBT Card's Transaction History. Credentials must be passed into the meth
 + name: `user-id` (string, required) - The name of the field. This should be pulled from the Field's `name` parameter.
 + value: `cordhernandez` (string, required) - The value of the field. The value should always be a String.
 
+### Balance (object)
+
++ cash_balance: `93.04` (number, required) - The amount of cash money left on the EBT Card
++ food_balance: `31.30` (number, required) - The amount of food money left on the EBT Card
 
 ### Transaction (object)
 
@@ -264,3 +266,7 @@ View an EBT Card's Transaction History. Credentials must be passed into the meth
     + CHARGE
     + DEPOSIT
 + type: `FOOD` (string, required) - Additional information about the type of the transaction.
+
+### OperationResult (object)
++ success: `true` (boolean, required) - Whether the operation succeeded or not
++ message (string, optional) - A detailed message in case the operation failed

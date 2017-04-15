@@ -27,7 +27,7 @@ import tech.blacksource.blacknectar.ebt.balance.StateWebsiteFactory;
 import tech.blacksource.blacknectar.service.data.MediaTypes;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.json.EBTJsonSerializer;
-import tech.blacksource.blacknectar.service.json.JsonCollectors;
+import tech.blacksource.blacknectar.service.json.JSON;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
@@ -69,7 +69,7 @@ public class GetStatesOperation implements Route
         JsonArray results = stateWebsites.getSupportedStates()
                                          .stream()
                                          .map(jsonSerializer::serializeState)
-                                         .collect(JsonCollectors.collectArray());
+                                         .collect(JSON.collectArray());
 
         makeNoteOfResults(request, results);
 

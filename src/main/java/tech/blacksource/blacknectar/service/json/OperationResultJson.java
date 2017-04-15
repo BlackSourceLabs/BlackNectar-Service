@@ -27,7 +27,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
 /**
  * @author SirWellington
  */
-public class OperationResultJson
+final class OperationResultJson implements AsJson
 {
     private final static Logger LOG = LoggerFactory.getLogger(OperationResultJson.class);
 
@@ -36,7 +36,7 @@ public class OperationResultJson
     private final JsonObject json;
 
 
-    public OperationResultJson(@Required String message, boolean success)
+    OperationResultJson(@Required String message, boolean success)
     {
         checkThat(message).is(nonEmptyString());
 
@@ -54,6 +54,7 @@ public class OperationResultJson
         return json;
     }
 
+    @Override
     public JsonObject asJson()
     {
         return json;

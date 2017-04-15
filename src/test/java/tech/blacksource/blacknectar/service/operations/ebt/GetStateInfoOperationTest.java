@@ -31,7 +31,7 @@ import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.ebt.balance.*;
 import tech.blacksource.blacknectar.service.data.MediaTypes;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
-import tech.blacksource.blacknectar.service.json.JsonCollectors;
+import tech.blacksource.blacknectar.service.json.JSON;
 import tech.blacksource.blacknectar.service.operations.Parameters;
 import tech.sirwellington.alchemy.generator.*;
 import tech.sirwellington.alchemy.test.junit.runners.*;
@@ -185,7 +185,7 @@ public class GetStateInfoOperationTest
         JsonArray expected = features.stream()
                                      .map(StateWebsite.Feature::toString)
                                      .map(JsonPrimitive::new)
-                                     .collect(JsonCollectors.collectArray());
+                                     .collect(JSON.collectArray());
 
         assertThat(result, is(expected));
 

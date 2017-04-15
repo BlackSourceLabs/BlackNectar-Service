@@ -31,7 +31,7 @@ import tech.blacksource.blacknectar.service.data.*;
 import tech.blacksource.blacknectar.service.exceptions.*;
 import tech.blacksource.blacknectar.service.images.Image;
 import tech.blacksource.blacknectar.service.images.ImageRepository;
-import tech.blacksource.blacknectar.service.json.JsonCollectors;
+import tech.blacksource.blacknectar.service.json.JSON;
 import tech.blacksource.blacknectar.service.operations.stores.SearchStoresOperation.QueryKeys;
 import tech.blacksource.blacknectar.service.stores.Location;
 import tech.blacksource.blacknectar.service.stores.Store;
@@ -47,7 +47,7 @@ import static sir.wellington.alchemy.collections.sets.Sets.toSet;
 import static tech.blacksource.blacknectar.service.BlackNectarAssertions.MAX_QUERY_PARAMETER_ARGUMENT_LENGTH;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.images;
 import static tech.blacksource.blacknectar.service.BlackNectarGenerators.stores;
-import static tech.blacksource.blacknectar.service.json.JsonCollectors.collectArray;
+import static tech.blacksource.blacknectar.service.json.JSON.collectArray;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.generator.GeolocationGenerators.latitudes;
@@ -174,7 +174,7 @@ public class SearchStoresOperationTest
 
         JsonArray expected = stores.stream()
                                    .map(Store::asJSON)
-                                   .collect(JsonCollectors.collectArray());
+                                   .collect(JSON.collectArray());
 
         assertThat(array, is(expected));
 

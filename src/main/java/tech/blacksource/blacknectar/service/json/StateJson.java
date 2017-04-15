@@ -27,7 +27,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
 /**
  * @author SirWellington
  */
-final class StateJson
+final class StateJson implements AsJson
 {
     private final State state;
     private final JsonObject json;
@@ -50,7 +50,8 @@ final class StateJson
         return object;
     }
 
-    JsonObject asJson()
+    @Override
+    public JsonObject asJson()
     {
         return json;
     }

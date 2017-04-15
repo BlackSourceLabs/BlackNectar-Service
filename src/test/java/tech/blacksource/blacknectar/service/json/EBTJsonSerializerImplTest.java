@@ -16,11 +16,16 @@
 
 package tech.blacksource.blacknectar.service.json;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import sir.wellington.alchemy.collections.lists.Lists;
+import tech.aroma.client.Aroma;
+import tech.blacksource.blacknectar.ebt.balance.Field;
 import tech.blacksource.blacknectar.ebt.balance.State;
+import tech.blacksource.blacknectar.ebt.balance.states.California;
 import tech.sirwellington.alchemy.test.junit.runners.*;
 
 import static org.hamcrest.Matchers.is;
@@ -36,8 +41,14 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 public class EBTJsonSerializerImplTest
 {
 
+    private Aroma aroma;
+
+    private Gson gson = new Gson();
+
     @GenerateEnum
     private State state;
+
+    private Field field;
 
     private EBTJsonSerializerImpl instance;
 
@@ -48,17 +59,18 @@ public class EBTJsonSerializerImplTest
         setupData();
         setupMocks();
 
-        instance = new EBTJsonSerializerImpl();
+        instance = new EBTJsonSerializerImpl(aroma, gson);
     }
 
 
     private void setupData() throws Exception
     {
+        this.field = Lists.oneOf(California.Fields.INSTANCE.getAll());
     }
 
     private void setupMocks() throws Exception
     {
-
+        aroma = Aroma.createNoOpInstance();
     }
 
     @Test
@@ -77,4 +89,27 @@ public class EBTJsonSerializerImplTest
         assertThrows(() -> instance.serializeState(null)).isInstanceOf(IllegalArgumentException.class);
     }
 
+    @Test
+    public void testSerializeField() throws Exception
+    {
+        JsonObject result = instance.serializeField(field);
+        JsonObject expected = gson.toJsonTree(field).getAsJsonObject();
+
+        assertThat(result, is(expected));
+    }
+
+
+    @Test
+    public void testSerializedFieldWithBadArgs() throws Exception
+    {
+        assertThrows(() -> instance.serializeField(null)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+
+    @Test
+    public void testDeserializeFieldWithBadArgs() throws Exception
+    {
+        assertThrows(() -> instance.deserializeFieldValue("")).isInstanceOf(IllegalArgumentException);
+        assertThrows(() -> instance.deserializeFieldValue(null)).isInstanceOf(IllegalArgumentException);
+    }
 }

@@ -27,16 +27,16 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
 /**
  * @author SirWellington
  */
-public class OperationResult
+public class OperationResultJson
 {
-    private final static Logger LOG = LoggerFactory.getLogger(OperationResult.class);
+    private final static Logger LOG = LoggerFactory.getLogger(OperationResultJson.class);
 
     private final String message;
     private final boolean success;
     private final JsonObject json;
 
 
-    public OperationResult(@Required String message, boolean success)
+    public OperationResultJson(@Required String message, boolean success)
     {
         checkThat(message).is(nonEmptyString());
 

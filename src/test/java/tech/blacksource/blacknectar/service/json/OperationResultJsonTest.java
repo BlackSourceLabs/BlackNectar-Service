@@ -32,7 +32,7 @@ import static org.junit.Assert.assertThat;
  */
 @RunWith(AlchemyTestRunner.class)
 @Repeat
-public class OperationResultTest
+public class OperationResultJsonTest
 {
     @GenerateString
     private String message;
@@ -40,12 +40,12 @@ public class OperationResultTest
     @GenerateBoolean
     private Boolean result;
 
-    private OperationResult instance;
+    private OperationResultJson instance;
 
     @Before
     public void setUp() throws Exception
     {
-        instance = new OperationResult(message, result);
+        instance = new OperationResultJson(message, result);
     }
 
     @Test
@@ -54,8 +54,8 @@ public class OperationResultTest
         JsonObject result = instance.asJson();
         assertThat(result, Matchers.notNullValue());
 
-        String messageResult = result.get(OperationResult.Keys.MESSAGE).getAsString();
-        boolean successResult = result.get(OperationResult.Keys.SUCCESS).getAsBoolean();
+        String messageResult = result.get(OperationResultJson.Keys.MESSAGE).getAsString();
+        boolean successResult = result.get(OperationResultJson.Keys.SUCCESS).getAsBoolean();
 
         assertThat(messageResult, not(isEmptyOrNullString()));
 

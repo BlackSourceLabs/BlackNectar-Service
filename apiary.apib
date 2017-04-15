@@ -94,6 +94,7 @@ Get a list of all states supported by the EBT API.
             + name: `California` - The long human-displayable name of the state.
 
 
+---------------------------------
 
 ## US State Information [/ebt/{state}]
 
@@ -114,7 +115,7 @@ Get a States' features, sign-in requirements, and sign-up requirements.
 
         Thrown when acessing a state that does not exist
         
-        
+---------------------------------
         
 ## Check State Account [/ebt/{state}/check]
 
@@ -130,6 +131,10 @@ Check if a user has an account with the state website. The request must include 
     + Attributes (object)
         + exists: `true` (boolean, required) - True if the account exists, false otherwise
         + message (string, optional) - A detailed message in case the operation failed
+
+
+---------------------------------
+
 
 ## Create State Account [/ebt/{state}/create]
 
@@ -148,6 +153,10 @@ Note that each website has different account requirements.
         + success: `true` (boolean, required) - Whether the operation succeeded or not
         + message (string, optional) - A detailed message in case the operation failed
 
+
+---------------------------------
+
+
 ## Balance [/ebt/{state}/balance]
 
 ### View Balance [POST]
@@ -163,6 +172,9 @@ View an EBT Card's Balance. Credentials must be passed into the method body.
     + Attributes (object)
         + cash_balance: `93.04` (number, required) - The amount of cash money left on the EBT Card
         + food_balance: `31.30` (number, required) - The amount of food money left on the EBT Card
+
+---------------------------------
+
 
 ## Transactions [/ebt/{state}/transactions]
 
@@ -180,6 +192,7 @@ View an EBT Card's Transaction History. Credentials must be passed into the meth
     + Attributes (array[Transaction])
 
 
+---------------------------------
 
 ## Data Structures
 

@@ -116,11 +116,12 @@ Get a States' features, sign-in requirements, and sign-up requirements.
         Thrown when acessing a state that does not exist
         
 ---------------------------------
-        
+
 ## Check State Account [/ebt/{state}/check]
 
 ### Check State Account Exists [POST]
-Check if a user has an account with the state website. The request must include values for each of the required sign-in fields.
+Check if a user has an account with the state website. 
+The request must include values for each of the required sign-in fields.
 
 + Request (application/json)
     
@@ -135,6 +136,13 @@ Check if a user has an account with the state website. The request must include 
 
 ---------------------------------
 
+## Sign In [/ebt/{state}/sign-in]
+
+### Sign In [POST]
+Sign into a State Website.
+The request must include values for each of the required sign-in fields.
+
+---------------------------------
 
 ## Create State Account [/ebt/{state}/create]
 
@@ -156,7 +164,6 @@ Note that each website has different account requirements.
 
 ---------------------------------
 
-
 ## Balance [/ebt/{state}/balance]
 
 ### View Balance [POST]
@@ -174,7 +181,6 @@ View an EBT Card's Balance. Credentials must be passed into the method body.
         + food_balance: `31.30` (number, required) - The amount of food money left on the EBT Card
 
 ---------------------------------
-
 
 ## Transactions [/ebt/{state}/transactions]
 

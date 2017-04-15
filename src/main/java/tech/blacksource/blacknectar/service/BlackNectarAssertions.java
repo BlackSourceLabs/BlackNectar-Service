@@ -21,6 +21,7 @@ package tech.blacksource.blacknectar.service;
 import java.util.Set;
 
 import com.google.common.base.Strings;
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.sets.Sets;
@@ -29,6 +30,8 @@ import tech.blacksource.blacknectar.ebt.balance.StateWebsiteFactory;
 import tech.sirwellington.alchemy.annotations.access.NonInstantiable;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
+import tech.sirwellington.alchemy.arguments.FailedAssertionException;
+import tech.sirwellington.alchemy.arguments.assertions.StringAssertions;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
@@ -92,6 +95,25 @@ public final class BlackNectarAssertions
             checkThat(supportedStates)
                     .usingMessage("State is unsupported: " + state)
                     .is(collectionContaining(state));
+        };
+    }
+
+    /**
+     * Checks whether a {@link JsonObject} {@linkplain JsonObject#has(String) has} the specified field
+     *
+     * @param field The field to check.
+     * @return
+     */
+    public static AlchemyAssertion<JsonObject> hasField(@Required String field)
+    {
+        checkThat(field).is(StringAssertions.nonEmptyString());
+
+        return json ->
+        {
+            if (!json.has(field))
+            {
+                throw new FailedAssertionException("Expecting JSON to have field: " + field);
+            }
         };
     }
 }

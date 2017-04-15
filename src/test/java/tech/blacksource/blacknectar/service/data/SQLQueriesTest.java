@@ -27,43 +27,42 @@ import static org.junit.Assert.assertThat;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
- *
  * @author SirWellington
  */
 @RunWith(AlchemyTestRunner.class)
-public class SQLQueriesTest 
+public class SQLQueriesTest
 {
 
     @Before
     public void setUp() throws Exception
     {
     }
-    
+
     @Test
     public void testConstructor() throws Exception
     {
         assertThrows(SQLQueries::new).isInstanceOf(IllegalAccessException.class);
     }
-    
+
     @Test
     public void testQueries() throws Exception
     {
         assertThat(SQLQueries.CREATE_ADDRESS_TABLE, not(isEmptyOrNullString()));
         assertThat(SQLQueries.CREATE_STORES_TABLE, not(isEmptyOrNullString()));
-        
+
         assertThat(SQLQueries.CONTAINS_STORE, not(isEmptyOrNullString()));
         assertThat(SQLQueries.COUNT_IMAGES_FOR_STORE, not(isEmptyOrNullString()));
-        
+
         assertThat(SQLQueries.DELETE_IMAGE, not(isEmptyOrNullString()));
         assertThat(SQLQueries.DELETE_IMAGES_FOR_STORE, not(isEmptyOrNullString()));
         assertThat(SQLQueries.DELETE_STORE, not(isEmptyOrNullString()));
-        
+
         assertThat(SQLQueries.INSERT_GOOGLE_DATA, not(isEmptyOrNullString()));
         assertThat(SQLQueries.INSERT_GOOGLE_PHOTO, not(isEmptyOrNullString()));
         assertThat(SQLQueries.INSERT_STORE, not(isEmptyOrNullString()));
         assertThat(SQLQueries.INSERT_STORE_IMAGE, not(isEmptyOrNullString()));
         assertThat(SQLQueries.INSERT_IMAGE, not(isEmptyOrNullString()));
-        
+
         assertThat(SQLQueries.QUERY_STORES_WITH_LOCATION, not(isEmptyOrNullString()));
         assertThat(SQLQueries.QUERY_STORES_WITH_NAME, not(isEmptyOrNullString()));
         assertThat(SQLQueries.QUERY_STORES_WITH_ZIPCODE, not(isEmptyOrNullString()));
@@ -71,7 +70,7 @@ public class SQLQueriesTest
         assertThat(SQLQueries.QUERY_STORES_WITH_NAME_AND_ZIPCODE, not(isEmptyOrNullString()));
         assertThat(SQLQueries.QUERY_IMAGES_FOR_STORE, not(isEmptyOrNullString()));
         assertThat(SQLQueries.QUERY_IMAGE, not(isEmptyOrNullString()));
-        
+
         assertThat(SQLQueries.UPDATE_STORE, not(isEmptyOrNullString()));
     }
 

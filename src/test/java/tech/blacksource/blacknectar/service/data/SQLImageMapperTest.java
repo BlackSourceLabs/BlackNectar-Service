@@ -37,7 +37,6 @@ import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(25)
@@ -47,10 +46,10 @@ public class SQLImageMapperTest
 
     @Mock(answer = RETURNS_MOCKS)
     private ResultSetMetaData metadata;
-    
+
     @Mock
     private ResultSet results;
-    
+
     @Mock
     private SQLTools sqlTools;
 
@@ -64,7 +63,7 @@ public class SQLImageMapperTest
 
         setupData();
         setupMocks();
-        
+
         instance = new SQLImageMapper.Impl(sqlTools);
     }
 
@@ -76,14 +75,14 @@ public class SQLImageMapperTest
     private void setupMocks() throws Exception
     {
         setupResultsWithImage(results, image);
-        
+
         when(results.getMetaData()).thenReturn(metadata);
         when(metadata.getColumnCount()).thenReturn(10);
         when(metadata.getColumnLabel(anyInt())).thenReturn(SQLColumns.Images.IMAGE_BINARY);
-        
+
         when(sqlTools.hasColumn(results, SQLColumns.Images.IMAGE_BINARY)).thenReturn(true);
     }
-    
+
     @DontRepeat
     @Test
     public void testConstructor() throws Exception

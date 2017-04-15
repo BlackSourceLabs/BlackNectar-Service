@@ -24,7 +24,6 @@ import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
- *
  * @author SirWellington
  */
 @RunWith(AlchemyTestRunner.class)

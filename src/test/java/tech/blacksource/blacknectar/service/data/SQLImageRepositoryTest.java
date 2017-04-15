@@ -44,7 +44,6 @@ import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(50)
@@ -89,9 +88,9 @@ public class SQLImageRepositoryTest
         storeId = UUID.fromString(store.getStoreId());
 
         images = listOf(images(), 10)
-            .stream()
-            .map(img -> Image.Builder.fromImage(img).withStoreID(storeId).build())
-            .collect(toList());
+                .stream()
+                .map(img -> Image.Builder.fromImage(img).withStoreID(storeId).build())
+                .collect(toList());
 
         image = Lists.oneOf(images);
         imageId = image.getImageId();
@@ -133,7 +132,7 @@ public class SQLImageRepositoryTest
     {
         String sql = SQLQueries.QUERY_IMAGE;
         when(database.queryForObject(sql, imageMapper, storeId, imageId))
-            .thenReturn(image);
+                .thenReturn(image);
 
         Image result = instance.getImage(storeId, imageId);
         assertThat(result, is(image));
@@ -145,7 +144,7 @@ public class SQLImageRepositoryTest
         String query = SQLQueries.QUERY_IMAGES_FOR_STORE;
 
         when(database.query(query, imageMapper, storeId))
-            .thenReturn(images);
+                .thenReturn(images);
 
         List<Image> results = instance.getImagesForStore(storeId);
         assertThat(results, is(images));
@@ -157,7 +156,7 @@ public class SQLImageRepositoryTest
         String sql = SQLQueries.COUNT_IMAGES_FOR_STORE;
 
         when(database.queryForObject(sql, Integer.class, storeId))
-            .thenReturn(1);
+                .thenReturn(1);
 
         assertTrue(instance.hasImages(storeId));
     }
@@ -168,7 +167,7 @@ public class SQLImageRepositoryTest
         String sql = SQLQueries.COUNT_IMAGES_FOR_STORE;
 
         when(database.queryForObject(sql, Integer.class, storeId))
-            .thenReturn(0);
+                .thenReturn(0);
 
         assertFalse(instance.hasImages(storeId));
     }

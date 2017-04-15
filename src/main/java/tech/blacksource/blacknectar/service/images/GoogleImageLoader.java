@@ -42,7 +42,6 @@ import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
- *
  * @author SirWellington
  */
 @Internal
@@ -59,7 +58,7 @@ final class GoogleImageLoader implements ImageLoader
     GoogleImageLoader(Aroma aroma, GooglePlacesAPI google, StoreSearchAlgorithm<Place> googlePlaces)
     {
         checkThat(aroma, google, googlePlaces)
-            .are(notNull());
+                .are(notNull());
 
         this.aroma = aroma;
         this.google = google;
@@ -70,9 +69,9 @@ final class GoogleImageLoader implements ImageLoader
     public List<URL> getImagesFor(Store store)
     {
         checkThat(store)
-            .throwing(BadArgumentException.class)
-            .is(validStore());
-        
+                .throwing(BadArgumentException.class)
+                .is(validStore());
+
         Place matchingPlace = googlePlaces.findMatchFor(store);
 
         if (Objects.isNull(matchingPlace))
@@ -87,9 +86,9 @@ final class GoogleImageLoader implements ImageLoader
         }
 
         List<URL> urls = matchingPlace.photos.stream()
-            .map(photo -> this.loadPhoto(photo, matchingPlace))
-            .filter(Objects::nonNull)
-            .collect(toList());
+                                             .map(photo -> this.loadPhoto(photo, matchingPlace))
+                                             .filter(Objects::nonNull)
+                                             .collect(toList());
 
         return urls;
     }
@@ -97,9 +96,9 @@ final class GoogleImageLoader implements ImageLoader
     private GetPhotoRequest createRequestToGetPhoto(Photo photo)
     {
         return GetPhotoRequest.newBuilder()
-            .withPhotoReference(photo.photoReference)
-            .withMaxHeight(GetPhotoRequest.Builder.MAX_HEIGHT)
-            .build();
+                              .withPhotoReference(photo.photoReference)
+                              .withMaxHeight(GetPhotoRequest.Builder.MAX_HEIGHT)
+                              .build();
     }
 
     private URL loadPhoto(Photo photo, Place place)
@@ -125,8 +124,8 @@ final class GoogleImageLoader implements ImageLoader
         LOG.info("Matching store has no photos: {}", place);
 
         aroma.begin().titled("No Image Found")
-            .withBody("Google Place has no image.\n\nStore:\n{}\n\nPlace:\n{}", store, place)
-            .withPriority(Priority.LOW);
+             .withBody("Google Place has no image.\n\nStore:\n{}\n\nPlace:\n{}", store, place)
+             .withPriority(Priority.LOW);
     }
 
     private void makeNoteThatGooglePhotoCallFailed(Photo photo, Place place, GooglePlacesException ex)
@@ -134,8 +133,8 @@ final class GoogleImageLoader implements ImageLoader
         LOG.error("API call to Google Places failed", ex);
 
         aroma.begin().titled("Image Load Failed")
-            .withBody("API Call to Google failed.\nPhoto: {}\n\nPlace:\n{}\n\n{}", photo, place, ex)
-            .withPriority(Priority.HIGH);
+             .withBody("API Call to Google failed.\nPhoto: {}\n\nPlace:\n{}\n\n{}", photo, place, ex)
+             .withPriority(Priority.HIGH);
     }
 
 }

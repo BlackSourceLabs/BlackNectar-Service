@@ -45,38 +45,37 @@ import static tech.sirwellington.alchemy.generator.StringGenerators.uuids;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
- *
  * @author SirWellington
  */
 @IntegrationTest
 @RunWith(AlchemyTestRunner.class)
-public class SQLStoreRepositoryIT 
+public class SQLStoreRepositoryIT
 {
     private static final Location NYC = Location.with(40.758659, -73.985217);
     private static final Location LA = Location.with(34.0420322, -118.2541062);
     private static final String ZIP_SANTA_MONICA = "90401";
     private static final String ZIP_BRONX = "10455";
-    
+
 
     private Aroma aroma;
     private JdbcTemplate database;
     private SQLStoreMapper storeMapper;
-    
+
     private SQLStoreRepository instance;
-    
+
     private List<Store> stores;
     private Store store;
     private String storeId;
-    
+
     @Before
     public void setUp() throws Exception
     {
         setupData();
         setupMocks();
-        
+
         instance = new SQLStoreRepository(aroma, database, storeMapper);
     }
-    
+
     @After
     public void tearDown() throws Exception
     {
@@ -97,7 +96,7 @@ public class SQLStoreRepositoryIT
         database = TestingResources.createDatabaseConnection();
         storeMapper = SQLStoreMapper.INSTANCE;
     }
-    
+
     @Test
     public void testAddStore() throws Exception
     {
@@ -105,23 +104,23 @@ public class SQLStoreRepositoryIT
         instance.addStore(store);
         assertTrue(instance.containsStore(storeId));
     }
-    
+
     @Test
     public void testAddStoreWhenAlreadyExists() throws Exception
     {
         instance.addStore(store);
         assertTrue(instance.containsStore(storeId));
-        
+
         assertThrows(() -> instance.addStore(store)).isInstanceOf(BlackNectarAPIException.class);
     }
-    
+
     @Test
     public void testContainsStoreWhenNotContains() throws Exception
     {
         String randomId = one(uuids);
         assertFalse(instance.containsStore(randomId));
     }
-    
+
     @Test
     public void testContainsStoreWhenContains() throws Exception
     {
@@ -138,15 +137,15 @@ public class SQLStoreRepositoryIT
         List<Store> result = instance.getAllStores();
         assertThat(result, not(empty()));
     }
-    
+
     @Test
     public void testGetAllStoresWithLimit()
     {
         stores.forEach(instance::addStore);
         int limit = one(integers(10, 1_000));
-        
+
         List<Store> result = instance.getAllStores(limit);
-        
+
         assertThat(result, not(empty()));
         assertThat(result.size(), lessThanOrEqualTo(limit));
     }
@@ -155,33 +154,33 @@ public class SQLStoreRepositoryIT
     public void testSearchForStoresWithName()
     {
         String name = "Duane";
-        
+
         BlackNectarSearchRequest request = new BlackNectarSearchRequest()
-            .withSearchTerm(name);
+                .withSearchTerm(name);
 
         List<Store> results = instance.searchForStores(request);
         assertThat(results, not(empty()));
-        
+
         results.forEach(s -> assertThat(s.getName(), not(isEmptyOrNullString())));
-        
+
         for (Store result : results)
         {
             assertThat(result.getName(), anyOf(containsString(name), containsString(name.toUpperCase())));
         }
     }
-    
+
     @Test
     public void testSearchForStoreWithCenter()
     {
         double radius = one(doubles(1_000, 10_000));
-        
+
         BlackNectarSearchRequest request = new BlackNectarSearchRequest()
-            .withCenter(LA)
-            .withRadius(radius);
-        
+                .withCenter(LA)
+                .withRadius(radius);
+
         List<Store> results = instance.searchForStores(request);
         assertThat(results, not(empty()));
-        
+
     }
 
     @Test
@@ -189,44 +188,44 @@ public class SQLStoreRepositoryIT
     {
         double radius = one(doubles(5_000, 10_000));
         String searchTerm = "Duane";
-        
+
         BlackNectarSearchRequest request = new BlackNectarSearchRequest()
-            .withCenter(NYC)
-            .withRadius(radius)
-            .withSearchTerm(searchTerm);
-        
+                .withCenter(NYC)
+                .withRadius(radius)
+                .withSearchTerm(searchTerm);
+
         List<Store> results = instance.searchForStores(request);
         assertThat(results, not(empty()));
 
         results.forEach(s -> assertThat(s.getName(),
-                                          anyOf(containsString(searchTerm),
-                                                containsString(searchTerm.toUpperCase()))));
+                                        anyOf(containsString(searchTerm),
+                                              containsString(searchTerm.toUpperCase()))));
     }
-    
+
     @Test
     public void testSearchForStoresWithZipCode() throws Exception
     {
         String zipCode = ZIP_SANTA_MONICA;
-        
+
         BlackNectarSearchRequest request = new BlackNectarSearchRequest()
-            .withZipCode(zipCode);
-        
+                .withZipCode(zipCode);
+
         List<Store> results = instance.searchForStores(request);
         assertThat(results, not(empty()));
-        
+
         results.forEach(s -> assertThat(s.getAddress().getZipCode(), is(zipCode)));
     }
-    
+
     @Test
     public void testSearchForStoresWithZipCodeAndName() throws Exception
     {
         String name = "Duane";
         String zip = ZIP_BRONX;
-        
+
         BlackNectarSearchRequest request = new BlackNectarSearchRequest()
-            .withZipCode(zip)
-            .withSearchTerm(name);
-        
+                .withZipCode(zip)
+                .withSearchTerm(name);
+
         List<Store> results = instance.searchForStores(request);
         assertThat(results, notNullValue());
 
@@ -239,64 +238,64 @@ public class SQLStoreRepositoryIT
     public void testSearchForStoresResultsHaveImages() throws Exception
     {
         BlackNectarSearchRequest request = new BlackNectarSearchRequest()
-            .withRadius(10_000)
-            .withCenter(LA);
-        
+                .withRadius(10_000)
+                .withCenter(LA);
+
         List<Store> results = instance.searchForStores(request);
-        
+
         long withImages = results.stream()
-            .filter(Store::hasMainImage)
-            .count();
-        
+                                 .filter(Store::hasMainImage)
+                                 .count();
+
         assertThat(withImages, greaterThan(0L));
     }
-    
+
     @Test
     public void testDeleteStore() throws Exception
     {
-        
+
         instance.addStore(store);
         assertTrue(instance.containsStore(storeId));
-        
+
         instance.deleteStore(storeId);
         assertFalse(instance.containsStore(storeId));
     }
-    
+
     @Test
     public void testUpdateStore() throws Exception
     {
         instance.addStore(store);
         assertTrue(instance.containsStore(storeId));
-        
+
         String newName = one(alphabeticString());
         Store updatedStore = Store.Builder.fromStore(store).withName(newName).build();
-        
+
         instance.updateStore(updatedStore);
-        
+
         BlackNectarSearchRequest request = new BlackNectarSearchRequest()
-            .withSearchTerm(newName)
-            .withCenter(updatedStore.getLocation());
-        
+                .withSearchTerm(newName)
+                .withCenter(updatedStore.getLocation());
+
         List<Store> results = instance.searchForStores(request);
         boolean anyMatch = results.stream().anyMatch(s -> Objects.equal(s.getStoreId(), storeId));
         assertTrue(anyMatch);
-        
+
         Optional<Store> match = results.stream()
-            .filter(s -> Objects.equal(s.getStoreId(), storeId))
-            .findFirst();
-        
+                                       .filter(s -> Objects.equal(s.getStoreId(), storeId))
+                                       .findFirst();
+
         assertTrue(match.isPresent());
-        
+
         Store resultingStore = match.get();
         assertThat(resultingStore.getName(), is(newName));
         assertThat(resultingStore.getAddress(), is(store.getAddress()));
     }
-    
+
     @Test
     public void testUpdateStoreWhenStoreDoesNotExist() throws Exception
     {
         instance.updateStore(store);
-        
+
         assertTrue(instance.containsStore(storeId));
     }
 

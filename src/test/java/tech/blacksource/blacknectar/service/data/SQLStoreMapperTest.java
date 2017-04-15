@@ -37,7 +37,6 @@ import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(50)
@@ -76,17 +75,17 @@ public class SQLStoreMapperTest
     private void setupMocks() throws Exception
     {
         setupResultsWithStore(results, store);
-        
+
         when(sqlTools.hasColumn(results, SQLColumns.Images.URL))
-            .thenReturn(true);
-        
+                .thenReturn(true);
+
         when(sqlTools.hasColumn(results, SQLColumns.STORE_CODE))
-            .thenReturn(true);
-        
+                .thenReturn(true);
+
         when(sqlTools.hasColumn(results, SQLColumns.IS_FARMERS_MARKET))
-            .thenReturn(true);
+                .thenReturn(true);
     }
-    
+
     @DontRepeat
     @Test
     public void testConstructor() throws Exception
@@ -116,8 +115,8 @@ public class SQLStoreMapperTest
     public void testMapToStoreWhenStoreHasNoImage() throws Exception
     {
         when(sqlTools.hasColumn(results, SQLColumns.Images.URL))
-            .thenReturn(false);
-        
+                .thenReturn(false);
+
         Store result = instance.mapRow(results, 1);
         assertThat(result, is(storeWithoutImage));
     }
@@ -128,28 +127,28 @@ public class SQLStoreMapperTest
     {
         assertThrows(() -> instance.mapRow(null, 1)).isInstanceOf(IllegalArgumentException.class);
     }
-    
+
     @DontRepeat
     @Test
     public void testWhenHasStoreCodeColumnDoesNotExist() throws Exception
     {
         when(sqlTools.hasColumn(results, SQLColumns.STORE_CODE)).thenReturn(false);
-        
+
         Store result = instance.mapRow(results, 1);
         Store expected = Store.Builder.fromStore(store).withoutStoreCode().build();
-        
+
         assertThat(result, is(expected));
     }
-    
+
     @DontRepeat
     @Test
     public void testWhenFarmersMarketColumnDoesNotExist() throws Exception
     {
         store = Store.Builder.fromStore(store).isFarmersMarket(true).build();
         setupResultsWithStore(results, store);
-        
+
         when(sqlTools.hasColumn(results, SQLColumns.IS_FARMERS_MARKET)).thenReturn(Boolean.FALSE);
-        
+
         Store result = instance.mapRow(results, 0);
         assertThat(result.isFarmersMarket(), is(false));
     }

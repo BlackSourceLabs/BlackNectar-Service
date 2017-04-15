@@ -30,22 +30,21 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_MOCKS;
 
 /**
- *
  * @author SirWellington
  */
 @RunWith(AlchemyTestRunner.class)
-public class ModuleProductionDatabaseTest 
+public class ModuleProductionDatabaseTest
 {
 
     @Mock(answer = RETURNS_MOCKS)
     private Aroma fakeAroma;
-    
+
     private ModuleDatabaseProduction instance;
-    
+
     @Before
     public void setUp() throws Exception
     {
-        
+
         setupData();
         setupMocks();
         instance = new ModuleDatabaseProduction();
@@ -54,12 +53,12 @@ public class ModuleProductionDatabaseTest
 
     private void setupData() throws Exception
     {
-        
+
     }
 
     private void setupMocks() throws Exception
     {
-        
+
     }
 
     @Test
@@ -67,7 +66,7 @@ public class ModuleProductionDatabaseTest
     {
         instance.configure();
     }
-    
+
     @Test
     public void testProvideSQLConnection() throws Exception
     {

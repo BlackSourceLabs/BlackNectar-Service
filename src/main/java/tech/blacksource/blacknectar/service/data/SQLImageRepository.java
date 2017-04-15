@@ -36,29 +36,28 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
- *
  * @author SirWellington
  */
 final class SQLImageRepository implements ImageRepository
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(SQLImageRepository.class);
-    
+
     private final Aroma aroma;
     private final JdbcTemplate database;
     private final SQLImageMapper imageMapper;
-    
+
     @Inject
     SQLImageRepository(Aroma aroma, JdbcTemplate database, SQLImageMapper imageMapper)
     {
         checkThat(aroma, database, imageMapper)
-            .are(notNull());
-        
+                .are(notNull());
+
         this.aroma = aroma;
         this.database = database;
         this.imageMapper = imageMapper;
     }
-    
+
     @Override
     public void addImage(Image image) throws BlackNectarAPIException
     {
@@ -76,7 +75,7 @@ final class SQLImageRepository implements ImageRepository
     }
 
     @Override
-    public Image getImage(UUID storeId, String imageId) throws DoesNotExistException, BlackNectarAPIException
+    public Image getImage(UUID storeId, String imageId) throws BlackNectarAPIException
     {
         checkNotNull(storeId);
         checkNotEmpty(imageId);
@@ -85,7 +84,7 @@ final class SQLImageRepository implements ImageRepository
         {
             return _getImage(storeId, imageId);
         }
-        catch(EmptyResultDataAccessException ex)
+        catch (EmptyResultDataAccessException ex)
         {
             throw new DoesNotExistException(ex);
         }
@@ -151,11 +150,11 @@ final class SQLImageRepository implements ImageRepository
     {
         String message = "Failed to save Image: {}";
         LOG.error(message, image, ex);
-        
+
         aroma.begin().titled("SQL Image Save Failed")
-            .withBody(message, image, ex)
-            .withPriority(Priority.MEDIUM)
-            .send();
+             .withBody(message, image, ex)
+             .withPriority(Priority.MEDIUM)
+             .send();
     }
 
     private void _addImage(Image image)
@@ -218,11 +217,11 @@ final class SQLImageRepository implements ImageRepository
     {
         String message = "Failed to get image: StoreID[{}] | ImageID[{}]";
         LOG.error(message, storeId, imageId, ex);
-        
+
         aroma.begin().titled("SQL Image Get Failed")
-            .withBody(message, storeId, imageId, ex)
-            .withPriority(Priority.MEDIUM)
-            .send();
+             .withBody(message, storeId, imageId, ex)
+             .withPriority(Priority.MEDIUM)
+             .send();
     }
 
     private void makeNoteThatFailedToGetImagesForStore(UUID storeId, Exception ex)
@@ -230,52 +229,52 @@ final class SQLImageRepository implements ImageRepository
         String message = "Failed to get images for Store: [{}]";
         LOG.error(message, storeId, ex);
         aroma.begin().titled("SQL Image Get Failed")
-            .withBody(message, storeId, ex)
-            .withPriority(Priority.MEDIUM)
-            .send();
+             .withBody(message, storeId, ex)
+             .withPriority(Priority.MEDIUM)
+             .send();
     }
 
     private void makeNoteThatFailedToCheckIfStoreHasImages(UUID storeId, Exception ex)
     {
         String message = "Failed to check if store has images: [{}]";
         LOG.error(message, storeId, ex);
-       
+
         aroma.begin().titled("SQL Store Image Check Failed")
-            .withBody(message, storeId, ex)
-            .withPriority(Priority.MEDIUM)
-            .send();
+             .withBody(message, storeId, ex)
+             .withPriority(Priority.MEDIUM)
+             .send();
     }
 
     private void makeNoteThatFailedToDeleteImage(UUID storeId, String imageId, Exception ex)
     {
         String message = "Failed to delete Image. Store: [{}] | Image ID: [{}]";
         LOG.error(message, storeId, imageId, ex);
-       
+
         aroma.begin().titled("SQL Image Delete Failed")
-            .withBody(message, storeId, imageId, ex)
-            .withPriority(Priority.MEDIUM)
-            .send();
+             .withBody(message, storeId, imageId, ex)
+             .withPriority(Priority.MEDIUM)
+             .send();
     }
 
     private void checkNotNull(Object object)
     {
         checkThat(object)
-            .throwing(BadArgumentException.class)
-            .is(notNull());
+                .throwing(BadArgumentException.class)
+                .is(notNull());
     }
 
     private void checkNotEmpty(String imageId)
     {
         checkThat(imageId)
-            .throwing(BadArgumentException.class)
-            .is(nonEmptyString());
+                .throwing(BadArgumentException.class)
+                .is(nonEmptyString());
     }
 
     private void checkHaveResult(Image result)
     {
         checkThat(result)
-            .throwing(DoesNotExistException.class)
-            .is(notNull());
+                .throwing(DoesNotExistException.class)
+                .is(notNull());
     }
 
 }

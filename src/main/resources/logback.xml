@@ -1,6 +1,6 @@
 <configuration>
     <contextName>BlackNectar</contextName>
-    <jmxConfigurator />
+    <jmxConfigurator/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>

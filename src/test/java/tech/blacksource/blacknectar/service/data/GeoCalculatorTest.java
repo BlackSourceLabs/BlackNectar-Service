@@ -33,7 +33,6 @@ import static tech.sirwellington.alchemy.generator.NumberGenerators.negativeInte
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(100)
@@ -43,10 +42,10 @@ public class GeoCalculatorTest
     private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     private GeoCalculator formula;
-    
+
     private Location first;
     private Location second;
-    
+
     @Before
     public void setUp() throws Exception
     {
@@ -59,7 +58,7 @@ public class GeoCalculatorTest
     {
         AlchemyGenerator<Double> latitudes = doubles(-90, 90.0);
         AlchemyGenerator<Double> longitudes = doubles(-180, 180);
-        
+
         first = new Location(latitudes.get(), longitudes.get());
         second = new Location(latitudes.get(), longitudes.get());
     }
@@ -99,15 +98,15 @@ public class GeoCalculatorTest
     public void testBearing()
     {
         LOG.info("First: {}, Second: {}", first, second);
-        
+
         Location start = Location.with(-20.179275814170015, 127.56747344883186);
         Location end = Location.with(-45.62360109416997, 37.51602010912128);
         double bearing = formula.calculateBearingFromTo(start, end);
         double expected = 226.1;
-        
+
         assertEquals(expected, bearing, 0.1);
     }
-    
+
     @DontRepeat
     @Test
     public void testCalculateBearingWithBadArguments()
@@ -115,7 +114,7 @@ public class GeoCalculatorTest
         assertThrows(() -> formula.calculateBearingFromTo(null, second)).isInstanceOf(IllegalArgumentException.class);
         assertThrows(() -> formula.calculateBearingFromTo(first, null)).isInstanceOf(IllegalArgumentException.class);
     }
-    
+
     @Test
     public void testCalculateDestination()
     {
@@ -123,21 +122,21 @@ public class GeoCalculatorTest
         double distanceInMeters = formula.distanceBetween(first, second);
         double distanceInKM = distanceInMeters / 1000;
         double bearing = formula.calculateBearingFromTo(first, second);
-        
+
         Location expected = second;
-        
+
         Location destination = formula.calculateDestinationFrom(first, distanceInMeters, bearing);
         assertEquals(expected.getLatitude(), destination.getLatitude(), 1.0);
         assertEquals(expected.getLongitude(), destination.getLongitude(), 1.0);
     }
-    
+
     @DontRepeat
     @Test
     public void testCalculateDestinationWithBadArgs()
     {
         AlchemyGenerator<Integer> negatives = negativeIntegers();
         AlchemyGenerator<Double> badBearings = doubles(360, 1000);
-        
+
         assertThrows(() -> formula.calculateDestinationFrom(null, 0, 0)).isInstanceOf(IllegalArgumentException.class);
         assertThrows(() -> formula.calculateDestinationFrom(first, one(negatives), 0)).isInstanceOf(IllegalArgumentException.class);
         assertThrows(() -> formula.calculateDestinationFrom(first, 0, 0)).isInstanceOf(IllegalArgumentException.class);

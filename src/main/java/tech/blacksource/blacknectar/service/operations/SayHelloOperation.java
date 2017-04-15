@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- 
+
 package tech.blacksource.blacknectar.service.operations;
 
 
@@ -32,7 +32,6 @@ import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
- *
  * @author SirWellington
  */
 public class SayHelloOperation implements Route
@@ -45,25 +44,25 @@ public class SayHelloOperation implements Route
     public SayHelloOperation(@Required Aroma aroma)
     {
         checkThat(aroma).is(notNull());
-        
+
         this.aroma = aroma;
     }
-    
+
     @Override
     public String handle(Request request, Response response) throws Exception
     {
         checkThat(request, response)
-            .usingMessage("Request and response cannot be null")
-            .throwing(BadArgumentException.class)
-            .is(notNull());
-        
+                .usingMessage("Request and response cannot be null")
+                .throwing(BadArgumentException.class)
+                .is(notNull());
+
         LOG.info("Received GET request from IP [{}]", request.ip());
-        
+
         aroma.begin().titled("Request Received")
-            .withBody("From IP [{}]", request.ip())
-            .withPriority(Priority.LOW)
-            .send();
-        
+             .withBody("From IP [{}]", request.ip())
+             .withPriority(Priority.LOW)
+             .send();
+
         response.status(200);
         //U+1F573
         return "We are BlackSource 🌑";

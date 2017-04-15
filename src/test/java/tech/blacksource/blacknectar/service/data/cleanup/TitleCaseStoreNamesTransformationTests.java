@@ -30,7 +30,6 @@ import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.ALPHABETIC;
 
 /**
- *
  * @author SirWellington
  */
 @RunWith(AlchemyTestRunner.class)
@@ -85,85 +84,85 @@ public class TitleCaseStoreNamesTransformationTests
 
         assertNameMatches(name, expected);
     }
-    
+
     @Test
     public void testWithSantoDomingoCoffee() throws Exception
     {
         String name = "SANTO DOMINGO BAKERY AND COFFEE";
         String expected = "Santo Domingo Bakery And Coffee";
-        
+
         assertNameMatches(name, expected);
     }
-    
+
     @Test
     public void testWithApostrophy() throws Exception
     {
         String name = "MANNING'S MARKETPLACE";
         String expected = "Manning's Marketplace";
-        
+
         assertNameMatches(name, expected);
     }
-    
+
     @Test
     public void testWithAmpersand() throws Exception
     {
         String name = "K & S FOOD MARKET, INC.";
         String expected = "K & S Food Market, INC.";
-        
+
         assertNameMatches(name, expected);
     }
-    
+
     @Test
     public void testWith7Eleven() throws Exception
     {
         String name = "7-ELEVEN";
         String expected = "7-Eleven";
-        
+
         assertNameMatches(name, expected);
     }
-    
+
     @Test
     public void testWithAmpersandAndApostrophe() throws Exception
     {
         String name = "KIRBIE'S FAMILY MEATS & CATERING";
         String expected = "Kirbie's Family Meats & Catering";
-        
+
         assertNameMatches(name, expected);
     }
-    
+
     @Test
     public void testWithCVS() throws Exception
     {
         String name = "CVS PHARMACY";
         String expected = "CVS Pharmacy";
-        
+
         assertNameMatches(name, expected);
     }
-    
+
     @Test
     public void testWithCVSAlreadyGood() throws Exception
     {
         String name = "CVS Pharmacy";
         String expected = "CVS Pharmacy";
-        
+
         assertNameMatches(name, expected);
     }
-    
+
     @Test
     public void testWithHyphens() throws Exception
     {
         String name = "SPEE-D-FOODS";
         String expected = "Spee-D-Foods";
-        
+
         assertNameMatches(name, expected);
     }
-    
+
     @Test
     public void testWithVons() throws Exception
     {
         String name = "VONS";
         String expected = "Vons";
-        
+
         assertNameMatches(name, expected);
     }
 
@@ -179,7 +178,7 @@ public class TitleCaseStoreNamesTransformationTests
     private Store storeWithName(String name)
     {
         return Store.Builder.fromStore(store)
-            .withName(name)
-            .build();
+                            .withName(name)
+                            .build();
     }
 }

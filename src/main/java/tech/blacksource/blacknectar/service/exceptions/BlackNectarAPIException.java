@@ -41,7 +41,7 @@ public class BlackNectarAPIException extends RuntimeException
     {
         super(cause);
     }
-    
+
     public int getStatusCode()
     {
         return 500;

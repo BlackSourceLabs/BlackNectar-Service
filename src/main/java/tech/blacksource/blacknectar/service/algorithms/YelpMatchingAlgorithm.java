@@ -34,7 +34,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
 
 /**
  * This class matches Stores with businesses on Yelp.
- * 
+ *
  * @author SirWellington
  */
 @StrategyPattern(role = CONCRETE_BEHAVIOR)
@@ -56,7 +56,7 @@ final class YelpMatchingAlgorithm implements StoreMatchingAlgorithm<YelpBusiness
     public boolean matchesStore(YelpBusiness candidate, Store store)
     {
         checkThat(candidate, store)
-            .are(notNull());
+                .are(notNull());
 
         return areSimilar(candidate, store);
     }
@@ -66,9 +66,9 @@ final class YelpMatchingAlgorithm implements StoreMatchingAlgorithm<YelpBusiness
         if (haveTheSameName(business, store))
         {
             aroma.begin().titled("Yelp Match")
-                .withBody("Businessess have the same name. \n\nYelp:\n{}\n\nBlackNectar:\n{}", business, store)
-                .withPriority(Priority.LOW)
-                .send();
+                 .withBody("Businessess have the same name. \n\nYelp:\n{}\n\nBlackNectar:\n{}", business, store)
+                 .withPriority(Priority.LOW)
+                 .send();
 
             return true;
         }
@@ -76,9 +76,9 @@ final class YelpMatchingAlgorithm implements StoreMatchingAlgorithm<YelpBusiness
         if (haveTheSameAddressLine(business, store))
         {
             aroma.begin().titled("Yelp Match")
-                .withBody("Businessess have the same address. \n\nYelp:\n{}\n\nBlackNectar:\n{}", business, store)
-                .withPriority(Priority.LOW)
-                .send();
+                 .withBody("Businessess have the same address. \n\nYelp:\n{}\n\nBlackNectar:\n{}", business, store)
+                 .withPriority(Priority.LOW)
+                 .send();
 
             return true;
         }

@@ -24,9 +24,8 @@ import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.INTERFACE;
 
 /**
- *
- * @author SirWellington
  * @param <Result> The data type returned by the specific Search Engine.
+ * @author SirWellington
  * @see StoreMatchingAlgorithm
  */
 @StrategyPattern(role = INTERFACE)

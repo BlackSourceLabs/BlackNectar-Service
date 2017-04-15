@@ -33,44 +33,44 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
  * This transformation fixes an issue where some store names come capitalized in ALL CAPS.
  * <p>
  * This algorithm uses a simple rule-based system.
- * 
+ * <p>
  * <pre>
  * 1. In order to be considered as a candidate, store names must contains stretches with at least 3 upper-case characters [A-Z]
  * 2. Names are broken up into individual tokens.
  * 3. Keywords and abbreviations are ignored, like CVS, USA, LLC, IGA, etc.
  * </pre>
- * 
+ *
  * @author SirWellington
  */
 final class TitleCaseStoreNamesTransformation implements StoreTransformation
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(TitleCaseStoreNamesTransformation.class);
-    
+
     private static final int ABBREVIATION_LENGTH = 2;
     private static final String STORE_NAME_PATTERN = "[\\w\\-\\&\\' ]*[A-Z]{4,}.*";
     private static final String ALL_UPPER_CASE_PATTERN = "[A-Z\\']+";
-    
+
     private static final List<String> KEYWORDS = Lists.createFrom("LLC", "CVS", "IGA", "USA");
 
     @Override
     public Store apply(Store store)
     {
         checkThat(store)
-            .is(notNull());
-        
+                .is(notNull());
+
         String storeName = store.getName();
         checkThat(storeName)
-            .is(nonEmptyString());
-        
+                .is(nonEmptyString());
+
         if (!matchesPattern(storeName))
         {
             return store;
         }
-        
+
         List<String> tokens = tokenize(storeName);
         List<String> resultingTokens = Lists.create();
-        
+
         for (String token : tokens)
         {
             if (shouldTitleCase(token))
@@ -78,18 +78,18 @@ final class TitleCaseStoreNamesTransformation implements StoreTransformation
                 String titleCased = titleCaseString(token);
                 resultingTokens.add(titleCased);
             }
-            else 
+            else
             {
                 resultingTokens.add(token);
             }
         }
-        
+
         String newName = String.join("", resultingTokens);
-        
+
         return Store.Builder.fromStore(store)
-            .withName(newName)
-            .build();
-        
+                            .withName(newName)
+                            .build();
+
     }
 
     private boolean matchesPattern(String storeName)
@@ -100,30 +100,30 @@ final class TitleCaseStoreNamesTransformation implements StoreTransformation
     private List<String> tokenize(String storeName)
     {
         StringTokenizer tokenizer = new StringTokenizer(storeName, " \t-&,", true);
-        
+
         List<String> tokens = Lists.create();
-        
-        while(tokenizer.hasMoreTokens())
+
+        while (tokenizer.hasMoreTokens())
         {
             tokens.add(tokenizer.nextToken());
         }
-        
+
         return tokens;
     }
 
     private boolean shouldTitleCase(String token)
     {
         return allUpperCase(token) &&
-               notTooShort(token) &&
-               notAKeyword(token);
+                notTooShort(token) &&
+                notAKeyword(token);
     }
 
     private boolean notAKeyword(String token)
     {
         return KEYWORDS.stream()
-            .noneMatch(keyword -> token.contains(keyword));
+                       .noneMatch(token::contains);
     }
-    
+
     private boolean allUpperCase(String token)
     {
         return token.matches(ALL_UPPER_CASE_PATTERN);
@@ -140,14 +140,14 @@ final class TitleCaseStoreNamesTransformation implements StoreTransformation
         {
             return token;
         }
-        
+
         String lowerCased = token.toLowerCase();
-        
+
         String firstCharacter = "" + lowerCased.charAt(0);
         String uppercasedFirstCharacter = firstCharacter.toUpperCase();
-        
+
         String tokenWithoutFirstCharacter = lowerCased.substring(1);
-        
+
         return uppercasedFirstCharacter + tokenWithoutFirstCharacter;
     }
 

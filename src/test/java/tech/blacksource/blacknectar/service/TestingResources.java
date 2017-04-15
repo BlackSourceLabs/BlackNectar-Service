@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- 
+
 package tech.blacksource.blacknectar.service;
 
 
@@ -28,10 +28,9 @@ import tech.blacksource.blacknectar.service.data.SQLImageMapper;
 import tech.blacksource.blacknectar.service.data.StoreRepository;
 
 /**
- *
  * @author SirWellington
  */
-public class TestingResources 
+public class TestingResources
 {
     private final static Logger LOG = LoggerFactory.getLogger(TestingResources.class);
 
@@ -41,7 +40,7 @@ public class TestingResources
     {
         return INJECTOR;
     }
-    
+
     public static JdbcTemplate createDatabaseConnection()
     {
         return INJECTOR.getInstance(JdbcTemplate.class);
@@ -51,7 +50,7 @@ public class TestingResources
     {
         return INJECTOR.getInstance(Aroma.class);
     }
-    
+
     public static SQLImageMapper getImageMapper()
     {
         return INJECTOR.getInstance(SQLImageMapper.class);
@@ -61,5 +60,5 @@ public class TestingResources
     {
         return INJECTOR.getInstance(StoreRepository.class);
     }
-    
+
 }

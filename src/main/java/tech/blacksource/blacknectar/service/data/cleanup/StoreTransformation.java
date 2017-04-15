@@ -23,7 +23,6 @@ import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 /**
- *
  * @author SirWellington
  */
 @Internal
@@ -37,6 +36,6 @@ public interface StoreTransformation extends Function<Store, Store>
      * @return
      */
     @Override
-    public Store apply(@Required Store store);
+    Store apply(@Required Store store);
 
 }

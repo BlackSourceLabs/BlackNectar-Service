@@ -20,7 +20,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -59,7 +58,7 @@ final class SQLStoreRepository implements StoreRepository
                        @Required SQLStoreMapper storeMapper) throws IllegalArgumentException, SQLException
     {
         checkThat(aroma, database, storeMapper)
-            .are(notNull());
+                .are(notNull());
 
         this.aroma = aroma;
         this.database = database;
@@ -70,9 +69,9 @@ final class SQLStoreRepository implements StoreRepository
     public void addStore(@Required Store store) throws OperationFailedException
     {
         checkThat(store)
-            .throwing(BadArgumentException.class)
-            .is(notNull())
-            .is(validStore());
+                .throwing(BadArgumentException.class)
+                .is(notNull())
+                .is(validStore());
 
         int inserted = 0;
         try
@@ -88,8 +87,8 @@ final class SQLStoreRepository implements StoreRepository
         }
 
         aroma.begin().titled("SQL Store Inserted")
-            .withBody("Inserted {} store: \n\n{}", inserted, store)
-            .send();
+             .withBody("Inserted {} store: \n\n{}", inserted, store)
+             .send();
         LOG.debug("Successfully inserted {} store", inserted);
     }
 
@@ -97,15 +96,15 @@ final class SQLStoreRepository implements StoreRepository
     public boolean containsStore(String storeId) throws BlackNectarAPIException
     {
         checkThat(storeId)
-            .throwing(BadArgumentException.class)
-            .is(nonEmptyString())
-            .is(validUUID());
-        
-        try 
+                .throwing(BadArgumentException.class)
+                .is(nonEmptyString())
+                .is(validUUID());
+
+        try
         {
             return _containsStore(storeId);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             String message = "Failed to check whether store Exists: [{}]";
             makeNoteOfSQLError(message, storeId, ex);
@@ -117,9 +116,9 @@ final class SQLStoreRepository implements StoreRepository
     public List<Store> getAllStores(int limit) throws BlackNectarAPIException
     {
         checkThat(limit)
-            .usingMessage("limit must be >= 0")
-            .throwing(BadArgumentException.class)
-            .is(greaterThanOrEqualTo(0));
+                .usingMessage("limit must be >= 0")
+                .throwing(BadArgumentException.class)
+                .is(greaterThanOrEqualTo(0));
 
         String sql = createSQLToGetAllStores(limit);
 
@@ -140,9 +139,9 @@ final class SQLStoreRepository implements StoreRepository
         LOG.trace("SQL query to get all stores with limit {} turned up {} stores", limit, stores.size());
 
         aroma.begin().titled("SQL Query Complete")
-            .withBody("Query to get all stores with limit {} turned up {} stores", limit, stores.size())
-            .withPriority(Priority.LOW)
-            .send();
+             .withBody("Query to get all stores with limit {} turned up {} stores", limit, stores.size())
+             .withPriority(Priority.LOW)
+             .send();
 
         return stores;
     }
@@ -151,19 +150,19 @@ final class SQLStoreRepository implements StoreRepository
     public void updateStore(Store store) throws BlackNectarAPIException
     {
         checkThat(store)
-            .throwing(BadArgumentException.class)
-            .is(notNull());
-            
+                .throwing(BadArgumentException.class)
+                .is(notNull());
+
         if (!containsStore(store.getStoreId()))
         {
             addStoreToDatabase(store, database);
         }
-        
-        try 
+
+        try
         {
             _updateStore(store);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             String message = "Failed to update Store: {}";
             makeNoteOfSQLError(message, store, ex);
@@ -175,9 +174,9 @@ final class SQLStoreRepository implements StoreRepository
     public List<Store> searchForStores(BlackNectarSearchRequest request) throws BlackNectarAPIException
     {
         checkThat(request)
-            .usingMessage("request missing")
-            .throwing(BadArgumentException.class)
-            .is(notNull());
+                .usingMessage("request missing")
+                .throwing(BadArgumentException.class)
+                .is(notNull());
 
         List<Store> stores;
 
@@ -201,8 +200,8 @@ final class SQLStoreRepository implements StoreRepository
     public void deleteStore(String storeId) throws BlackNectarAPIException
     {
         checkThat(storeId)
-            .throwing(BadArgumentException.class)
-            .is(validUUID());
+                .throwing(BadArgumentException.class)
+                .is(validUUID());
 
         try
         {
@@ -240,7 +239,7 @@ final class SQLStoreRepository implements StoreRepository
                                store.getAddress().getLocalZipCode());
 
     }
-    
+
     private String createSQLToGetAllStores(int limit)
     {
         if (limit <= 0)
@@ -254,7 +253,7 @@ final class SQLStoreRepository implements StoreRepository
         }
     }
 
-    
+
     private List<Store> findStoresBasedOfRequest(BlackNectarSearchRequest request)
     {
 
@@ -347,10 +346,10 @@ final class SQLStoreRepository implements StoreRepository
     private void _deleteStore(String storeId)
     {
         String deleteStatement = SQLQueries.DELETE_STORE;
-        
+
         UUID storeUuid = UUID.fromString(storeId);
         int rowsAffected = database.update(deleteStatement, storeUuid);
-        
+
         LOG.debug("Delete Store with ID [{}] resulted in {} rows affected", storeId, rowsAffected);
     }
 
@@ -361,9 +360,9 @@ final class SQLStoreRepository implements StoreRepository
         LOG.error(message, storeId, ex);
 
         aroma.begin().titled("SQL Delete Store Failed")
-            .withBody(message, storeId, ex)
-            .withPriority(Priority.HIGH)
-            .send();
+             .withBody(message, storeId, ex)
+             .withPriority(Priority.HIGH)
+             .send();
     }
 
     private void makeNoteThatStoresSearched(BlackNectarSearchRequest request, List<Store> stores)
@@ -371,17 +370,17 @@ final class SQLStoreRepository implements StoreRepository
         String message = "Found {} stores for Search Request {}";
         LOG.debug(message, stores.size(), request);
         aroma.begin().titled("SQL Complete")
-            .withBody(message, stores.size(), request)
-            .withPriority(Priority.LOW)
-            .send();
+             .withBody(message, stores.size(), request)
+             .withPriority(Priority.LOW)
+             .send();
     }
 
     private void makeNoteOfSQLError(String message, Object... args)
     {
         aroma.begin().titled("SQL Failed")
-            .withBody(message, args)
-            .withPriority(Priority.HIGH)
-            .send();
+             .withBody(message, args)
+             .withPriority(Priority.HIGH)
+             .send();
 
         LOG.error(message, args);
     }
@@ -389,10 +388,10 @@ final class SQLStoreRepository implements StoreRepository
     private boolean _containsStore(String storeId)
     {
         String sql = SQLQueries.CONTAINS_STORE;
-        
+
         UUID storeUuid = UUID.fromString(storeId);
         Integer count = database.queryForObject(sql, Integer.class, storeUuid);
-        
+
         return count > 0;
     }
 
@@ -400,11 +399,11 @@ final class SQLStoreRepository implements StoreRepository
     {
         String sql = SQLQueries.UPDATE_STORE;
         UUID storeId = UUID.fromString(store.getStoreId());
-        
+
         double latitude = store.getLocation().getLatitude();
         double longitude = store.getLocation().getLongitude();
-        
-        database.update(sql, 
+
+        database.update(sql,
                         storeId,
                         store.getName(),
                         store.getStoreCode(),

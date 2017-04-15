@@ -25,15 +25,14 @@ import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
 /**
- *
  * @author SirWellington
  */
 @IntegrationTest
 @RunWith(AlchemyTestRunner.class)
-public class ServerIT 
+public class ServerIT
 {
     private Server instance;
-    
+
     @Before
     public void setUp() throws Exception
     {
@@ -41,7 +40,7 @@ public class ServerIT
         instance = injector.getInstance(Server.class);
     }
 
- 
+
     @Test
     public void testLaunch()
     {

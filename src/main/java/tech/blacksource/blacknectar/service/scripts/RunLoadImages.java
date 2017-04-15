@@ -71,7 +71,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
     RunLoadImages(AlchemyHttp http, Aroma aroma, JdbcTemplate database)
     {
         checkThat(http, aroma, database)
-            .are(notNull());
+                .are(notNull());
 
         this.http = http;
         this.aroma = aroma;
@@ -162,9 +162,9 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         List<URL> images = imageLoader.getImagesFor(store);
 
         checkThat(images)
-            .usingMessage("No Images found for Store: " + store)
-            .is(notNull())
-            .is(nonEmptyList());
+                .usingMessage("No Images found for Store: " + store)
+                .is(notNull())
+                .is(nonEmptyList());
 
         images.stream().forEach(url -> this.tryToStoreImage(store, args, url));
     }
@@ -203,7 +203,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
     {
         URLConnection connection = imageUrl.openConnection();
         String contentType = connection.getContentType();
-        
+
         if (connection instanceof HttpURLConnection)
         {
             ((HttpURLConnection) connection).disconnect();
@@ -271,9 +271,9 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         LOG.info(message, source, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores, store);
 
         aroma.begin().titled("Image Saved")
-            .withBody(message, source, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores, store)
-            .withPriority(Priority.LOW)
-            .send();
+             .withBody(message, source, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores, store)
+             .withPriority(Priority.LOW)
+             .send();
 
     }
 
@@ -286,9 +286,9 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         LOG.debug(message, source, imageUrl, store);
 
         aroma.begin().titled("Image Saved")
-            .withBody(message, source, imageUrl, store)
-            .withPriority(Priority.LOW)
-            .send();
+             .withBody(message, source, imageUrl, store)
+             .withPriority(Priority.LOW)
+             .send();
     }
 
     private void makeNoteThatOperationToSaveImageFailed(Store store, Arguments args, Exception ex)
@@ -299,9 +299,9 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         LOG.error(message, source, store, ex);
 
         aroma.begin().titled("Image Load Failed")
-            .withBody(message, source, store, ex)
-            .withPriority(Priority.HIGH)
-            .send();
+             .withBody(message, source, store, ex)
+             .withPriority(Priority.HIGH)
+             .send();
     }
 
     private void makeNoteThatSleepInterrupted(InterruptedException ex)
@@ -311,9 +311,9 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         LOG.error(message, ex);
 
         aroma.begin().titled("Script Interrupted")
-            .withBody(message, ex)
-            .withPriority(Priority.MEDIUM)
-            .send();
+             .withBody(message, ex)
+             .withPriority(Priority.MEDIUM)
+             .send();
     }
 
     private void makeNoteThatOperationToProcessStoreFailed(Store store,
@@ -328,9 +328,9 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         LOG.error(message, totalStoresProcessed, totalStores, source, store);
 
         aroma.begin().titled("Store Image Load Failed")
-            .withBody(message, totalStoresProcessed, totalStores, source, store)
-            .withPriority(Priority.MEDIUM)
-            .send();
+             .withBody(message, totalStoresProcessed, totalStores, source, store)
+             .withPriority(Priority.MEDIUM)
+             .send();
     }
 
     private void makeNoteOfScriptCompletion(Arguments args, int totalSuccesses, int totalStoresProcessed, int totalStores,
@@ -342,9 +342,9 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         LOG.info(message, source, runtimeHours, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores);
 
         aroma.begin().titled("Script Finished")
-            .withBody(message, source, runtimeHours, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores)
-            .withPriority(Priority.MEDIUM)
-            .send();
+             .withBody(message, source, runtimeHours, totalSuccesses, totalStoresProcessed, totalStoresProcessed, totalStores)
+             .withPriority(Priority.MEDIUM)
+             .send();
     }
 
     //================================================================
@@ -361,11 +361,11 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
         Arguments(long sleepTimeMillis, String source, ImageLoader imageLoader, Queue<Store> stores)
         {
             checkThat(source, imageLoader, stores)
-                .are(notNull());
+                    .are(notNull());
 
             checkThat((Collection<Store>) stores)
-                .usingMessage("stores cannot be empty")
-                .is(nonEmptyCollection());
+                    .usingMessage("stores cannot be empty")
+                    .is(nonEmptyCollection());
 
             checkThat(sleepTimeMillis).is(greaterThanOrEqualTo(0L));
 
@@ -414,11 +414,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
             {
                 return false;
             }
-            if (!Objects.equals(this.stores, other.stores))
-            {
-                return false;
-            }
-            return true;
+            return Objects.equals(this.stores, other.stores);
         }
 
         @Override
@@ -477,7 +473,7 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
             Builder withStores(@NonEmpty Queue<Store> stores)
             {
                 checkThat((Collection<Store>) stores)
-                    .is(nonEmptyCollection());
+                        .is(nonEmptyCollection());
 
                 this.stores = Queues.newArrayDeque(stores);
                 return this;
@@ -494,15 +490,15 @@ class RunLoadImages implements Consumer<RunLoadImages.Arguments>
             Arguments build() throws IllegalStateException
             {
                 checkThat(source)
-                    .usingMessage("source is missing")
-                    .is(nonEmptyString());
+                        .usingMessage("source is missing")
+                        .is(nonEmptyString());
 
                 checkThat(imageLoader)
-                    .usingMessage("imageLoader is missing")
-                    .is(notNull());
+                        .usingMessage("imageLoader is missing")
+                        .is(notNull());
 
                 checkThat((Collection<Store>) stores)
-                    .is(nonEmptyCollection());
+                        .is(nonEmptyCollection());
 
                 return new Arguments(sleepTimeMillis, source, imageLoader, stores);
             }

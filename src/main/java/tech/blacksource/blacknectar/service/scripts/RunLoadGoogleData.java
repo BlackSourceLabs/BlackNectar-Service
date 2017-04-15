@@ -49,16 +49,16 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
  */
 public class RunLoadGoogleData implements Callable<Void>
 {
-    
+
     private final static Logger LOG = LoggerFactory.getLogger(RunLoadGoogleData.class);
-    
+
     private final Aroma aroma;
     private final Gson gson;
     private final GooglePlacesAPI googlePlaces;
     private final StoreRepository storeRepository;
     private final StoreSearchAlgorithm<Place> storeSearch;
     private final JdbcTemplate database;
-    
+
     @Inject
     RunLoadGoogleData(Aroma aroma,
                       Gson gson,
@@ -68,8 +68,8 @@ public class RunLoadGoogleData implements Callable<Void>
                       JdbcTemplate database)
     {
         checkThat(aroma, gson, googlePlaces, storeRepository, storeSearch, database)
-            .are(notNull());
-        
+                .are(notNull());
+
         this.aroma = aroma;
         this.gson = gson;
         this.googlePlaces = googlePlaces;
@@ -77,42 +77,42 @@ public class RunLoadGoogleData implements Callable<Void>
         this.storeSearch = storeSearch;
         this.database = database;
     }
-    
+
     public static void main(String[] args) throws Exception
     {
         Injector injector = Guice.createInjector(new ModuleServer(), new ModuleDatabaseTesting());
-        
+
         RunLoadGoogleData instance = injector.getInstance(RunLoadGoogleData.class);
         instance.call();
     }
-    
+
     @Override
     public Void call() throws Exception
     {
         List<Store> stores = storeRepository.getAllStores();
-        
+
         int totalStores = stores.size();
         int processed = -1;
         int succeeded = 0;
         int failed = 0;
-        
+
         makeNoteThatScriptStartedWith(totalStores);
-        
+
         for (Store store : stores)
         {
             ++processed;
-            
+
             Place place = tryToFindMatchFor(store);
-            
+
             if (place == null)
             {
                 ++failed;
                 makeNoteThatNoPlaceFound(store, failed, processed, totalStores);
                 continue;
             }
-            
+
             boolean success = tryToStorePlaceInformation(place, store);
-            
+
             if (success)
             {
                 ++succeeded;
@@ -123,14 +123,14 @@ public class RunLoadGoogleData implements Callable<Void>
                 ++failed;
                 makeNoteOfFailure(failed, processed, totalStores);
             }
-            
+
         }
-        
+
         makeNoteThatScriptCompleted(succeeded, failed, totalStores);
-        
+
         return null;
     }
-    
+
     private Place tryToFindMatchFor(Store store)
     {
         try
@@ -156,16 +156,16 @@ public class RunLoadGoogleData implements Callable<Void>
             return false;
         }
     }
-    
+
     private void storePlaceInformation(Place place, Store store) throws Exception
     {
         PlaceDetails placeDetails = getPlaceDetailsFor(place);
-        
+
         String statement = SQLQueries.INSERT_GOOGLE_DATA;
-        
+
         UUID storeId = UUID.fromString(store.getStoreId());
         String placeId = place.placeId;
-        
+
         database.update(statement,
                         storeId,
                         placeId,
@@ -186,11 +186,11 @@ public class RunLoadGoogleData implements Callable<Void>
                         toJsonString(placeDetails.getReviews()),
                         toStringArray(place.types),
                         null);
-        
+
         savePhotosFor(placeDetails);
-        
+
     }
-    
+
     private void savePhotosFor(PlaceDetails placeDetails)
     {
         List<Photo> photos = placeDetails.getPhotos();
@@ -198,15 +198,15 @@ public class RunLoadGoogleData implements Callable<Void>
         {
             return;
         }
-        
+
         photos.forEach(p -> this.savePhoto(p, placeDetails));
     }
-    
+
     private void savePhoto(Photo photo, PlaceDetails place)
     {
         String statement = SQLQueries.INSERT_GOOGLE_PHOTO;
         String attributions = String.join(",", Lists.nullToEmpty(photo.htmlAttributions));
-        
+
         database.update(statement,
                         photo.photoReference,
                         place.getPlaceId(),
@@ -215,102 +215,102 @@ public class RunLoadGoogleData implements Callable<Void>
                         attributions,
                         null);
     }
-    
+
     private PlaceDetails getPlaceDetailsFor(Place place)
     {
         return googlePlaces.simpleGetPlaceDetails(place);
     }
-    
+
     private String toStringArray(List<Types.ReturnedPlaceType> types)
     {
         List<String> list = types.stream()
-            .filter(Objects::nonNull)
-            .map(t -> t.toString())
-            .collect(toList());
-        
+                                 .filter(Objects::nonNull)
+                                 .map(Enum::toString)
+                                 .collect(toList());
+
         return String.join(",", list);
     }
-    
+
     private String toJsonString(Object object)
     {
         if (Objects.isNull(object))
         {
             return null;
         }
-        
+
         return gson.toJson(object);
     }
-    
+
     private void makeNoteThatScriptStartedWith(int totalStores)
     {
         String message = "Script Started with {} Total stores for processing.";
         LOG.debug(message, totalStores);
 
         aroma.begin().titled("Script Began")
-            .withBody(message, totalStores)
-            .withPriority(Priority.LOW)
-            .send();
+             .withBody(message, totalStores)
+             .withPriority(Priority.LOW)
+             .send();
     }
 
     private void makeNoteThatNoPlaceFound(Store store, int failed, int processed, int totalStores)
     {
         String message = "[{} failed, {} processed, {} remaining, {} total] - No matching place found for store: {}";
         int remaining = totalStores - processed;
-        
+
         LOG.info(message, failed, processed, remaining, totalStores, store);
-        
+
         aroma.begin().titled("Store Skipped")
-            .withBody(message, failed, processed, remaining, totalStores, store)
-            .withPriority(Priority.MEDIUM)
-            .send();
+             .withBody(message, failed, processed, remaining, totalStores, store)
+             .withPriority(Priority.MEDIUM)
+             .send();
     }
-    
+
     private void makeNoteThatScriptCompleted(int completed, int failed, int totalStores)
     {
         String message = "[{} completed, {} failed, {} total stores] - Completed processing all stores.";
-        
+
         LOG.info(message, completed, failed, totalStores);
-        
+
         aroma.begin().titled("Script Complete")
-            .withBody(message, completed, failed, totalStores)
-            .withPriority(Priority.HIGH)
-            .send();
+             .withBody(message, completed, failed, totalStores)
+             .withPriority(Priority.HIGH)
+             .send();
     }
-    
+
     private void makeNoteOfSuccess(int completed, int processed, int totalStores)
     {
         int remaining = totalStores - processed;
         String message = "[{} succeeded, {} processed, {} remaining, {} total] - Successfully stored Place Information.";
-        
+
         LOG.info(message, completed, processed, remaining, totalStores);
         aroma.begin().titled("Google Place Saved")
-            .withBody(message, completed, processed, remaining, totalStores)
-            .withPriority(Priority.LOW)
-            .send();
+             .withBody(message, completed, processed, remaining, totalStores)
+             .withPriority(Priority.LOW)
+             .send();
     }
-    
+
     private void makeNoteOfFailure(int failed, int processed, int totalStores)
     {
         String message = "[{} failed, {} processed, {} remaining, {} total] - Failed to store Place Information.";
         int remaining = totalStores - processed;
-        
+
         LOG.warn(message, failed, processed, remaining, totalStores);
         aroma.begin().titled("Database Insert Failed")
-            .withBody(message, failed, processed, remaining, totalStores)
-            .withPriority(Priority.MEDIUM)
-            .send();
+             .withBody(message, failed, processed, remaining, totalStores)
+             .withPriority(Priority.MEDIUM)
+             .send();
     }
-    
+
     private void makeNoteOfError(Exception ex, Place place, Store store)
     {
         String message = "Failed to process store: {}";
-        
+
         LOG.error(message, store, ex);
-        
+
         aroma.begin().titled("Script Error")
-            .withBody(message, store, ex)
-            .withPriority(Priority.HIGH)
-            .send();
+             .withBody(message, store, ex)
+             .withPriority(Priority.HIGH)
+             .send();
     }
 
 }

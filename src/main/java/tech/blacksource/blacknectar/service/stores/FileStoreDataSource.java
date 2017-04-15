@@ -37,7 +37,6 @@ import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
- *
  * @author SirWellington
  */
 @Internal
@@ -57,7 +56,7 @@ final class FileStoreDataSource implements StoreDataSource
     FileStoreDataSource(Aroma aroma, IDGenerator idGenerator)
     {
         checkThat(aroma, idGenerator)
-            .is(notNull());
+                .is(notNull());
 
         this.aroma = aroma;
         this.idGenerator = idGenerator;
@@ -83,16 +82,16 @@ final class FileStoreDataSource implements StoreDataSource
         }
 
         return lines.parallelStream()
-            .map(this::toStore)
-            .filter(Objects::nonNull)
-            .distinct()
-            .collect(Collectors.toList());
+                    .map(this::toStore)
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .collect(Collectors.toList());
     }
 
     String readCSVFile()
     {
         URL url;
-        
+
         try
         {
             url = Resources.getResource(FILENAME);
@@ -102,14 +101,14 @@ final class FileStoreDataSource implements StoreDataSource
             LOG.error("Failed to load resource at {}", FILENAME, ex);
 
             aroma.begin()
-                .titled("Operation Failed")
-                .withBody("Could not load CSV file at {}", FILENAME, ex)
-                .withPriority(Priority.HIGH)
-                .send();
+                 .titled("Operation Failed")
+                 .withBody("Could not load CSV file at {}", FILENAME, ex)
+                 .withPriority(Priority.HIGH)
+                 .send();
 
             return "";
         }
-        
+
         try
         {
             return Resources.toString(url, Charsets.UTF_8);
@@ -119,10 +118,10 @@ final class FileStoreDataSource implements StoreDataSource
             LOG.error("Failed to load URL into a String: {}", url, ex);
 
             aroma.begin()
-                .titled("Operation Failed")
-                .withBody("Could not load URL into String: [{}]", url.toString(), ex)
-                .withPriority(Priority.HIGH)
-                .send();
+                 .titled("Operation Failed")
+                 .withBody("Could not load URL into String: [{}]", url.toString(), ex)
+                 .withPriority(Priority.HIGH)
+                 .send();
 
             return "";
         }
@@ -131,7 +130,7 @@ final class FileStoreDataSource implements StoreDataSource
     List<String> splitFileIntoLines(String file)
     {
         String[] lines = file.split("\n");
-        
+
         if (lines == null || lines.length == 0)
         {
             return Lists.emptyList();
@@ -143,7 +142,7 @@ final class FileStoreDataSource implements StoreDataSource
     Store toStore(String line)
     {
         String[] components = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-        
+
         if (components == null || components.length == 0)
         {
             LOG.debug("Received empty components");
@@ -179,10 +178,10 @@ final class FileStoreDataSource implements StoreDataSource
             LOG.error("Failed to convert Geo-Coordinate: [{},{}]", latitudeString, longitudeString, ex);
 
             aroma.begin()
-                .titled("Conversion Failed")
-                .withBody("Failed to convert to Geo-Point: [{}, {}]", latitudeString, longitudeString, ex)
-                .withPriority(Priority.MEDIUM)
-                .send();
+                 .titled("Conversion Failed")
+                 .withBody("Failed to convert to Geo-Point: [{}, {}]", latitudeString, longitudeString, ex)
+                 .withPriority(Priority.MEDIUM)
+                 .send();
 
             throw ex;
         }
@@ -204,10 +203,10 @@ final class FileStoreDataSource implements StoreDataSource
         Location location = extractLocationFrom(latitudeString, longitudeString);
 
         Address.Builder addressBuilder = Address.Builder.newBuilder()
-            .withAddressLineOne(addressLineOne)
-            .withCity(city)
-            .withState(state)
-            .withZipCode(zipCode);
+                                                        .withAddressLineOne(addressLineOne)
+                                                        .withCity(city)
+                                                        .withState(state)
+                                                        .withZipCode(zipCode);
 
         if (!Strings.isNullOrEmpty(localZipCode))
         {
@@ -229,16 +228,16 @@ final class FileStoreDataSource implements StoreDataSource
         {
             addressBuilder = addressBuilder.withCounty(county);
         }
-        
+
         //Finally, generate an ID for the Store
         UUID storeId = idGenerator.generateKey();
 
         return Store.Builder.newInstance()
-            .withStoreID(storeId)
-            .withAddress(addressBuilder.build())
-            .withLocation(location)
-            .withName(storeName)
-            .build();
+                            .withStoreID(storeId)
+                            .withAddress(addressBuilder.build())
+                            .withLocation(location)
+                            .withName(storeName)
+                            .build();
     }
 
     private void removeFirstLine(List<String> lines)

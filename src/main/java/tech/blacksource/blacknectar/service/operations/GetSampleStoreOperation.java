@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- 
+
 package tech.blacksource.blacknectar.service.operations;
 
 
@@ -36,7 +36,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
 
 /**
  * Returns a sample BlackNectar store to use for testing purposes.
- * 
+ *
  * @author SirWellington
  */
 public class GetSampleStoreOperation implements Route
@@ -51,21 +51,21 @@ public class GetSampleStoreOperation implements Route
         checkThat(aroma).is(notNull());
         this.aroma = aroma;
     }
-    
+
     @Override
     public JsonArray handle(Request request, Response response) throws Exception
     {
         checkThat(request, response)
-            .usingMessage("Received null arguments")
-            .throwing(BadArgumentException.class)
-            .are(notNull());
-        
+                .usingMessage("Received null arguments")
+                .throwing(BadArgumentException.class)
+                .are(notNull());
+
         LOG.info("Received GET request to GET a Sample Store from IP [{}]", request.ip());
 
         aroma.begin().titled("Request Received")
-            .withBody("Request to get sample store from IP [{}]", request.ip())
-            .withPriority(Priority.LOW)
-            .send();
+             .withBody("Request to get sample store from IP [{}]", request.ip())
+             .withPriority(Priority.LOW)
+             .send();
 
         response.status(200);
         response.type(APPLICATION_JSON);
@@ -81,9 +81,9 @@ public class GetSampleStoreOperation implements Route
         catch (Exception ex)
         {
             aroma.begin().titled("Request Failed")
-                .withBody("Could not load Store, {}", ex)
-                .withPriority(Priority.HIGH)
-                .send();
+                 .withBody("Could not load Store, {}", ex)
+                 .withPriority(Priority.HIGH)
+                 .send();
 
             return new JsonArray();
         }

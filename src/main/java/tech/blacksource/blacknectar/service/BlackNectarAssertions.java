@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- 
+
 package tech.blacksource.blacknectar.service;
 
 
@@ -28,30 +28,29 @@ import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.stringWithLengthLessThanOrEqualTo;
 
 /**
- *
  * @author SirWellington
  */
 @NonInstantiable
-public final class BlackNectarAssertions 
+public final class BlackNectarAssertions
 {
     private final static Logger LOG = LoggerFactory.getLogger(BlackNectarAssertions.class);
-    
+
     /**
-     * This is the maximum length of any query parameter or value that can be 
+     * This is the maximum length of any query parameter or value that can be
      * passed into the Service. Any String longer than this has to be suspicious.
      */
     public static final int MAX_QUERY_PARAMETER_ARGUMENT_LENGTH = 1_000;
 
-    
+
     private BlackNectarAssertions() throws IllegalAccessException
     {
         throw new IllegalAccessException("cannot instantiate");
     }
-    
+
     /**
      * Checks that an argument String does not exceed {@link #MAX_QUERY_PARAMETER_ARGUMENT_LENGTH}.
-     * 
-     * @return 
+     *
+     * @return
      */
     public static AlchemyAssertion<String> argumentWithSaneLength()
     {
@@ -61,10 +60,10 @@ public final class BlackNectarAssertions
             {
                 return;
             }
-            
+
             checkThat(arg)
-                .usingMessage("Argument is too long at " + arg.length() + " characters")
-                .is(stringWithLengthLessThanOrEqualTo(MAX_QUERY_PARAMETER_ARGUMENT_LENGTH));
+                    .usingMessage("Argument is too long at " + arg.length() + " characters")
+                    .is(stringWithLengthLessThanOrEqualTo(MAX_QUERY_PARAMETER_ARGUMENT_LENGTH));
         };
     }
 }

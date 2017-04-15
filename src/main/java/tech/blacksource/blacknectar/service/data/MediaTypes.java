@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
- 
+
 package tech.blacksource.blacknectar.service.data;
 
 /**
- *
  * @author SirWellington
  */
-public interface MediaTypes 
+public interface MediaTypes
 {
-    final static String APPLICATION_JSON = "application/json";
-    final static String TEXT_PLAIN = "text/plain";
+    String APPLICATION_JSON = "application/json";
+    String TEXT_PLAIN = "text/plain";
 }

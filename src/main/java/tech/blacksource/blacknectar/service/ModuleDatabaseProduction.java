@@ -34,7 +34,6 @@ import tech.sirwellington.alchemy.arguments.FailedAssertionException;
 import static tech.sirwellington.alchemy.arguments.Arguments.*;
 
 /**
- *
  * @author SirWellington
  */
 public final class ModuleDatabaseProduction extends AbstractModule
@@ -78,11 +77,11 @@ public final class ModuleDatabaseProduction extends AbstractModule
         dataSource.setAcquireIncrement(3);
         dataSource.setTestConnectionOnCheckin(true);
 
-        try(Connection connection = dataSource.getConnection();)
+        try (Connection connection = dataSource.getConnection())
         {
             checkThat(connection)
-                .throwing(SQLException.class)
-                .is(connected());
+                    .throwing(SQLException.class)
+                    .is(connected());
 
             connection.close();
         }
@@ -91,9 +90,9 @@ public final class ModuleDatabaseProduction extends AbstractModule
             String message = "Failed to create connection to PostgreSQL. Defaulting to SQLite.";
             LOG.error(message, ex);
             aroma.begin().titled("SQL Connection Failed")
-                .withBody(message, ex)
-                .withPriority(Priority.HIGH)
-                .send();
+                 .withBody(message, ex)
+                 .withPriority(Priority.HIGH)
+                 .send();
 
             throw ex;
         }

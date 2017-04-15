@@ -28,24 +28,23 @@ import static org.junit.Assert.assertThat;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(10)
 @RunWith(AlchemyTestRunner.class)
-public class BlackNectarAssertionsTest 
+public class BlackNectarAssertionsTest
 {
-    
+
     @GenerateString
     private String normalString;
-    
+
     @GenerateString(length = BlackNectarAssertions.MAX_QUERY_PARAMETER_ARGUMENT_LENGTH * 2)
     private String longString;
 
     @Before
     public void setUp() throws Exception
     {
-        
+
         setupData();
         setupMocks();
     }
@@ -53,34 +52,34 @@ public class BlackNectarAssertionsTest
 
     private void setupData() throws Exception
     {
-        
+
     }
 
     private void setupMocks() throws Exception
     {
-        
+
     }
-    
+
     @DontRepeat
     @Test
     public void testCannotInstantiate() throws Exception
     {
-        assertThrows(() -> BlackNectarAssertions.class.newInstance());
+        assertThrows(BlackNectarAssertions.class::newInstance);
     }
-    
-    
+
+
     @Test
     public void testArgumentWithSaneLength() throws Exception
     {
         AlchemyAssertion<String> assertion = BlackNectarAssertions.argumentWithSaneLength();
         assertThat(assertion, notNullValue());
-        
+
         assertion.check(normalString);
-        
+
         assertThrows(() -> assertion.check(longString)).isInstanceOf(FailedAssertionException.class);
-        
+
     }
-    
+
     @DontRepeat
     @Test
     public void testArgumentWithSaneLengthWithEmptyArgs() throws Exception
@@ -90,6 +89,6 @@ public class BlackNectarAssertionsTest
         assertion.check("");
         assertion.check(null);
     }
-    
+
 
 }

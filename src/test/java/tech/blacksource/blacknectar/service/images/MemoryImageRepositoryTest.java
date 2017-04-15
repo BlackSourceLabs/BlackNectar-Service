@@ -38,7 +38,6 @@ import static tech.sirwellington.alchemy.generator.StringGenerators.strings;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(10)
@@ -68,9 +67,9 @@ public class MemoryImageRepositoryTest
         store = one(stores());
 
         images = images
-            .stream()
-            .map(img -> Image.Builder.fromImage(img).withStoreID(store.getStoreId()).build())
-            .collect(toList());
+                .stream()
+                .map(img -> Image.Builder.fromImage(img).withStoreID(store.getStoreId()).build())
+                .collect(toList());
 
         image = Lists.oneOf(images);
 
@@ -105,7 +104,7 @@ public class MemoryImageRepositoryTest
     {
         String fakeId = one(strings());
         assertThrows(() -> instance.getImage(store.getStoreId(), fakeId))
-            .isInstanceOf(DoesNotExistException.class);
+                .isInstanceOf(DoesNotExistException.class);
     }
 
     @Test
@@ -116,7 +115,7 @@ public class MemoryImageRepositoryTest
         List<Image> result = instance.getImagesForStore(image.getStoreId());
         assertThat(result, is(images));
     }
-    
+
 
     @Test
     public void testGetImagesForStoreWhenNoImages() throws Exception

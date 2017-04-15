@@ -36,49 +36,48 @@ import static tech.sirwellington.alchemy.test.junit.runners.GenerateInteger.Type
 
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(10)
 @RunWith(AlchemyTestRunner.class)
-public class SQLToolsTest 
+public class SQLToolsTest
 {
-    
+
     @Mock
     private ResultSet results;
-    
+
     @Mock
     private ResultSetMetaData metaData;
-    
+
     private SQLTools instance;
-    
+
     @GenerateInteger(value = RANGE, min = 1, max = 20)
     private int numberOfColumns;
-    
+
     @GenerateString
     private String columnName;
 
     @Before
     public void setUp() throws Exception
     {
-        
+
         setupData();
         setupMocks();
-        
+
         instance = new SQLTools.Impl();
     }
 
 
     private void setupData() throws Exception
     {
-        
+
     }
 
     private void setupMocks() throws Exception
     {
         when(results.getMetaData()).thenReturn(metaData);
         when(metaData.getColumnCount()).thenReturn(numberOfColumns);
-        
+
         when(metaData.getColumnLabel(anyInt())).thenReturn(one(alphabeticString()));
     }
 
@@ -86,18 +85,18 @@ public class SQLToolsTest
     public void testHasColumnWhenHasColumn() throws Exception
     {
         when(metaData.getColumnLabel(1)).thenReturn(columnName);
-        
+
         boolean result = instance.hasColumn(results, columnName);
         assertTrue(result);
     }
-    
+
     @Test
     public void testHasColumnWhenNotPresent() throws Exception
     {
         boolean result = instance.hasColumn(results, columnName);
         assertFalse(result);
     }
-    
+
     @DontRepeat
     @Test
     public void testHasColumnWithBadArgs() throws Exception

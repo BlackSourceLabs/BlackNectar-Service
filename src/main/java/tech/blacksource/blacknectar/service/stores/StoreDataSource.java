@@ -26,9 +26,9 @@ import tech.sirwellington.alchemy.annotations.arguments.Required;
  * A {@link StoreDataSource} represents a resource that can provide access to all EBT stores.
  * For a file-based Data Source that loads stores from a government-provided CSV file, see
  * {@link #newFileBasedDataSource(tech.aroma.client.Aroma) }.
- * 
+ *
  * @author SirWellington
- * @see #newFileBasedDataSource(tech.aroma.client.Aroma) 
+ * @see #newFileBasedDataSource(tech.aroma.client.Aroma)
  */
 @ImplementedBy(FileStoreDataSource.class)
 public interface StoreDataSource
@@ -40,13 +40,13 @@ public interface StoreDataSource
      * @return
      */
     List<Store> getAllStores();
-    
+
     /**
      * Creates a new file-based Data Source that reads all of
      * the stores out of a CSV file.
-     * 
+     *
      * @param aroma
-     * @return 
+     * @return
      */
     static StoreDataSource newFileBasedDataSource(@Required Aroma aroma)
     {

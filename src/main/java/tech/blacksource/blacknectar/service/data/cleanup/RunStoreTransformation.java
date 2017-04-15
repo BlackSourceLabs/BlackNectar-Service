@@ -33,7 +33,6 @@ import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
- *
  * @author SirWellington
  */
 public class RunStoreTransformation implements Callable<Void>
@@ -49,7 +48,7 @@ public class RunStoreTransformation implements Callable<Void>
     RunStoreTransformation(Aroma aroma, StoreRepository storeRepository, StoreTransformation transformation)
     {
         checkThat(aroma, storeRepository, transformation)
-            .are(notNull());
+                .are(notNull());
 
         this.aroma = aroma;
         this.storeRepository = storeRepository;
@@ -73,10 +72,11 @@ public class RunStoreTransformation implements Callable<Void>
         long end = System.currentTimeMillis();
 
         LOG.info("Script completed in {}ms", end - start);
-        aroma.begin().titled("Stores Updated")
-            .withBody("Successfully cleaned store numbers in {}ms", end - start)
-            .withPriority(Priority.MEDIUM)
-            .send();
+        aroma.begin()
+             .titled("Stores Updated")
+             .withBody("Successfully cleaned store numbers in {}ms", end - start)
+             .withPriority(Priority.MEDIUM)
+             .send();
 
         return null;
 
@@ -122,10 +122,11 @@ public class RunStoreTransformation implements Callable<Void>
         String message = "Failed to run scrip to remove and strip store data";
         LOG.error(message, ex);
 
-        aroma.begin().titled("Data Cleanup Failed")
-            .withBody(message, ex)
-            .withPriority(Priority.HIGH)
-            .send();
+        aroma.begin()
+             .titled("Data Cleanup Failed")
+             .withBody(message, ex)
+             .withPriority(Priority.HIGH)
+             .send();
     }
 
     private void makeNoteThatUpdatingStore(Store store, Store updatedStore)
@@ -133,10 +134,11 @@ public class RunStoreTransformation implements Callable<Void>
         String message = "Updating Store [{}] with [{]]";
         LOG.info(message, store, updatedStore);
 
-        aroma.begin().titled("Updating Store")
-            .withBody("Old Store:\n{}\n\nNew Store:\n{}", store, updatedStore)
-            .withPriority(Priority.LOW)
-            .send();
+        aroma.begin()
+             .titled("Updating Store")
+             .withBody("Old Store:\n{}\n\nNew Store:\n{}", store, updatedStore)
+             .withPriority(Priority.LOW)
+             .send();
     }
 
     private void tryToUpdateStore(Store updatedStore)
@@ -156,10 +158,11 @@ public class RunStoreTransformation implements Callable<Void>
         String message = "Failed to update store: [{}]";
         LOG.error(message, updatedStore, ex);
 
-        aroma.begin().titled("Store Update Failed")
-            .withBody("Failed to update store:\n{}\n\n{}", updatedStore, ex)
-            .withPriority(Priority.HIGH)
-            .send();
+        aroma.begin()
+             .titled("Store Update Failed")
+             .withBody("Failed to update store:\n{}\n\n{}", updatedStore, ex)
+             .withPriority(Priority.HIGH)
+             .send();
 
     }
 
@@ -167,10 +170,11 @@ public class RunStoreTransformation implements Callable<Void>
     {
         String message = "Failed to try to transform store: {}";
         LOG.error(message, store, ex);
-        aroma.begin().titled("Script Operation Failed")
-            .withBody(message, store, ex)
-            .withPriority(Priority.HIGH)
-            .send();
+        aroma.begin()
+             .titled("Script Operation Failed")
+             .withBody(message, store, ex)
+             .withPriority(Priority.HIGH)
+             .send();
     }
 
 }

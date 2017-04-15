@@ -40,7 +40,6 @@ import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(25)
@@ -96,13 +95,13 @@ public class YelpImageLoaderTest
     public void testConstructor() throws Exception
     {
         assertThrows(() -> new YelpImageLoader(null, searchAlgorithm, yelpAPI))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         assertThrows(() -> new YelpImageLoader(aroma, null, yelpAPI))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         assertThrows(() -> new YelpImageLoader(aroma, searchAlgorithm, null))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test

@@ -22,10 +22,10 @@ import com.google.gson.JsonObject;
 
 /**
  * Represents a POJO that can be represented as JSON (using the GSON library).
- * 
+ *
  * @author SirWellington
  */
-public interface JSONRepresentable 
+public interface JSONRepresentable
 {
     JsonObject asJSON();
 }

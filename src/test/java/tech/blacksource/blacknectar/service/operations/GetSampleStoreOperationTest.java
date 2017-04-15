@@ -92,7 +92,7 @@ public class GetSampleStoreOperationTest
         JsonArray result = instance.handle(request, response);
         assertThat(result, notNullValue());
         
-        JsonArray array = (JsonArray) result;
+        JsonArray array = result;
         assertThat(array.size(), greaterThan(0));
         
         JsonObject object = array.get(0).getAsJsonObject();

@@ -29,7 +29,6 @@ import static org.junit.Assert.assertThat;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateInteger.Type.RANGE;
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(25)
@@ -53,19 +52,20 @@ public class IDGeneratorTest
     {
         assertAllValuesAreUnique(instance);
     }
+
     @Test
     public void testGenerateString() throws Exception
     {
-       Set<String> ids = Sets.create();
-       
-       for (int i = 0; i < iterations; ++ i)
-       {
-           ids.add(instance.generateKeyAsString());
-       }
+        Set<String> ids = Sets.create();
+
+        for (int i = 0; i < iterations; ++i)
+        {
+            ids.add(instance.generateKeyAsString());
+        }
 
         assertThat(ids.size(), is(iterations));
     }
-    
+
     private void assertAllValuesAreUnique(IDGenerator generator)
     {
         Set<String> ids = Sets.create();

@@ -1,17 +1,33 @@
+/*
+ * Copyright 2017 BlackSource, LLC.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package tech.blacksource.blacknectar.service.operations.ebt;
 
 import javax.inject.Inject;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.*;
-import tech.blacksource.blacknectar.ebt.balance.State;
+import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.ebt.balance.StateWebsiteFactory;
-import tech.blacksource.blacknectar.service.JSON;
 import tech.blacksource.blacknectar.service.data.MediaTypes;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
+import tech.blacksource.blacknectar.service.json.EBTJsonSerializer;
+import tech.blacksource.blacknectar.service.json.JSON;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
@@ -23,15 +39,21 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
  */
 public class GetStatesOperation implements Route
 {
+
     private final static Logger LOG = LoggerFactory.getLogger(GetStatesOperation.class);
 
+    private final Aroma aroma;
+    private final EBTJsonSerializer jsonSerializer;
     private final StateWebsiteFactory stateWebsites;
 
     @Inject
-    GetStatesOperation(StateWebsiteFactory stateWebsites)
+    GetStatesOperation(Aroma aroma, EBTJsonSerializer jsonSerializer, StateWebsiteFactory stateWebsites)
     {
-        checkThat(stateWebsites).is(notNull());
+        checkThat(aroma, jsonSerializer, stateWebsites)
+                .are(notNull());
 
+        this.aroma = aroma;
+        this.jsonSerializer = jsonSerializer;
         this.stateWebsites = stateWebsites;
     }
 
@@ -44,39 +66,23 @@ public class GetStatesOperation implements Route
 
         response.type(MediaTypes.APPLICATION_JSON);
 
-        return stateWebsites.getSupportedStates()
-                            .stream()
-                            .map(StateJson::new)
-                            .map(StateJson::asJson)
-                            .collect(JSON.collectArray());
+        JsonArray results = stateWebsites.getSupportedStates()
+                                         .stream()
+                                         .map(jsonSerializer::serializeState)
+                                         .collect(JSON.collectArray());
+
+        makeNoteOfResults(request, results);
+
+        return results;
     }
 
-    static class StateJson
+    private void makeNoteOfResults(Request request, JsonArray results)
     {
-        private final State state;
-        private final JsonObject json;
+        String message = "Found {} states for request {} from IP [{}]";
 
-        StateJson(State state)
-        {
-            checkThat(state).is(notNull());
+        LOG.debug(message, results.size(), request, request.ip());
 
-            this.state = state;
-            this.json = toJson();
-        }
-
-        private JsonObject toJson()
-        {
-            JsonObject object = new JsonObject();
-
-            object.addProperty("id", state.getAbbreviation().name());
-            object.addProperty("name", state.getTitleCased());
-
-            return object;
-        }
-
-        JsonObject asJson()
-        {
-            return json;
-        }
+        aroma.sendLowPriorityMessage("Get States Called", message, results.size(), request, request.ip());
     }
+
 }

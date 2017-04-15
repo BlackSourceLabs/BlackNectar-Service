@@ -36,7 +36,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.p
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
- * This is a mutable request object that encapsulates parameters for a BlackNectar API request. 
+ * This is a mutable request object that encapsulates parameters for a BlackNectar API request.
  * All of the fields are publicly accessible and mutable, which makes this class Thread-Unsafe.
  *
  * @author SirWellington
@@ -101,8 +101,8 @@ public class BlackNectarSearchRequest
     public BlackNectarSearchRequest withSearchTerm(String searchTerm)
     {
         checkThat(searchTerm)
-            .usingMessage("searchTerm cannot be empty")
-            .is(nonEmptyString());
+                .usingMessage("searchTerm cannot be empty")
+                .is(nonEmptyString());
 
         this.searchTerm = searchTerm;
         return this;
@@ -111,8 +111,8 @@ public class BlackNectarSearchRequest
     public BlackNectarSearchRequest withCenter(@Required Location center)
     {
         checkThat(center)
-            .usingMessage("center cannot be null")
-            .is(notNull());
+                .usingMessage("center cannot be null")
+                .is(notNull());
 
         this.center = center;
         return this;
@@ -121,7 +121,7 @@ public class BlackNectarSearchRequest
     public BlackNectarSearchRequest withLimit(int limit)
     {
         checkThat(limit)
-            .is(positiveInteger());
+                .is(positiveInteger());
 
         this.limit = limit;
         return this;
@@ -130,7 +130,7 @@ public class BlackNectarSearchRequest
     public BlackNectarSearchRequest withRadius(double radius)
     {
         checkThat(radius)
-            .is(greaterThanOrEqualTo(0.0));
+                .is(greaterThanOrEqualTo(0.0));
 
         this.radiusInMeters = radius;
         return this;
@@ -139,8 +139,8 @@ public class BlackNectarSearchRequest
     public BlackNectarSearchRequest withZipCode(@NonEmpty String zipCode)
     {
         checkThat(zipCode)
-            .is(nonEmptyString())
-            .is(validZipCode());
+                .is(nonEmptyString())
+                .is(validZipCode());
 
         this.zipCode = zipCode;
         return this;
@@ -190,11 +190,7 @@ public class BlackNectarSearchRequest
         {
             return false;
         }
-        if (!Objects.equals(this.center, other.center))
-        {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.center, other.center);
     }
 
     @Override

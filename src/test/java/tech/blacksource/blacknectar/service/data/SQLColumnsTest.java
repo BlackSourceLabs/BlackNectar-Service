@@ -24,7 +24,6 @@ import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
- *
  * @author SirWellington
  */
 @RunWith(AlchemyTestRunner.class)
@@ -52,7 +51,7 @@ public class SQLColumnsTest
     @Test
     public void testCannotInstatiate() throws Exception
     {
-        assertThrows(() -> new SQLColumns());
+        assertThrows(SQLColumns::new);
     }
 
 }

@@ -52,7 +52,6 @@ import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticSt
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(50)
@@ -97,17 +96,17 @@ public class SQLStoreRepositoryTest
 
         Location center = one(locations());
         request = new BlackNectarSearchRequest()
-            .withCenter(center)
-            .withRadius(one(doubles(1000, 10_000)))
-            .withSearchTerm(one(alphabeticString()));
+                .withCenter(center)
+                .withRadius(one(doubles(1000, 10_000)))
+                .withSearchTerm(one(alphabeticString()));
     }
 
     private void setupMocks() throws Exception
     {
         setupSQLInsertForStore();
-        
+
         when(database.queryForObject(eq(SQLQueries.CONTAINS_STORE), eq(Integer.class), any(UUID.class)))
-            .thenReturn(0);
+                .thenReturn(0);
     }
 
     @DontRepeat
@@ -115,13 +114,13 @@ public class SQLStoreRepositoryTest
     public void testConstructorWithBadArguments()
     {
         assertThrows(() -> new SQLStoreRepository(null, database, storeMapper))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         assertThrows(() -> new SQLStoreRepository(aroma, null, storeMapper))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         assertThrows(() -> new SQLStoreRepository(aroma, database, null))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -130,7 +129,7 @@ public class SQLStoreRepositoryTest
         String expectedQuery = "SELECT * FROM Stores";
 
         when(database.query(anyString(), eq(storeMapper)))
-            .thenReturn(stores);
+                .thenReturn(stores);
 
         List<Store> results = instance.getAllStores(0);
         assertThat(results, is(stores));
@@ -145,7 +144,7 @@ public class SQLStoreRepositoryTest
         String expectedQuery = format("SELECT * FROM Stores LIMIT %d", limit);
 
         when(database.query(anyString(), eq(storeMapper)))
-            .thenReturn(stores);
+                .thenReturn(stores);
 
         List<Store> results = instance.getAllStores(limit);
         assertThat(results, not(empty()));
@@ -168,10 +167,10 @@ public class SQLStoreRepositoryTest
         DataAccessException ex = mock(DataAccessException.class);
 
         when(database.query(anyString(), eq(storeMapper)))
-            .thenThrow(ex);
+                .thenThrow(ex);
 
         assertThrows(() -> instance.getAllStores())
-            .isInstanceOf(BlackNectarAPIException.class);
+                .isInstanceOf(BlackNectarAPIException.class);
 
     }
 
@@ -179,29 +178,29 @@ public class SQLStoreRepositoryTest
     public void testSearchForStores()
     {
         when(database.query(anyString(), eq(storeMapper), Mockito.<Object>anyVararg()))
-            .thenReturn(stores);
+                .thenReturn(stores);
 
         List<Store> results = instance.searchForStores(request);
 
         assertThat(results, not(empty()));
         assertThat(results, is(stores));
     }
-    
+
     @Test
     public void testSearchForStoresWithZipCode() throws Exception
     {
         int zipCodeInt = one(integers(10_000, 99_999));
         String zipCode = String.valueOf(zipCodeInt);
-        
+
         request = new BlackNectarSearchRequest()
-            .withSearchTerm(one(alphabeticString()))
-            .withZipCode(zipCode);
-        
+                .withSearchTerm(one(alphabeticString()))
+                .withZipCode(zipCode);
+
         when(database.query(eq(SQLQueries.QUERY_STORES_WITH_NAME_AND_ZIPCODE), eq(storeMapper), Mockito.<Object>anyVararg()))
-            .thenReturn(stores);
-        
+                .thenReturn(stores);
+
         List<Store> results = instance.searchForStores(request);
-        
+
         assertThat(results, not(empty()));
         assertThat(results, is(stores));
     }
@@ -210,7 +209,7 @@ public class SQLStoreRepositoryTest
     public void testAddStore() throws Exception
     {
         when(database.update(anyString(), Mockito.<Object>anyVararg()))
-            .thenReturn(1);
+                .thenReturn(1);
 
         instance.addStore(store);
 
@@ -222,7 +221,7 @@ public class SQLStoreRepositoryTest
         String insert = SQLQueries.INSERT_STORE;
 
         when(database.update(eq(insert), Mockito.<Object>anyVararg()))
-            .thenReturn(1);
+                .thenReturn(1);
     }
 
     @Test
@@ -231,7 +230,7 @@ public class SQLStoreRepositoryTest
         String expectedQuery = SQLQueries.DELETE_STORE;
 
         when(database.update(expectedQuery, storeUuid))
-            .thenReturn(1);
+                .thenReturn(1);
 
         instance.deleteStore(store.getStoreId());
 
@@ -243,11 +242,11 @@ public class SQLStoreRepositoryTest
     public void testDeleteStoreWithBadArgs() throws Exception
     {
         assertThrows(() -> instance.deleteStore(""))
-            .isInstanceOf(BadArgumentException.class);
+                .isInstanceOf(BadArgumentException.class);
 
         String badId = one(alphabeticString());
         assertThrows(() -> instance.deleteStore(badId))
-            .isInstanceOf(BadArgumentException.class);
+                .isInstanceOf(BadArgumentException.class);
 
     }
 
@@ -257,9 +256,9 @@ public class SQLStoreRepositoryTest
         String sql = SQLQueries.CONTAINS_STORE;
 
         String storeId = store.getStoreId();
-        
+
         when(database.queryForObject(sql, Integer.class, storeUuid))
-            .thenReturn(1);
+                .thenReturn(1);
 
         assertTrue(instance.containsStore(storeId));
     }
@@ -272,7 +271,7 @@ public class SQLStoreRepositoryTest
         String storeId = store.getStoreId();
 
         when(database.queryForObject(sql, Integer.class, storeUuid))
-            .thenReturn(0);
+                .thenReturn(0);
 
         assertFalse(instance.containsStore(storeId));
     }
@@ -287,14 +286,14 @@ public class SQLStoreRepositoryTest
         instance.updateStore(store);
         assertStoreUpdatedIntoDatabase(database, store);
     }
-    
-    
+
+
     @Test
     public void testUpdateStoreWhenStoreDoesNotExist() throws Exception
     {
         Store newStore = one(stores());
         instance.updateStore(newStore);
-        
+
         assertStoreInsertedIntoDatabase(database, newStore);
     }
 

@@ -43,7 +43,6 @@ import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.StringGenerators.uuids;
 
 /**
- *
  * @author SirWellington
  */
 @Pojo
@@ -108,28 +107,28 @@ public class Store implements JSONRepresentable
         return store ->
         {
             checkThat(store)
-                .usingMessage("store cannot be null")
-                .is(notNull());
+                    .usingMessage("store cannot be null")
+                    .is(notNull());
 
             checkThat(store.storeId)
-                .usingMessage("storeId must be a valid UUID")
-                .is(validUUID());
+                    .usingMessage("storeId must be a valid UUID")
+                    .is(validUUID());
 
             checkThat(store.address)
-                .usingMessage("store is missing address")
-                .is(notNull())
-                .is(validAddress());
+                    .usingMessage("store is missing address")
+                    .is(notNull())
+                    .is(validAddress());
 
             checkThat(store.location)
-                .usingMessage("store is missing location")
-                .is(notNull())
-                .is(validLocation());
+                    .usingMessage("store is missing location")
+                    .is(notNull())
+                    .is(validLocation());
 
             if (!isNullOrEmpty(store.mainImageURL))
             {
                 checkThat(store.mainImageURL)
-                    .usingMessage("store image must be a valid URL")
-                    .is(validURL());
+                        .usingMessage("store image must be a valid URL")
+                        .is(validURL());
             }
         };
     }
@@ -238,11 +237,7 @@ public class Store implements JSONRepresentable
         {
             return false;
         }
-        if (!Objects.equals(this.address, other.address))
-        {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.address, other.address);
     }
 
     @Override
@@ -361,7 +356,7 @@ public class Store implements JSONRepresentable
         public Builder withStoreID(@NonEmpty UUID storeId) throws IllegalArgumentException
         {
             checkThat(storeId)
-                .is(notNull());
+                    .is(notNull());
 
             this.storeId = storeId.toString();
             return this;
@@ -377,8 +372,8 @@ public class Store implements JSONRepresentable
         public Builder withName(@NonEmpty String name) throws IllegalArgumentException
         {
             checkThat(name)
-                .usingMessage("name cannot be empty")
-                .is(nonEmptyString());
+                    .usingMessage("name cannot be empty")
+                    .is(nonEmptyString());
 
             this.name = name;
             return this;
@@ -398,7 +393,7 @@ public class Store implements JSONRepresentable
         public Builder withStoreCode(@NonEmpty String storeCode) throws IllegalArgumentException
         {
             checkThat(storeCode)
-                .is(nonEmptyString());
+                    .is(nonEmptyString());
 
             this.storeCode = storeCode;
             return this;
@@ -425,7 +420,7 @@ public class Store implements JSONRepresentable
         public Builder withAddress(@Required Address address) throws IllegalArgumentException
         {
             checkThat(address)
-                .is(validAddress());
+                    .is(validAddress());
 
             this.address = address;
             return this;
@@ -434,7 +429,7 @@ public class Store implements JSONRepresentable
         public Builder withLocation(@Required Location location) throws IllegalArgumentException
         {
             checkThat(location)
-                .is(validLocation());
+                    .is(validLocation());
 
             this.location = location;
             return this;
@@ -443,8 +438,8 @@ public class Store implements JSONRepresentable
         public Builder withMainImageURL(@Required String imageURL) throws IllegalArgumentException
         {
             checkThat(imageURL)
-                .is(nonEmptyString())
-                .is(validURL());
+                    .is(nonEmptyString())
+                    .is(validURL());
 
             this.mainImageURL = imageURL;
             return this;
@@ -455,11 +450,12 @@ public class Store implements JSONRepresentable
             this.mainImageURL = null;
             return this;
         }
-        
+
         /**
          * Set if the store is a Farmer's Market.
+         *
          * @param isFarmersMarket {@code true } if the store is a Farmer's Market, {@code false} otherwise.
-         * @return 
+         * @return
          */
         public Builder isFarmersMarket(boolean isFarmersMarket)
         {
@@ -471,20 +467,20 @@ public class Store implements JSONRepresentable
         {
 
             checkThat(storeId)
-                .usingMessage("storeId is required")
-                .is(validUUID());
+                    .usingMessage("storeId is required")
+                    .is(validUUID());
 
             checkThat(location)
-                .usingMessage("Location is missing or invalid")
-                .is(validLocation());
+                    .usingMessage("Location is missing or invalid")
+                    .is(validLocation());
 
             checkThat(name)
-                .usingMessage("Missing name")
-                .is(nonEmptyString());
+                    .usingMessage("Missing name")
+                    .is(nonEmptyString());
 
             checkThat(address)
-                .usingMessage("Address is missing or invalid")
-                .is(validAddress());
+                    .usingMessage("Address is missing or invalid")
+                    .is(validAddress());
 
             return new Store(this.storeId,
                              this.name,

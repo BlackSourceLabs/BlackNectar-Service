@@ -31,7 +31,6 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
- *
  * @author SirWellington
  */
 @Internal
@@ -49,8 +48,8 @@ final class MemoryImageRepository implements ImageRepository
     public void addImage(Image image) throws BlackNectarAPIException
     {
         checkThat(image)
-            .throwing(BadArgumentException.class)
-            .is(notNull());
+                .throwing(BadArgumentException.class)
+                .is(notNull());
 
         UUID storeId = image.getStoreId();
 
@@ -60,22 +59,22 @@ final class MemoryImageRepository implements ImageRepository
     }
 
     @Override
-    public Image getImage(UUID storeId, String imageId) throws DoesNotExistException, BlackNectarAPIException
+    public Image getImage(UUID storeId, String imageId) throws BlackNectarAPIException
     {
         checkThat(storeId)
-            .usingMessage("missing storeId")
-            .is(notNull());
+                .usingMessage("missing storeId")
+                .is(notNull());
 
         checkThat(imageId)
-            .usingMessage("missing imageId")
-            .is(nonEmptyString());
+                .usingMessage("missing imageId")
+                .is(nonEmptyString());
 
         List<Image> storeImages = images.getOrDefault(storeId, Lists.emptyList());
 
         return storeImages.stream()
-            .filter(img -> Objects.equal(img.getImageId(), imageId))
-            .findAny()
-            .orElseThrow(() -> new DoesNotExistException());
+                          .filter(img -> Objects.equal(img.getImageId(), imageId))
+                          .findAny()
+                          .orElseThrow(DoesNotExistException::new);
     }
 
     @Override
@@ -88,19 +87,19 @@ final class MemoryImageRepository implements ImageRepository
     public void deleteImage(UUID storeId, String imageId) throws BlackNectarAPIException
     {
         checkThat(storeId)
-            .usingMessage("missing storeId")
-            .is(notNull());
+                .usingMessage("missing storeId")
+                .is(notNull());
 
         checkThat(imageId)
-            .usingMessage("imageId is missing")
-            .is(nonEmptyString());
+                .usingMessage("imageId is missing")
+                .is(nonEmptyString());
 
         List<Image> storeImages = images.getOrDefault(storeId, Lists.emptyList());
 
         if (Lists.notEmpty(storeImages))
         {
             storeImages.removeIf(img -> Objects.equal(img.getImageId(), imageId));
-            
+
             images.put(storeId, storeImages);
         }
 

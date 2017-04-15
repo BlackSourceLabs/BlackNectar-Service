@@ -40,7 +40,6 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.validUUID;
 
 /**
- *
  * @author SirWellington
  */
 @Internal
@@ -52,11 +51,11 @@ final class MemoryStoreRepository implements StoreRepository
     private final List<Store> stores;
     private final GeoCalculator distanceFormula;
 
-    @Inject 
+    @Inject
     MemoryStoreRepository(List<Store> stores, GeoCalculator distanceFormula)
     {
         checkThat(stores, distanceFormula)
-            .are(notNull());
+                .are(notNull());
 
         this.stores = stores;
         this.distanceFormula = distanceFormula;
@@ -66,10 +65,10 @@ final class MemoryStoreRepository implements StoreRepository
     public void addStore(Store store) throws BadArgumentException
     {
         checkThat(store)
-            .throwing(BadArgumentException.class)
-            .is(notNull())
-            .is(validStore());
-        
+                .throwing(BadArgumentException.class)
+                .is(notNull())
+                .is(validStore());
+
         stores.add(store);
         LOG.debug("Successfully saved store: {}", store);
     }
@@ -78,20 +77,20 @@ final class MemoryStoreRepository implements StoreRepository
     public boolean containsStore(String storeId) throws BlackNectarAPIException
     {
         checkThat(storeId)
-            .throwing(BadArgumentException.class)
-            .is(validUUID());
-        
+                .throwing(BadArgumentException.class)
+                .is(validUUID());
+
         return stores
-            .stream()
-            .anyMatch(store -> Objects.equals(storeId, store.getStoreId()));
+                .stream()
+                .anyMatch(store -> Objects.equals(storeId, store.getStoreId()));
     }
-    
+
     @Override
     public List<Store> getAllStores(int limit)
     {
         checkThat(limit)
-            .usingMessage("limit must be >= 0")
-            .is(greaterThanOrEqualTo(0));
+                .usingMessage("limit must be >= 0")
+                .is(greaterThanOrEqualTo(0));
 
         if (limit == 0)
         {
@@ -99,16 +98,16 @@ final class MemoryStoreRepository implements StoreRepository
         }
 
         return stores.stream()
-            .limit(limit)
-            .collect(toList());
+                     .limit(limit)
+                     .collect(toList());
     }
 
     @Override
     public List<Store> searchForStores(BlackNectarSearchRequest request) throws OperationFailedException
     {
         checkThat(request)
-            .usingMessage("request missing")
-            .is(notNull());
+                .usingMessage("request missing")
+                .is(notNull());
 
         Stream<Store> stream = stores.parallelStream();
 
@@ -121,19 +120,19 @@ final class MemoryStoreRepository implements StoreRepository
         {
             stream = stream.filter(containsInName(request.searchTerm));
         }
-        
+
         if (request.hasCenter())
         {
             if (request.hasRadius())
             {
                 stream = stream.filter(nearby(request.center, request.radiusInMeters));
             }
-            else 
+            else
             {
                 stream = stream.filter(nearby(request.center, DEFAULT_RADIUS_METERS));
             }
         }
-        
+
         if (request.hasZipCode())
         {
             stream = stream.filter(hasZipCode(request.zipCode));
@@ -146,9 +145,9 @@ final class MemoryStoreRepository implements StoreRepository
     public void updateStore(Store store) throws BlackNectarAPIException
     {
         checkThat(store)
-            .throwing(BadArgumentException.class)
-            .is(notNull());
-        
+                .throwing(BadArgumentException.class)
+                .is(notNull());
+
         stores.removeIf(s -> Objects.equals(s.getStoreId(), store.getStoreId()));
         stores.add(store);
     }
@@ -157,10 +156,10 @@ final class MemoryStoreRepository implements StoreRepository
     public void deleteStore(String storeId) throws BlackNectarAPIException
     {
         checkThat(storeId)
-            .throwing(BadArgumentException.class)
-            .is(nonEmptyString())
-            .is(validUUID());
-        
+                .throwing(BadArgumentException.class)
+                .is(nonEmptyString())
+                .is(validUUID());
+
         this.stores.removeIf(s -> Objects.equals(s.getStoreId(), storeId));
     }
 
@@ -170,26 +169,26 @@ final class MemoryStoreRepository implements StoreRepository
         return store ->
         {
             double distance = distanceFormula.distanceBetween(store.getLocation(), center);
-            
+
             return distance <= radius;
         };
     }
-    
+
     private Predicate<Store> containsInName(String term)
     {
         return store ->
         {
             String storeName = store.getName();
-            
+
             if (isNullOrEmpty(storeName))
             {
                 return false;
             }
-            
+
             return storeName.contains(term);
         };
     }
-    
+
     private Predicate<Store> hasZipCode(String zipCode)
     {
         return store ->
@@ -208,7 +207,7 @@ final class MemoryStoreRepository implements StoreRepository
             {
                 return false;
             }
-            
+
             return Objects.equals(store.getAddress().getZipCode(), zipCode);
         };
     }

@@ -30,7 +30,6 @@ import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.NUMERIC;
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(10)
@@ -67,14 +66,14 @@ public class ExtractStoreCodeTransformationTest
 
         dirtyStore = one(stores());
         dirtyStore = Store.Builder.fromStore(dirtyStore)
-            .withName(combinedName)
-            .withoutStoreCode()
-            .build();
+                                  .withName(combinedName)
+                                  .withoutStoreCode()
+                                  .build();
 
         cleanStore = Store.Builder.fromStore(dirtyStore)
-            .withName(storeName)
-            .withStoreCode(storeCode)
-            .build();
+                                  .withName(storeName)
+                                  .withStoreCode(storeCode)
+                                  .build();
     }
 
     private void setupMocks() throws Exception

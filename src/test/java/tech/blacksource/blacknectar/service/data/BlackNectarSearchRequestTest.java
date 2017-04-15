@@ -33,7 +33,6 @@ import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticSt
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(50)
@@ -50,7 +49,7 @@ public class BlackNectarSearchRequestTest
     private double radiusInMeters;
     private int limit;
     private String searchTerm;
-    
+
     private String zipCode;
 
     @Before
@@ -67,7 +66,7 @@ public class BlackNectarSearchRequestTest
         limit = one(positiveIntegers());
         radiusInMeters = one(positiveDoubles());
         searchTerm = one(alphabeticString());
-        
+
         int zipCodeInt = integers(10_000, 99_999).get();
         zipCode = String.valueOf(zipCodeInt);
     }
@@ -82,8 +81,7 @@ public class BlackNectarSearchRequestTest
         if (radiusInMeters > 0)
         {
             assertThat(instance.hasRadius(), is(true));
-        }
-        else
+        } else
         {
             assertThat(instance.hasRadius(), is(false));
         }
@@ -107,8 +105,7 @@ public class BlackNectarSearchRequestTest
         if (limit == 0)
         {
             assertThat(instance.hasLimit(), is(false));
-        }
-        else
+        } else
         {
             assertThat(instance.hasLimit(), is(true));
         }
@@ -122,12 +119,12 @@ public class BlackNectarSearchRequestTest
         instance.searchTerm = searchTerm;
         assertThat(instance.hasSearchTerm(), is(true));
     }
-    
+
     @Test
     public void testHasZipCode() throws Exception
     {
         assertThat(instance.hasZipCode(), is(false));
-        
+
         instance.zipCode = zipCode;
         assertThat(instance.hasZipCode(), is(true));
     }
@@ -139,7 +136,7 @@ public class BlackNectarSearchRequestTest
         assertThat(result, notNullValue());
         assertThat(result.searchTerm, is(searchTerm));
     }
-    
+
     @DontRepeat
     @Test
     public void testWithSearchTermWithBadArg()
@@ -191,7 +188,7 @@ public class BlackNectarSearchRequestTest
         double badRadius = one(NumberGenerators.doubles(-10000, -1));
         assertThrows(() -> instance.withRadius(badRadius));
     }
-    
+
     @Test
     public void testWithZipCode() throws Exception
     {
@@ -199,7 +196,7 @@ public class BlackNectarSearchRequestTest
         assertThat(result, notNullValue());
         assertThat(result.zipCode, is(zipCode));
     }
-    
+
     @Test
     public void testHasZipCodeWithBadArgs() throws Exception
     {

@@ -14,27 +14,32 @@
  * limitations under the License.
  */
 
-package tech.blacksource.blacknectar.service.data;
+package tech.blacksource.blacknectar.service.json;
 
+import com.google.gson.JsonObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.springframework.jdbc.core.JdbcTemplate;
-import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
+import tech.blacksource.blacknectar.ebt.balance.State;
+import tech.sirwellington.alchemy.test.junit.runners.*;
 
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
+
 
 /**
  * @author SirWellington
  */
+@Repeat(10)
 @RunWith(AlchemyTestRunner.class)
-public class BlackNectarServiceTest
+public class EBTJsonSerializerImplTest
 {
 
-    @Mock
-    private JdbcTemplate database;
+    @GenerateEnum
+    private State state;
+
+    private EBTJsonSerializerImpl instance;
 
     @Before
     public void setUp() throws Exception
@@ -42,12 +47,13 @@ public class BlackNectarServiceTest
 
         setupData();
         setupMocks();
+
+        instance = new EBTJsonSerializerImpl();
     }
 
 
     private void setupData() throws Exception
     {
-
     }
 
     private void setupMocks() throws Exception
@@ -56,16 +62,19 @@ public class BlackNectarServiceTest
     }
 
     @Test
-    public void testNewMemoryService()
+    public void testSerializeState()
     {
-        StoreRepository instance = StoreRepository.newMemoryService();
-        assertThat(instance, notNullValue());
+        JsonObject expected = new StateJson(state).asJson();
+        JsonObject result = instance.serializeState(state);
+
+        assertThat(result, is(expected));
     }
 
+    @DontRepeat
     @Test
-    public void testNewSQLService() throws Exception
+    public void testSerializeStateWithBadArgs() throws Exception
     {
-        StoreRepository result = StoreRepository.newSQLService(database);
-        assertThat(result, notNullValue());
+        assertThrows(() -> instance.serializeState(null)).isInstanceOf(IllegalArgumentException.class);
     }
+
 }

@@ -32,25 +32,24 @@ import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(50)
 @RunWith(AlchemyTestRunner.class)
-public class StoreTest 
+public class StoreTest
 {
 
     private Store instance;
-    
+
     private Store other;
-    
+
     private Store copy;
-    
+
     @GenerateURL
     private URL mainImageURL;
-    
+
     private String mainImage;
-    
+
     @Before
     public void setUp() throws Exception
     {
@@ -63,7 +62,7 @@ public class StoreTest
         instance = one(stores());
         other = one(stores());
         copy = Store.Builder.fromStore(instance).build();
-        
+
         mainImage = mainImageURL.toString();
     }
 
@@ -78,20 +77,20 @@ public class StoreTest
         assertThat(json.get(Store.Keys.STORE_CODE).getAsString(), is(instance.getStoreCode()));
         assertThat(json.get(Store.Keys.STORE_ID).getAsString(), is(instance.getStoreId()));
         assertThat(json.get(Store.Keys.IS_FARMERS_MARKET).getAsBoolean(), is(instance.isFarmersMarket()));
-        
+
         if (instance.hasMainImage())
         {
             assertThat(json.get(Store.Keys.MAIN_IMAGE).getAsString(), is(instance.getMainImageURL()));
         }
     }
-    
+
     @Test
     public void testThatImageCanBeAddedToStore()
     {
         Store newStore = Store.Builder.fromStore(instance)
-            .withMainImageURL(mainImage)
-            .build();
-        
+                                      .withMainImageURL(mainImage)
+                                      .build();
+
         assertThat(newStore, notNullValue());
         assertThat(newStore.getMainImageURL(), is(mainImage));
         assertThat(newStore, not(instance));
@@ -102,22 +101,22 @@ public class StoreTest
         assertThat(newStore.getAddress(), is(instance.getAddress()));
         assertThat(newStore.isFarmersMarket(), is(instance.isFarmersMarket()));
     }
-    
+
     @DontRepeat
     @Test
     public void testBuilderWithNothingSet() throws Exception
     {
         Store.Builder builder = Store.Builder.newInstance();
-        
-        assertThrows(() -> builder.build());
+
+        assertThrows(builder::build);
     }
-    
+
     @DontRepeat
     @Test
     public void testBuilderWithInvalidArguments() throws Exception
     {
         Store.Builder builder = Store.Builder.newInstance();
-        
+
         assertThrows(() -> builder.withAddress(null)).isInstanceOf(IllegalArgumentException.class);
         assertThrows(() -> builder.withLocation(null)).isInstanceOf(IllegalArgumentException.class);
         assertThrows(() -> builder.withName("")).isInstanceOf(IllegalArgumentException.class);
@@ -128,7 +127,7 @@ public class StoreTest
         assertThrows(() -> builder.withMainImageURL(null)).isInstanceOf(IllegalArgumentException.class);
         assertThrows(() -> builder.withStoreID(null)).isInstanceOf(IllegalArgumentException.class);
     }
-    
+
     @Test
     public void testEquals()
     {
@@ -140,8 +139,8 @@ public class StoreTest
     public void testEqualsWhenDifferent()
     {
         other = Store.Builder.fromStore(instance)
-            .withMainImageURL(mainImage)
-            .build();
+                             .withMainImageURL(mainImage)
+                             .build();
 
         assertThat(other, not(instance));
     }
@@ -151,7 +150,7 @@ public class StoreTest
     {
         AlchemyAssertion<Store> assertion = Store.validStore();
         assertThat(assertion, notNullValue());
-        
+
         assertion.check(instance);
         assertion.check(copy);
         assertion.check(other);

@@ -34,7 +34,6 @@ import tech.sirwellington.alchemy.arguments.FailedAssertionException;
 import static tech.sirwellington.alchemy.arguments.Arguments.*;
 
 /**
- *
  * @author SirWellington
  */
 public final class ModuleDatabaseTesting extends AbstractModule
@@ -57,20 +56,20 @@ public final class ModuleDatabaseTesting extends AbstractModule
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
         dataSource.setUrl(url);
 
-        try (Connection connection = dataSource.getConnection();)
+        try (Connection connection = dataSource.getConnection())
         {
             checkThat(connection)
-                .throwing(SQLException.class)
-                .is(connected());
+                    .throwing(SQLException.class)
+                    .is(connected());
         }
         catch (SQLException ex)
         {
             String message = "Failed to create connection to PostgreSQL.";
             LOG.error(message, ex);
             aroma.begin().titled("SQL Connection Failed")
-                .withBody(message, ex)
-                .withPriority(Priority.HIGH)
-                .send();
+                 .withBody(message, ex)
+                 .withPriority(Priority.HIGH)
+                 .send();
 
             throw ex;
         }
@@ -135,7 +134,7 @@ public final class ModuleDatabaseTesting extends AbstractModule
                                    user,
                                    password,
                                    applicationName);
-        
+
         return url;
     }
 }

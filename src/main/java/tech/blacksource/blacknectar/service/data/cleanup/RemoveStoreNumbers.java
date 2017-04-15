@@ -23,33 +23,32 @@ import tech.blacksource.blacknectar.service.ModuleDatabaseProduction;
 import tech.blacksource.blacknectar.service.ModuleServer;
 
 /**
- *
  * @author SirWellington
  */
 public final class RemoveStoreNumbers
 {
-    
+
     private final static Logger LOG = LoggerFactory.getLogger(RemoveStoreNumbers.class);
-    
+
     public static void main(String[] args) throws Exception
     {
-        Injector injector = Guice.createInjector(new ModuleServer(), 
+        Injector injector = Guice.createInjector(new ModuleServer(),
                                                  new ModuleDatabaseProduction(),
                                                  new ModuleRemoveStoreNumbers());
-        
+
         RunStoreTransformation instance = injector.getInstance(RunStoreTransformation.class);
-        
+
         instance.call();
     }
-    
+
     private static class ModuleRemoveStoreNumbers extends AbstractModule
     {
-        
+
         @Override
         protected void configure()
         {
             bind(StoreTransformation.class).to(ExtractStoreCodeTransformation.class);
         }
     }
-    
+
 }

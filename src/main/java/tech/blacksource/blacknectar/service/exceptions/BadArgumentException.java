@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- 
+
 package tech.blacksource.blacknectar.service.exceptions;
 
 /**
@@ -49,5 +49,5 @@ public class BadArgumentException extends BlackNectarAPIException
     {
         return 400;
     }
-    
+
 }

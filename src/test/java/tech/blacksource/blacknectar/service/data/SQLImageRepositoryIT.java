@@ -39,7 +39,6 @@ import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
- *
  * @author SirWellington
  */
 @RunWith(AlchemyTestRunner.class)
@@ -92,8 +91,8 @@ public class SQLImageRepositoryIT
 
         images = listOf(images());
         images = images.stream()
-            .map(img -> Image.Builder.fromImage(img).withStoreID(store.getStoreId()).build())
-            .collect(toList());
+                       .map(img -> Image.Builder.fromImage(img).withStoreID(store.getStoreId()).build())
+                       .collect(toList());
 
         image = Lists.oneOf(images);
         storeId = image.getStoreId();

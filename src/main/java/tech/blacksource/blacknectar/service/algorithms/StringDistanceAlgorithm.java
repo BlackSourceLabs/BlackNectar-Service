@@ -23,20 +23,20 @@ import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 /**
  * String Distance algorithms compute the distance between two strings, with the overall goals of matching Strings that are "sort of"
  * the same. This is otherwise known as Fuzzy Matching.
- * 
+ *
  * @author SirWellington
  * @see <a href="https://asecuritysite.com/forensics/simstring">https://asecuritysite.com/forensics/simstring</a>
  */
-public interface StringDistanceAlgorithm 
+public interface StringDistanceAlgorithm
 {
     /**
      * Calculates the distance from one string to another.
-     * 
+     *
      * @param first
      * @param second
      * @return The number of edits/transpositions that need to be made to make the strings equal.
-     * @throws IllegalArgumentException 
+     * @throws IllegalArgumentException
      */
     int distance(@NonEmpty String first, @NonEmpty String second) throws IllegalArgumentException;
-    
+
 }

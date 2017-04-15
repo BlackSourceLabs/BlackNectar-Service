@@ -71,7 +71,7 @@ public final class Image
         checkThat(storeId).is(notNull());
         checkThat(imageId).is(nonEmptyString());
         checkThat(width, height).are(positiveInteger());
-        
+
         this.storeId = storeId;
         this.imageId = imageId;
         this.height = height;
@@ -212,11 +212,7 @@ public final class Image
         {
             return false;
         }
-        if (!Objects.equals(this.url, other.url))
-        {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.url, other.url);
     }
 
     @Override
@@ -253,7 +249,7 @@ public final class Image
             checkThat(image).is(notNull());
 
             Builder builder = newInstance();
-            
+
             builder.storeId = image.storeId;
             builder.imageId = image.imageId;
             builder.height = image.height;
@@ -270,8 +266,8 @@ public final class Image
         public Builder withStoreID(@NonEmpty String storeId) throws IllegalArgumentException
         {
             checkThat(storeId)
-                .is(nonEmptyString())
-                .is(validUUID());
+                    .is(nonEmptyString())
+                    .is(validUUID());
 
             this.storeId = UUID.fromString(storeId);
             return this;
@@ -280,7 +276,7 @@ public final class Image
         public Builder withStoreID(@Required UUID storeId) throws IllegalArgumentException
         {
             checkThat(storeId)
-                .is(notNull());
+                    .is(notNull());
 
             this.storeId = storeId;
             return this;
@@ -289,7 +285,7 @@ public final class Image
         public Builder withImageID(@NonEmpty String imageId) throws IllegalArgumentException
         {
             checkThat(imageId)
-                .is(nonEmptyString());
+                    .is(nonEmptyString());
 
             this.imageId = imageId;
             return this;
@@ -299,7 +295,7 @@ public final class Image
         public Builder withWidthAndHeight(int width, int height) throws IllegalArgumentException
         {
             checkThat(width, height)
-                .are(positiveInteger());
+                    .are(positiveInteger());
 
             this.width = width;
             this.height = height;
@@ -309,7 +305,7 @@ public final class Image
         public Builder withSizeInBytes(int size) throws IllegalArgumentException
         {
             checkThat(size)
-                .is(positiveInteger());
+                    .is(positiveInteger());
 
             this.sizeInBytes = size;
             return this;
@@ -342,8 +338,8 @@ public final class Image
         public Builder withURL(@NonEmpty String url) throws IllegalArgumentException, MalformedURLException
         {
             checkThat(url)
-                .is(nonEmptyString())
-                .is(validURL());
+                    .is(nonEmptyString())
+                    .is(validURL());
 
             this.url = new URL(url);
             return this;
@@ -356,22 +352,22 @@ public final class Image
             this.url = url;
             return this;
         }
-        
+
         public Builder withoutURL()
         {
             this.url = null;
             return this;
         }
-        
+
         public Image build() throws IllegalStateException
         {
             checkThat(storeId)
-                .usingMessage("storeId is missing")
-                .is(notNull());
+                    .usingMessage("storeId is missing")
+                    .is(notNull());
 
             checkThat(imageId)
-                .usingMessage("imageId is required")
-                .is(nonEmptyString());
+                    .usingMessage("imageId is required")
+                    .is(nonEmptyString());
 
             return new Image(storeId, imageId, height, width, sizeInBytes, contentType, imageType, source, url);
         }

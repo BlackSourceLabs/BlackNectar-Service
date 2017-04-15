@@ -46,7 +46,6 @@ import static tech.sirwellington.alchemy.generator.NetworkGenerators.httpUrls;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(25)
@@ -69,7 +68,7 @@ public class GoogleImageLoaderTest
 
     @GeneratePojo
     private Place matchingPlace;
-    
+
     @GenerateList(value = Photo.class, size = 15)
     private List<Photo> photos;
 
@@ -107,7 +106,7 @@ public class GoogleImageLoaderTest
     private void setupMocks() throws Exception
     {
         when(searchAlgorithm.findMatchFor(store)).thenReturn(matchingPlace);
-        
+
         for (Photo photo : photos)
         {
             GetPhotoRequest photoRequest = createExpectedPhotoRequestFor(photo);
@@ -122,13 +121,13 @@ public class GoogleImageLoaderTest
     public void testConstructor() throws Exception
     {
         assertThrows(() -> new GoogleImageLoader(null, google, searchAlgorithm))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         assertThrows(() -> new GoogleImageLoader(aroma, null, searchAlgorithm))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         assertThrows(() -> new GoogleImageLoader(aroma, google, null))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -150,21 +149,20 @@ public class GoogleImageLoaderTest
         assertThat(result, notNullValue());
         assertThat(result, is(empty()));
     }
-    
+
     @DontRepeat
     @Test
     public void testGetImageForWithBadArgs() throws Exception
     {
-        assertThrows(() -> instance.getImagesFor(null))
-            .isInstanceOf(BadArgumentException.class);
+        assertThrows(() -> instance.getImagesFor(null)).isInstanceOf(BadArgumentException.class);
     }
 
     private GetPhotoRequest createExpectedPhotoRequestFor(Photo photo)
     {
         return GetPhotoRequest.newBuilder()
-            .withPhotoReference(photo.photoReference)
-            .withMaxHeight(GetPhotoRequest.Builder.MAX_HEIGHT)
-            .build();
+                              .withPhotoReference(photo.photoReference)
+                              .withMaxHeight(GetPhotoRequest.Builder.MAX_HEIGHT)
+                              .build();
     }
 
 }

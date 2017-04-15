@@ -81,6 +81,7 @@ public class GetStateInfoOperation implements Route
     private State getStateFromRequest(Request request)
     {
         String stateParameter = request.params(Parameters.EBT.STATE);
+
         checkThat(stateParameter)
                 .throwing(BadArgumentException.class)
                 .usingMessage("State parameter missing")

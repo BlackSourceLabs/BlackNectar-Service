@@ -36,7 +36,6 @@ import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
- *
  * @author SirWellington
  */
 public final class RunLoadStores implements Callable<Void>
@@ -52,7 +51,7 @@ public final class RunLoadStores implements Callable<Void>
     RunLoadStores(Aroma aroma, StoreRepository service, StoreDataSource storeRepository)
     {
         checkThat(aroma, service, storeRepository)
-            .are(notNull());
+                .are(notNull());
 
         this.aroma = aroma;
         this.service = service;
@@ -74,7 +73,7 @@ public final class RunLoadStores implements Callable<Void>
     {
         List<Store> stores = storeRepository.getAllStores();
         AtomicInteger counter = new AtomicInteger();
-        
+
         stores.parallelStream().forEach((store) ->
         {
             try
@@ -95,8 +94,8 @@ public final class RunLoadStores implements Callable<Void>
         
         LOG.info("Successfully saved {} stores", counter.get());
         aroma.begin().titled("RunLoadStores Complete")
-            .withBody("Finished loading {} stores", counter.get())
-            .send();
+             .withBody("Finished loading {} stores", counter.get())
+             .send();
 
         return null;
     }

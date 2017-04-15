@@ -70,13 +70,13 @@ public class SearchStoresOperation implements Route
 
     private final Aroma aroma;
     private final StoreRepository storesRepository;
-    
+
     @Inject
     SearchStoresOperation(Aroma aroma, StoreRepository storesRepository)
     {
         checkThat(aroma, storesRepository)
-            .are(notNull());
-        
+                .are(notNull());
+
         this.aroma = aroma;
         this.storesRepository = storesRepository;
     }
@@ -85,13 +85,13 @@ public class SearchStoresOperation implements Route
     public JsonArray handle(Request request, Response response) throws Exception
     {
         checkThat(request, response)
-            .usingMessage("request and response cannot be null")
-            .throwing(BadArgumentException.class)
-            .are(notNull());
+                .usingMessage("request and response cannot be null")
+                .throwing(BadArgumentException.class)
+                .are(notNull());
 
         checkThat(request)
-            .throwing(BadArgumentException::new)
-            .is(validRequest());
+                .throwing(BadArgumentException::new)
+                .is(validRequest());
 
         long begin = System.currentTimeMillis();
 
@@ -100,8 +100,8 @@ public class SearchStoresOperation implements Route
         List<Store> stores = findStores(request);
 
         JsonArray json = stores.stream()
-            .map(Store::asJSON)
-            .collect(JSON.collectArray());
+                               .map(Store::asJSON)
+                               .collect(JSON.collectArray());
 
         makeNoteOfRequestCompleted(begin, request, json);
 
@@ -152,20 +152,20 @@ public class SearchStoresOperation implements Route
         String longitudeString = queryParameters.value(QueryKeys.LONGITUDE);
 
         checkThat(latitudeString, longitudeString)
-            .usingMessage("latitude and longitude must be numerical")
-            .throwing(BadArgumentException.class)
-            .are(decimalString());
+                .usingMessage("latitude and longitude must be numerical")
+                .throwing(BadArgumentException.class)
+                .are(decimalString());
 
         double latitude = Double.valueOf(latitudeString);
         double longitude = Double.valueOf(longitudeString);
 
         checkThat(latitude)
-            .throwing(BadArgumentException.class)
-            .is(validLatitude());
+                .throwing(BadArgumentException.class)
+                .is(validLatitude());
 
         checkThat(longitude)
-            .throwing(BadArgumentException.class)
-            .is(validLongitude());
+                .throwing(BadArgumentException.class)
+                .is(validLongitude());
 
         request.withCenter(new Location(latitude, longitude));
     }
@@ -181,18 +181,18 @@ public class SearchStoresOperation implements Route
         String radiusString = queryParameters.value(QueryKeys.RADIUS);
 
         checkThat(radiusString)
-            .throwing(BadArgumentException.class)
-            .usingMessage("radius parameter must be a decimal value")
-            .is(decimalString());
+                .throwing(BadArgumentException.class)
+                .usingMessage("radius parameter must be a decimal value")
+                .is(decimalString());
 
         double radius = Double.valueOf(radiusString);
 
         checkThat(radius)
-            .throwing(BadArgumentException.class)
-            .usingMessage("radius must be > 0")
-            .is(greaterThanOrEqualTo(0.0))
-            .usingMessage("radius must be <= " + MAX_RADIUS_METERS)
-            .is(lessThanOrEqualTo(MAX_RADIUS_METERS));
+                .throwing(BadArgumentException.class)
+                .usingMessage("radius must be > 0")
+                .is(greaterThanOrEqualTo(0.0))
+                .usingMessage("radius must be <= " + MAX_RADIUS_METERS)
+                .is(lessThanOrEqualTo(MAX_RADIUS_METERS));
 
         request.withRadius(radius);
     }
@@ -208,16 +208,16 @@ public class SearchStoresOperation implements Route
         String limitString = queryParameters.value(QueryKeys.LIMIT);
 
         checkThat(limitString)
-            .throwing(BadArgumentException.class)
-            .usingMessage("limit must be a number")
-            .is(integerString());
+                .throwing(BadArgumentException.class)
+                .usingMessage("limit must be a number")
+                .is(integerString());
 
         int limit = Integer.valueOf(limitString);
 
         checkThat(limit)
-            .throwing(BadArgumentException.class)
-            .usingMessage("limit must be > 0")
-            .is(greaterThanOrEqualTo(0));
+                .throwing(BadArgumentException.class)
+                .usingMessage("limit must be > 0")
+                .is(greaterThanOrEqualTo(0));
 
         request.withLimit(limit);
 
@@ -233,36 +233,36 @@ public class SearchStoresOperation implements Route
         String searchTerm = queryParameters.value(QueryKeys.SEARCH_TERM);
 
         checkThat(searchTerm)
-            .throwing(BadArgumentException.class)
-            .usingMessage("search term cannot be empty")
-            .is(nonEmptyString())
-            .usingMessage("search term must have at least 2 characters")
-            .is(stringWithLengthGreaterThanOrEqualTo(2));
+                .throwing(BadArgumentException.class)
+                .usingMessage("search term cannot be empty")
+                .is(nonEmptyString())
+                .usingMessage("search term must have at least 2 characters")
+                .is(stringWithLengthGreaterThanOrEqualTo(2));
 
         request.withSearchTerm(searchTerm);
     }
-    
+
     private void insertZipCodeIfPresentInto(BlackNectarSearchRequest request, QueryParamsMap queryParameters)
     {
         if (!hasZipCodeParameter(queryParameters))
         {
             return;
         }
-        
+
         String zipCode = queryParameters.value(QueryKeys.ZIP_CODE);
-        
+
         checkThat(zipCode)
-            .throwing(BadArgumentException.class)
-            .is(validZipCodeString());
-        
+                .throwing(BadArgumentException.class)
+                .is(validZipCodeString());
+
         request.withZipCode(zipCode);
-            
+
     }
 
     private boolean hasLocationParameters(QueryParamsMap queryParams)
     {
         return queryParams.hasKey(QueryKeys.LATITUDE) &&
-               queryParams.hasKey(QueryKeys.LONGITUDE);
+                queryParams.hasKey(QueryKeys.LONGITUDE);
     }
 
     private boolean hasLimitParameter(QueryParamsMap queryParams)
@@ -279,7 +279,7 @@ public class SearchStoresOperation implements Route
     {
         return queryParams.hasKey(QueryKeys.RADIUS);
     }
-    
+
     private boolean hasZipCodeParameter(QueryParamsMap queryParamsMap)
     {
         return queryParamsMap.hasKey(QueryKeys.ZIP_CODE);
@@ -294,26 +294,27 @@ public class SearchStoresOperation implements Route
             for (String key : queryParams)
             {
                 checkThat(key)
-                    .is(argumentWithSaneLength())
-                    .usingMessage("Unexpected empty query parameter")
-                    .is(nonEmptyString())
-                    .usingMessage("Unrecognized Query Parameter: " + key)
-                    .is(elementInCollection(QueryKeys.KEYS));
-                
-                checkThat(request.queryMap().value(key))
-                    .is(argumentWithSaneLength());
+                        .is(argumentWithSaneLength())
+                        .usingMessage("Unexpected empty query parameter")
+                        .is(nonEmptyString())
+                        .usingMessage("Unrecognized Query Parameter: " + key)
+                        .is(elementInCollection(QueryKeys.KEYS));
+
+                checkThat(request.queryMap()
+                                 .value(key))
+                        .is(argumentWithSaneLength());
             }
 
             checkThat(queryParams)
-                .usingMessage("query parameters must contain at least one of 'searchTerm', 'zipCode', 'latitude', 'longitude")
-                .is(CollectionAssertions.collectionContainingAtLeastOnceOf(QueryKeys.SEARCH_TERM, QueryKeys.LATITUDE,
-                                                                           QueryKeys.LONGITUDE, QueryKeys.ZIP_CODE));
-            
+                    .usingMessage("query parameters must contain at least one of 'searchTerm', 'zipCode', 'latitude', 'longitude")
+                    .is(CollectionAssertions.collectionContainingAtLeastOnceOf(QueryKeys.SEARCH_TERM, QueryKeys.LATITUDE,
+                                                                               QueryKeys.LONGITUDE, QueryKeys.ZIP_CODE));
+
             if (queryParams.contains(QueryKeys.LATITUDE) || queryParams.contains(QueryKeys.LONGITUDE))
             {
                 checkThat(queryParams)
-                    .usingMessage("query parameters must include both 'latitude' and 'longitude' if using location")
-                    .is(CollectionAssertions.collectionContainingAll(QueryKeys.LATITUDE, QueryKeys.LONGITUDE));
+                        .usingMessage("query parameters must include both 'latitude' and 'longitude' if using location")
+                        .is(CollectionAssertions.collectionContainingAll(QueryKeys.LATITUDE, QueryKeys.LONGITUDE));
             }
         };
     }
@@ -322,10 +323,11 @@ public class SearchStoresOperation implements Route
     {
         LOG.info("Received GET request to search stores from IP [{}]", request.ip());
 
-        aroma.begin().titled("Request Received")
-            .withBody("To get stores from IP [{}] with query params: [{}]", request.ip(), request.queryString())
-            .withPriority(Priority.LOW)
-            .send();
+        aroma.begin()
+             .titled("Request Received")
+             .withBody("To get stores from IP [{}] with query params: [{}]", request.ip(), request.queryString())
+             .withPriority(Priority.LOW)
+             .send();
     }
 
     private void makeNoteOfRequestCompleted(long begin, Request request, JsonArray jsonArray)
@@ -334,10 +336,11 @@ public class SearchStoresOperation implements Route
         String message = "Operation to search for stores with query parameters [{}] took {}ms and resulted in {} stores";
         LOG.debug(message, request.queryString(), delay, jsonArray.size());
 
-        aroma.begin().titled("Request Complete")
-            .withBody(message, request.queryString(), delay, jsonArray.size())
-            .withPriority(Priority.LOW)
-            .send();
+        aroma.begin()
+             .titled("Request Complete")
+             .withBody(message, request.queryString(), delay, jsonArray.size())
+             .withPriority(Priority.LOW)
+             .send();
     }
 
     static class QueryKeys

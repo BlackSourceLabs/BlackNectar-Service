@@ -29,7 +29,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(25)
@@ -39,7 +38,7 @@ public class StoreRepositoryTest
 
     @Mock
     private Aroma aroma;
-    
+
     @Mock
     private JdbcTemplate database;
 

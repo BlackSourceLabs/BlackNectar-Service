@@ -59,7 +59,6 @@ import static tech.sirwellington.alchemy.test.junit.runners.GenerateInteger.Type
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.ALPHANUMERIC;
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(50)
@@ -77,7 +76,7 @@ public class SearchStoresOperationTest
     private ImageRepository imageRepository;
 
     private List<Store> stores;
-    
+
     private List<Store> storesWithoutImages;
 
     private Map<Store, Image> images;
@@ -106,9 +105,9 @@ public class SearchStoresOperationTest
 
     @GenerateInteger
     private Integer limit;
-    
+
     private QueryParamsMap queryParams;
-    
+
     @GenerateString(length = MAX_QUERY_PARAMETER_ARGUMENT_LENGTH * 2)
     private String reallyLongString;
 
@@ -132,7 +131,7 @@ public class SearchStoresOperationTest
         ip = one(ip4Addresses());
         latitude = one(latitudes());
         longitude = one(longitudes());
-        
+
         expectedSearchRequest = createExpectedRequest();
         images = Maps.create();
     }
@@ -174,8 +173,8 @@ public class SearchStoresOperationTest
         JsonArray array = instance.handle(request, response);
 
         JsonArray expected = stores.stream()
-            .map(Store::asJSON)
-            .collect(JSON.collectArray());
+                                   .map(Store::asJSON)
+                                   .collect(JSON.collectArray());
 
         assertThat(array, is(expected));
 
@@ -186,11 +185,11 @@ public class SearchStoresOperationTest
     public void testWhenHaveNoImage() throws Exception
     {
         when(storesRepository.searchForStores(expectedSearchRequest))
-            .thenReturn(storesWithoutImages);
-        
+                .thenReturn(storesWithoutImages);
+
         JsonArray expectedResponse = storesWithoutImages.stream()
-            .map(Store::asJSON)
-            .collect(collectArray());
+                                                        .map(Store::asJSON)
+                                                        .collect(collectArray());
 
         JsonArray jsonResponse = instance.handle(request, response);
 
@@ -215,28 +214,28 @@ public class SearchStoresOperationTest
         when(request.queryParams()).thenReturn(params);
 
         assertThrows(() -> instance.handle(request, response))
-            .isInstanceOf(BadArgumentException.class);
+                .isInstanceOf(BadArgumentException.class);
     }
-    
+
     @Ignore
     @DontRepeat
     @Test
     public void testWhenImageRepositoryFails() throws Exception
     {
         when(imageRepository.getImagesForStore(any(Store.class)))
-            .thenThrow(new OperationFailedException());
-        
+                .thenThrow(new OperationFailedException());
+
         assertThrows(() -> instance.handle(request, response))
-            .isInstanceOf(BlackNectarAPIException.class);
+                .isInstanceOf(BlackNectarAPIException.class);
     }
-    
+
     @Test
     public void testWithInsanelyLongQueryParameterKey() throws Exception
     {
         Set<String> queryParamKeys = request.queryParams();
         queryParamKeys.add(reallyLongString);
         when(request.queryParams()).thenReturn(queryParamKeys);
-        
+
         assertThrows(() -> instance.handle(request, response)).isInstanceOf(BadArgumentException.class);
     }
 
@@ -246,7 +245,7 @@ public class SearchStoresOperationTest
         when(queryParams.value(QueryKeys.SEARCH_TERM)).thenReturn(reallyLongString);
 
         assertThrows(() -> instance.handle(request, response))
-            .isInstanceOf(BadArgumentException.class);
+                .isInstanceOf(BadArgumentException.class);
     }
 
     private BlackNectarSearchRequest createExpectedRequest()
@@ -254,9 +253,9 @@ public class SearchStoresOperationTest
         BlackNectarSearchRequest expectedRequest = new BlackNectarSearchRequest();
 
         expectedRequest.withCenter(Location.with(latitude, longitude))
-            .withLimit(limit)
-            .withRadius(radius)
-            .withSearchTerm(searchTerm);
+                       .withLimit(limit)
+                       .withRadius(radius)
+                       .withSearchTerm(searchTerm);
 
         return expectedRequest;
     }
@@ -282,8 +281,8 @@ public class SearchStoresOperationTest
         when(params.value(QueryKeys.RADIUS)).thenReturn(radius.toString());
         when(params.value(QueryKeys.LIMIT)).thenReturn(limit.toString());
         when(params.value(QueryKeys.SEARCH_TERM)).thenReturn(searchTerm);
-        
-        
+
+
         return params;
     }
 

@@ -29,98 +29,97 @@ import static org.junit.Assert.assertTrue;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(10)
 @RunWith(AlchemyTestRunner.class)
 public class ImageTest
 {
-    
+
     private Image instance;
     private Image other;
     private Image copy;
-    
+
     @Before
     public void setUp() throws Exception
     {
-        
+
         setupData();
         setupMocks();
     }
-    
+
     private void setupData() throws Exception
     {
         instance = BlackNectarGenerators.images().get();
         other = BlackNectarGenerators.images().get();
         copy = Image.Builder.fromImage(instance).build();
     }
-    
+
     private void setupMocks() throws Exception
     {
-        
+
     }
-    
+
     @Test
     public void testConstructor() throws Exception
     {
         assertThrows(() -> new Image(null, null, 0, 0, 0, null, null, null, null));
     }
-    
+
     @Test
     public void testHasContentType()
     {
         assertTrue(instance.hasContentType());
     }
-    
+
     @Test
     public void testHasImageType()
     {
         assertTrue(instance.hasImageType());
     }
-    
+
     @Test
     public void testHasSource()
     {
         assertTrue(instance.hasSource());
     }
-    
+
     @Test
     public void testHasURL()
     {
         assertTrue(instance.hasURL());
     }
-    
+
     @Test
     public void testGetStoreId()
     {
         assertThat(instance.getStoreId(), notNullValue());
     }
-    
+
     @Test
     public void testGetImageId()
     {
         assertThat(instance.getImageId(), notNullValue());
     }
-    
+
     @Test
     public void testGetImageType()
     {
         assertThat(instance.getImageType(), notNullValue());
     }
-    
+
     @Test
     public void testGetSource()
     {
         assertThat(instance.getSource(), notNullValue());
     }
-    
+
     @Test
     public void testGetUrl()
     {
         assertThat(instance.getUrl(), notNullValue());
     }
-    
+
     @Test
     public void testHashCode()
     {
@@ -128,7 +127,7 @@ public class ImageTest
         assertThat(copy.hashCode(), is(instance.hashCode()));
         assertThat(other.hashCode(), not(instance.hashCode()));
     }
-    
+
     @Test
     public void testEquals()
     {
@@ -136,11 +135,11 @@ public class ImageTest
         assertThat(copy, is(instance));
         assertThat(other, not(instance));
     }
-    
+
     @Test
     public void testToString()
     {
         assertThat(instance.toString(), not(isEmptyOrNullString()));
     }
-    
+
 }

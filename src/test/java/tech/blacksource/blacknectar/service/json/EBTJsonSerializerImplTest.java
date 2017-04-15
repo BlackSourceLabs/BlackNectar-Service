@@ -29,26 +29,25 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(10)
 @RunWith(AlchemyTestRunner.class)
-public class EBTJsonSerializerImplTest 
+public class EBTJsonSerializerImplTest
 {
 
     @GenerateEnum
     private State state;
-    
+
     private EBTJsonSerializerImpl instance;
-    
+
     @Before
     public void setUp() throws Exception
     {
-        
+
         setupData();
         setupMocks();
-        
+
         instance = new EBTJsonSerializerImpl();
     }
 
@@ -59,7 +58,7 @@ public class EBTJsonSerializerImplTest
 
     private void setupMocks() throws Exception
     {
-        
+
     }
 
     @Test
@@ -67,7 +66,7 @@ public class EBTJsonSerializerImplTest
     {
         JsonObject expected = new StateJson(state).asJson();
         JsonObject result = instance.serializeState(state);
-        
+
         assertThat(result, is(expected));
     }
 
@@ -77,5 +76,5 @@ public class EBTJsonSerializerImplTest
     {
         assertThrows(() -> instance.serializeState(null)).isInstanceOf(IllegalArgumentException.class);
     }
-    
+
 }

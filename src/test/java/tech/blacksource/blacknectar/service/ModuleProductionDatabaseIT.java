@@ -32,17 +32,16 @@ import static org.junit.Assert.*;
 import static org.mockito.Answers.RETURNS_MOCKS;
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(10)
 @RunWith(AlchemyTestRunner.class)
-public class ModuleProductionDatabaseIT 
+public class ModuleProductionDatabaseIT
 {
-    
+
     @Mock(answer = RETURNS_MOCKS)
     private Aroma fakeAroma;
-    
+
     private ModuleDatabaseProduction instance;
 
     @Before
@@ -56,12 +55,12 @@ public class ModuleProductionDatabaseIT
 
     private void setupData() throws Exception
     {
-        
+
     }
 
     private void setupMocks() throws Exception
     {
-        
+
     }
 
     @Test
@@ -75,19 +74,19 @@ public class ModuleProductionDatabaseIT
         DataSource connection = instance.provideSQLConnection(fakeAroma);
         assertThat(connection, notNullValue());
     }
-    
+
     @Test
     public void testSQLConnectionRefreshesOnClosure() throws Exception
     {
         DataSource dataSource = instance.provideSQLConnection(fakeAroma);
-        
+
         Connection connection = dataSource.getConnection();
         connection.close();
         assertTrue(connection.isClosed());
-        
+
         connection = dataSource.getConnection();
         assertFalse(connection.isClosed());
-        
+
     }
 
 }

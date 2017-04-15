@@ -53,17 +53,17 @@ public class GetStatesOperationTest
 {
 
     private Aroma aroma;
-    
+
     @Mock
     private EBTJsonSerializer jsonSerializer;
-    
+
     @Mock
     private StateWebsiteFactory websiteFactory;
 
     private Set<State> states;
-    
+
     private Map<State, JsonObject> jsonMap;
-    
+
     private JsonArray expected;
 
     @Mock
@@ -88,9 +88,9 @@ public class GetStatesOperationTest
         AlchemyGenerator<State> stateGenerator = EnumGenerators.enumValueOf(State.class);
         List<State> statesList = CollectionGenerators.listOf(stateGenerator, 10);
         this.states = Sets.copyOf(statesList);
-        
+
         this.jsonMap = Maps.newLinkedHashMap();
-        
+
         this.states.forEach(s -> jsonMap.put(s, one(jsonObjects())));
     }
 
@@ -99,7 +99,7 @@ public class GetStatesOperationTest
         aroma = Aroma.createNoOpInstance();
 
         when(websiteFactory.getSupportedStates()).thenReturn(states);
-        
+
         jsonMap.forEach((state, json) -> when(jsonSerializer.serializeState(state)).thenReturn(json));
     }
 
@@ -120,18 +120,19 @@ public class GetStatesOperationTest
         assertThat(result, notNullValue());
         assertThat(result.size(), greaterThan(0));
         assertThat(result.size(), is(states.size()));
-        
-        jsonMap.values().forEach(json -> assertTrue(result.contains(json)));
+
+        jsonMap.values()
+               .forEach(json -> assertTrue(result.contains(json)));
 
         verify(websiteFactory, never()).getConnectionToState(any());
         verify(response).type(MediaTypes.APPLICATION_JSON);
     }
-    
+
     @Test
     public void testHandleWhenNoStatesSupported() throws Exception
     {
         when(websiteFactory.getSupportedStates()).thenReturn(Sets.emptySet());
-        
+
         JsonArray result = instance.handle(request, response);
         assertThat(result, notNullValue());
         assertThat(result.size(), is(0));

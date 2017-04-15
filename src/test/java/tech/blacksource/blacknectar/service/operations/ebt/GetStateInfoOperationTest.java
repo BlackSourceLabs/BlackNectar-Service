@@ -92,7 +92,9 @@ public class GetStateInfoOperationTest
 
         when(stateWebsite.getFeatures()).thenReturn(this.features);
 
-        String stateParameter = state.getAbbreviation().toString().toLowerCase();
+        String stateParameter = state.getAbbreviation()
+                                     .toString()
+                                     .toLowerCase();
         when(request.params(Parameters.EBT.STATE)).thenReturn(stateParameter);
     }
 
@@ -153,7 +155,8 @@ public class GetStateInfoOperationTest
     @Test
     public void testWhenFullStateNameUsedAsParameter() throws Exception
     {
-        String stateParameter = state.toString().toLowerCase();
+        String stateParameter = state.toString()
+                                     .toLowerCase();
 
         when(request.params(Parameters.EBT.STATE)).thenReturn(stateParameter);
 

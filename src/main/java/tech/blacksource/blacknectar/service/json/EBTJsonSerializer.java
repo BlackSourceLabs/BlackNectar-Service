@@ -2,8 +2,10 @@ package tech.blacksource.blacknectar.service.json;
 
 import com.google.gson.JsonObject;
 import com.google.inject.ImplementedBy;
-import tech.blacksource.blacknectar.ebt.balance.State;
-import tech.sirwellington.alchemy.annotations.arguments.Required;
+import tech.aroma.client.Aroma;
+import tech.blacksource.blacknectar.ebt.balance.*;
+import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
+import tech.sirwellington.alchemy.annotations.arguments.*;
 
 /**
  * Responsible for serializing and deserializing classes from the
@@ -21,9 +23,28 @@ public interface EBTJsonSerializer
      * @param state The {@link State} to serialize. Cannot be null.
      * @return A {@linkplain JsonObject JSON representation} of the {@link State}.
      */
-    JsonObject serializeState(@Required State state);
+    JsonObject serializeState(@Required State state) throws BlackNectarAPIException;
 
-    static EBTJsonSerializer newInstance()
+    /**
+     * Serializes a {@link Field} into a JSON Object.
+     *
+     * @param field The field to serialize
+     * @return A {@link JsonObject} representation of the field
+     * @throws BlackNectarAPIException
+     */
+    JsonObject serializeField(@Required Field field) throws BlackNectarAPIException;
+
+    /**
+     * Attempts to deserialize the JSON String into a {@link FieldValue}.
+     *
+     * @param json The json to parse. Cannot be empty.
+     * @return The corresponding {@link FieldValue}, or null if it cannot be parsed.
+     * @throws BlackNectarAPIException
+     */
+    @Optional
+    FieldValue deserializeFieldValue(@NonEmpty String json) throws BlackNectarAPIException;
+
+    static EBTJsonSerializer newInstance(@Required Aroma aroma)
     {
         return new EBTJsonSerializerImpl();
     }

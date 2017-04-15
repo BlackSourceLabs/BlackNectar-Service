@@ -16,13 +16,20 @@
  */
 package tech.blacksource.blacknectar.service.json;
 
-import com.google.gson.JsonObject;
+import javax.inject.Inject;
+
+import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.blacksource.blacknectar.ebt.balance.State;
+import tech.aroma.client.Aroma;
+import tech.blacksource.blacknectar.ebt.balance.*;
+import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
+import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.*;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.instanceOf;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
  * @author SirWellington
@@ -30,6 +37,18 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
 final class EBTJsonSerializerImpl implements EBTJsonSerializer
 {
     private final static Logger LOG = LoggerFactory.getLogger(EBTJsonSerializerImpl.class);
+
+    private final Aroma aroma;
+    private final Gson gson;
+
+    @Inject
+    EBTJsonSerializerImpl(Aroma aroma, Gson gson)
+    {
+        checkThat(aroma, gson).are(notNull());
+
+        this.aroma = aroma;
+        this.gson = gson;
+    }
 
     @Override
     public JsonObject serializeState(State state)
@@ -44,5 +63,48 @@ final class EBTJsonSerializerImpl implements EBTJsonSerializer
         LOG.debug("Serialized {} to {}", state, result);
 
         return result;
+    }
+
+    @Override
+    public JsonObject serializeField(Field field) throws BlackNectarAPIException
+    {
+
+        JsonElement json = gson.toJsonTree(field);
+
+        checkThat(json)
+                .throwing(OperationFailedException.class)
+                .usingMessage("Could not serialize field to JSON: " + json)
+                .is(instanceOf(JsonObject.class));
+
+        return json.getAsJsonObject();
+    }
+
+    @Override
+    public FieldValue deserializeFieldValue(String json) throws BlackNectarAPIException
+    {
+        checkThat(json).is(nonEmptyString());
+
+        JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
+
+        if (jsonObject == null || jsonObject.isJsonNull())
+        {
+            return null;
+        }
+
+        FieldValue result = gson.fromJson(jsonObject, FieldValue.class);
+
+        if (result == null)
+        {
+            makeNoteThatCouldNotExtractFieldValueFrom(jsonObject);
+        }
+
+        return result;
+    }
+
+    private void makeNoteThatCouldNotExtractFieldValueFrom(JsonObject jsonObject)
+    {
+        String message = "Could not extract FieldValue from JSON: {}";
+        LOG.warn(message, jsonObject);
+        aroma.sendMediumPriorityMessage("Json Parse Failed", message, jsonObject);
     }
 }

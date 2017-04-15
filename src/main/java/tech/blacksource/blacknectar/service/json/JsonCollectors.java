@@ -29,10 +29,10 @@ import tech.sirwellington.alchemy.annotations.access.NonInstantiable;
  * @author SirWellington
  */
 @NonInstantiable
-public final class JSON
+public final class JsonCollectors
 {
 
-    private final static Logger LOG = LoggerFactory.getLogger(JSON.class);
+    private final static Logger LOG = LoggerFactory.getLogger(JsonCollectors.class);
 
     public static Collector<JsonElement, JsonArray, JsonArray> collectArray()
     {

@@ -26,7 +26,7 @@ import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.ebt.balance.*;
 import tech.blacksource.blacknectar.service.data.MediaTypes;
 import tech.blacksource.blacknectar.service.exceptions.UnsupportedStateException;
-import tech.blacksource.blacknectar.service.json.JSON;
+import tech.blacksource.blacknectar.service.json.JsonCollectors;
 import tech.blacksource.blacknectar.service.operations.Parameters;
 
 import static tech.blacksource.blacknectar.service.BlackNectarAssertions.supportedState;
@@ -79,7 +79,7 @@ public class GetStateInfoOperation implements Route
                            .stream()
                            .map(StateWebsite.Feature::toString)
                            .map(JsonPrimitive::new)
-                           .collect(JSON.collectArray());
+                           .collect(JsonCollectors.collectArray());
     }
 
     private void makeNoteOfUnknownStateAbbreviation(String stateParameter)

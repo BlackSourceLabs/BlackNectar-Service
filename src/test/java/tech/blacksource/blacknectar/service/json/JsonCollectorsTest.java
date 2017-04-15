@@ -30,7 +30,7 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(AlchemyTestRunner.class)
 @Repeat
-public class JSONTest
+public class JsonCollectorsTest
 {
 
     @GenerateList(String.class)
@@ -47,7 +47,7 @@ public class JSONTest
 
         JsonArray result = strings.stream()
                                   .map(JsonPrimitive::new)
-                                  .collect(JSON.collectArray());
+                                  .collect(JsonCollectors.collectArray());
 
         assertThat(result, is(expected));
     }
@@ -60,7 +60,7 @@ public class JSONTest
 
         JsonArray result = numbers.stream()
                                   .map(JsonPrimitive::new)
-                                  .collect(JSON.collectArray());
+                                  .collect(JsonCollectors.collectArray());
 
         assertThat(result, is(expected));
     }
@@ -74,7 +74,7 @@ public class JSONTest
         JsonArray result = Lists.<String>emptyList()
                                 .stream()
                                 .map(JsonPrimitive::new)
-                                .collect(JSON.collectArray());
+                                .collect(JsonCollectors.collectArray());
 
         assertThat(result, is(expected));
     }

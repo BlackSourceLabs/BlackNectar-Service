@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import spark.*;
 import tech.aroma.client.Aroma;
 import tech.aroma.client.Priority;
+import tech.blacksource.blacknectar.ebt.balance.State;
 import tech.redroma.yelp.exceptions.YelpException;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 import tech.sirwellington.alchemy.arguments.FailedAssertionException;
@@ -43,6 +44,7 @@ public final class BlackNectarExceptionHandler implements ExceptionHandler
     private final static Logger LOG = LoggerFactory.getLogger(BlackNectarExceptionHandler.class);
     private static final int BAD_ARGUMENT = 400;
     private static final int INTERNAL_ERROR = 500;
+    private static final int NOT_IMPLEMENTED = 501;
 
     private final Aroma aroma;
 
@@ -75,6 +77,15 @@ public final class BlackNectarExceptionHandler implements ExceptionHandler
                  .send();
 
             response.status(BAD_ARGUMENT);
+        }
+        else if (ex instanceof UnsupportedStateException)
+        {
+            State state = ((UnsupportedStateException) ex).getState();
+
+            LOG.error("Unsupported State received: {}", state);
+            aroma.sendMediumPriorityMessage("Unsupported State", state.toString(), ex);
+
+            response.status(NOT_IMPLEMENTED);
         }
         else if (ex instanceof BlackNectarAPIException)
         {

@@ -60,7 +60,7 @@ public class GetStateInfoOperation implements Route
         State state = Parameters.EBT.getStateFrom(request);
 
         checkThat(state)
-                .throwing(UnsupportedStateException.class)
+                .throwing(ex -> new UnsupportedStateException(ex, state))
                 .is(supportedState(websiteFactory));
 
         StateWebsite stateWebsite = websiteFactory.getConnectionToState(state);

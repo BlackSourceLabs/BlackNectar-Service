@@ -16,13 +16,15 @@ package tech.blacksource.blacknectar.service.json;/*
  */
 
 import com.google.gson.JsonObject;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import tech.blacksource.blacknectar.ebt.balance.State;
 import tech.sirwellington.alchemy.test.junit.runners.*;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -30,33 +32,35 @@ import static org.junit.Assert.assertThat;
  */
 @RunWith(AlchemyTestRunner.class)
 @Repeat
-public class StateJsonTest
+public class OperationResultTest
 {
-    @GenerateEnum
-    private State state;
+    @GenerateString
+    private String message;
 
-    private StateJson instance;
+    @GenerateBoolean
+    private Boolean result;
+
+    private OperationResult instance;
 
     @Before
     public void setUp() throws Exception
     {
-        instance = new StateJson(state);
+        instance = new OperationResult(message, result);
     }
 
     @Test
-    public void asJson() throws Exception
+    public void testAsJson() throws Exception
     {
         JsonObject result = instance.asJson();
-        assertThat(result, notNullValue());
+        assertThat(result, Matchers.notNullValue());
 
-        String stateId = result.get(StateJson.Keys.STATE_ID).getAsString();
-        String stateName = result.get(StateJson.Keys.STATE_NAME).getAsString();
+        String messageResult = result.get(OperationResult.Keys.MESSAGE).getAsString();
+        boolean successResult = result.get(OperationResult.Keys.SUCCESS).getAsBoolean();
 
-        assertThat(stateId, not(isEmptyOrNullString()));
-        assertThat(stateName, not(isEmptyOrNullString()));
+        assertThat(messageResult, not(isEmptyOrNullString()));
 
-        assertThat(stateId, is(state.getAbbreviation().toString()));
-        assertThat(stateName, is(state.getTitleCased()));
+        assertThat(messageResult, is(this.message));
+        assertThat(successResult, is(this.result));
     }
 
 }

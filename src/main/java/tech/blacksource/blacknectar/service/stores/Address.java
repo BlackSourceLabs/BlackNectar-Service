@@ -38,7 +38,6 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.stringWithLength;
 
 /**
- *
  * @author SirWellington
  */
 @Pojo
@@ -53,14 +52,18 @@ public final class Address implements JSONRepresentable
     private final String city;
     private final String state;
     private final String county;
-    /** This is the 5-part zip code. For example, 93013. */
+    /**
+     * This is the 5-part zip code. For example, 93013.
+     */
     private final String zipCode;
-    /** This is the local 4-part zip code. For example 0351. */
+    /**
+     * This is the local 4-part zip code. For example 0351.
+     */
     private final String localZipCode;
 
     private final JsonObject json;
 
-    
+
     Address(String addressLineOne,
             String addressLineTwo,
             String city,
@@ -85,27 +88,27 @@ public final class Address implements JSONRepresentable
         return a ->
         {
             checkThat(a)
-                .usingMessage("Address was null")
-                .is(notNull());
+                    .usingMessage("Address was null")
+                    .is(notNull());
 
             checkThat(a.addressLineOne)
-                .usingMessage("Address Line 1 cannot be empty")
-                .is(nonEmptyString());
+                    .usingMessage("Address Line 1 cannot be empty")
+                    .is(nonEmptyString());
 
             checkThat(a.city)
-                .usingMessage("City is missing")
-                .is(nonEmptyString());
+                    .usingMessage("City is missing")
+                    .is(nonEmptyString());
 
             checkThat(a.state)
-                .usingMessage("State is missing")
-                .is(nonEmptyString());
+                    .usingMessage("State is missing")
+                    .is(nonEmptyString());
 
             checkThat(a.county)
-                .usingMessage("Country is missing")
-                .is(nonEmptyString());
+                    .usingMessage("Country is missing")
+                    .is(nonEmptyString());
 
             checkThat(a.zipCode)
-                .is(validZipCode());
+                    .is(validZipCode());
         };
     }
 
@@ -260,8 +263,8 @@ public final class Address implements JSONRepresentable
         public Builder withAddressLineOne(@NonEmpty String addressLine) throws IllegalArgumentException
         {
             checkThat(addressLine)
-                .usingMessage("Address Line 1 cannot be empty")
-                .is(nonEmptyString());
+                    .usingMessage("Address Line 1 cannot be empty")
+                    .is(nonEmptyString());
 
             this.addressLineOne = addressLine;
             return this;
@@ -271,8 +274,8 @@ public final class Address implements JSONRepresentable
         public Builder withAddressLineTwo(@NonEmpty String addressLine) throws IllegalArgumentException
         {
             checkThat(addressLine)
-                .usingMessage("Address Line 2 should not be empty")
-                .is(nonEmptyString());
+                    .usingMessage("Address Line 2 should not be empty")
+                    .is(nonEmptyString());
 
             this.addressLineTwo = addressLine;
             return this;
@@ -281,8 +284,8 @@ public final class Address implements JSONRepresentable
         public Builder withCity(@NonEmpty String city) throws IllegalArgumentException
         {
             checkThat(city)
-                .usingMessage("City cannot be empty")
-                .are(nonEmptyString());
+                    .usingMessage("City cannot be empty")
+                    .are(nonEmptyString());
 
             this.city = city;
             return this;
@@ -291,8 +294,8 @@ public final class Address implements JSONRepresentable
         public Builder withState(@NonEmpty String state) throws IllegalArgumentException
         {
             checkThat(state)
-                .usingMessage("State cannot be empty")
-                .are(nonEmptyString());
+                    .usingMessage("State cannot be empty")
+                    .are(nonEmptyString());
 
             this.state = state;
             return this;
@@ -302,8 +305,8 @@ public final class Address implements JSONRepresentable
         public Builder withCounty(@NonEmpty String county) throws IllegalArgumentException
         {
             checkThat(county)
-                .usingMessage("County cannot be empty")
-                .are(nonEmptyString());
+                    .usingMessage("County cannot be empty")
+                    .are(nonEmptyString());
 
             this.county = county;
             return this;
@@ -312,9 +315,9 @@ public final class Address implements JSONRepresentable
         public Builder withZipCode(@NonEmpty String zipCode) throws IllegalArgumentException
         {
             checkThat(zipCode)
-                .is(validZipCode())
-                .usingMessage("zipCode must have length 5")
-                .is(stringWithLength(5));
+                    .is(validZipCode())
+                    .usingMessage("zipCode must have length 5")
+                    .is(stringWithLength(5));
 
             this.zipCode = zipCode;
             return this;
@@ -324,9 +327,9 @@ public final class Address implements JSONRepresentable
         public Builder withLocalZipCode(@NonEmpty String localZipCode) throws IllegalArgumentException
         {
             checkThat(localZipCode)
-                .is(validZipCode())
-                .usingMessage("localZipCode must have length 4")
-                .is(stringWithLength(4));
+                    .is(validZipCode())
+                    .usingMessage("localZipCode must have length 4")
+                    .is(stringWithLength(4));
 
             this.localZip = localZipCode;
             return this;
@@ -335,14 +338,14 @@ public final class Address implements JSONRepresentable
         public Address build() throws IllegalStateException
         {
             checkThat(addressLineOne, city, state, county)
-                .throwing(IllegalStateException.class)
-                .usingMessage("Required information missing")
-                .are(notNull())
-                .are(nonEmptyString());
+                    .throwing(IllegalStateException.class)
+                    .usingMessage("Required information missing")
+                    .are(notNull())
+                    .are(nonEmptyString());
 
             checkThat(zipCode)
-                .throwing(IllegalStateException.class)
-                .is(validZipCode());
+                    .throwing(IllegalStateException.class)
+                    .is(validZipCode());
 
             Address address = new Address(this.addressLineOne,
                                           this.addressLineTwo,

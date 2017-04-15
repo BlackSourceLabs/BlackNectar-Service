@@ -1,32 +1,32 @@
- /*
-  * Copyright 2017 BlackSource, LLC.
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License");
-  * you may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at
-  *
-  *      http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  */
+/*
+ * Copyright 2017 BlackSource, LLC.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package tech.blacksource.blacknectar.service.stores;
 
- import com.google.gson.JsonObject;
- import tech.sirwellington.alchemy.annotations.access.Internal;
- import tech.sirwellington.alchemy.annotations.concurrency.Immutable;
- import tech.sirwellington.alchemy.annotations.concurrency.ThreadSafe;
- import tech.sirwellington.alchemy.annotations.objects.Pojo;
- import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
+import com.google.gson.JsonObject;
+import tech.sirwellington.alchemy.annotations.access.Internal;
+import tech.sirwellington.alchemy.annotations.concurrency.Immutable;
+import tech.sirwellington.alchemy.annotations.concurrency.ThreadSafe;
+import tech.sirwellington.alchemy.annotations.objects.Pojo;
+import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 
- import static tech.sirwellington.alchemy.arguments.Arguments.*;
- import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
- import static tech.sirwellington.alchemy.arguments.assertions.GeolocationAssertions.validLatitude;
- import static tech.sirwellington.alchemy.arguments.assertions.GeolocationAssertions.validLongitude;
+import static tech.sirwellington.alchemy.arguments.Arguments.*;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+import static tech.sirwellington.alchemy.arguments.assertions.GeolocationAssertions.validLatitude;
+import static tech.sirwellington.alchemy.arguments.assertions.GeolocationAssertions.validLongitude;
 
 /**
  * A {@link Location} represents a Global Geo-Coordinate.
@@ -38,7 +38,7 @@ package tech.blacksource.blacknectar.service.stores;
 @ThreadSafe
 public final class Location implements JSONRepresentable
 {
-    
+
     private final double latitude;
     private final double longitude;
     private final JsonObject json;
@@ -47,35 +47,35 @@ public final class Location implements JSONRepresentable
     {
         this(0, 0);
     }
-    
+
     public Location(double latitude, double longitude)
     {
         checkThat(latitude).is(validLatitude());
         checkThat(longitude).is(validLongitude());
-        
+
         this.latitude = latitude;
         this.longitude = longitude;
         this.json = createJSON();
     }
-    
+
     public static Location with(double latitude, double longitude)
     {
         return new Location(latitude, longitude);
     }
-    
+
     public static AlchemyAssertion<Location> validLocation()
     {
         return location ->
         {
             checkThat(location)
-                .usingMessage("Location cannot be null")
-                .is(notNull());
-            
+                    .usingMessage("Location cannot be null")
+                    .is(notNull());
+
             checkThat(location.latitude).is(validLatitude());
             checkThat(location.longitude).is(validLongitude());
         };
     }
-    
+
     @Override
     public JsonObject asJSON()
     {
@@ -100,7 +100,7 @@ public final class Location implements JSONRepresentable
         hash = 89 * hash + (int) (Double.doubleToLongBits(this.longitude) ^ (Double.doubleToLongBits(this.longitude) >>> 32));
         return hash;
     }
-    
+
     @Override
     public boolean equals(Object obj)
     {
@@ -123,7 +123,7 @@ public final class Location implements JSONRepresentable
         }
         return Double.doubleToLongBits(this.longitude) == Double.doubleToLongBits(other.longitude);
     }
-    
+
     @Override
     public String toString()
     {
@@ -136,10 +136,10 @@ public final class Location implements JSONRepresentable
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty(Keys.LATITUDE, latitude);
         jsonObject.addProperty(Keys.LONGITUDE, longitude);
-        
+
         return jsonObject;
     }
-    
+
     static class Keys
     {
         static final String LATITUDE = "latitude";

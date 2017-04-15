@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- 
+
 package tech.blacksource.blacknectar.service.stores;
 
 
@@ -23,10 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
  * @author SirWellington
  */
-public final class ModuleStores extends AbstractModule 
+public final class ModuleStores extends AbstractModule
 {
     private final static Logger LOG = LoggerFactory.getLogger(ModuleStores.class);
 

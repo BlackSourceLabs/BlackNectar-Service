@@ -20,7 +20,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -251,7 +250,6 @@ final class SQLStoreRepository implements StoreRepository
         {
             return "SELECT * FROM Stores " +
                    "LIMIT " + limit;
-                    "LIMIT " + limit;
         }
     }
 

@@ -1,5 +1,6 @@
 package tech.blacksource.blacknectar.service.json;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.ImplementedBy;
 import tech.aroma.client.Aroma;
@@ -44,9 +45,24 @@ public interface EBTJsonSerializer
     @Optional
     FieldValue deserializeFieldValue(@NonEmpty String json) throws BlackNectarAPIException;
 
+    static EBTJsonSerializer newInstance()
+    {
+        return newInstance(Aroma.createNoOpInstance(), JSON.GSON);
+    }
+
+    static EBTJsonSerializer newInstance(@Required Gson gson)
+    {
+        return newInstance(Aroma.createNoOpInstance(), gson);
+    }
+
     static EBTJsonSerializer newInstance(@Required Aroma aroma)
     {
-        return new EBTJsonSerializerImpl();
+        return newInstance(aroma, JSON.GSON);
+    }
+
+    static EBTJsonSerializer newInstance(@Required Aroma aroma, @Required Gson gson)
+    {
+        return new EBTJsonSerializerImpl(aroma, gson);
     }
 
 }

@@ -30,6 +30,8 @@ import tech.sirwellington.alchemy.test.junit.runners.*;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 
@@ -50,6 +52,8 @@ public class EBTJsonSerializerImplTest
 
     private Field field;
 
+    private FieldValue fieldValue;
+
     private EBTJsonSerializerImpl instance;
 
     @Before
@@ -66,6 +70,8 @@ public class EBTJsonSerializerImplTest
     private void setupData() throws Exception
     {
         this.field = Lists.oneOf(California.Fields.INSTANCE.getAll());
+
+        this.fieldValue = new FieldValue(this.field, one(alphabeticString()));
     }
 
     private void setupMocks() throws Exception
@@ -130,5 +136,40 @@ public class EBTJsonSerializerImplTest
     {
         assertThrows(() -> instance.deserializeField("")).isInstanceOf(IllegalArgumentException.class);
         assertThrows(() -> instance.deserializeField(null)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void testSerializeFieldValue() throws Exception
+    {
+        JsonObject result = instance.serializeFieldValue(fieldValue);
+        JsonObject expected = gson.toJsonTree(fieldValue).getAsJsonObject();
+
+        assertThat(result, is(expected));
+    }
+
+
+    @Test
+    public void testSerializedFieldValueWithBadArgs() throws Exception
+    {
+        assertThrows(() -> instance.serializeFieldValue((null))).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void testDeserializeFieldValue() throws Exception
+    {
+        JsonObject json = instance.serializeFieldValue(fieldValue);
+        String jsonString = gson.toJson(json);
+
+        FieldValue result = instance.deserializeFieldValue(jsonString);
+        assertThat(result, notNullValue());
+        assertThat(result, is(fieldValue));
+    }
+
+    @DontRepeat
+    @Test
+    public void testDeserializeFieldValueWithBadArgs() throws Exception
+    {
+        assertThrows(() -> instance.deserializeFieldValue("")).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(() -> instance.deserializeFieldValue(null)).isInstanceOf(IllegalArgumentException.class);
     }
 }

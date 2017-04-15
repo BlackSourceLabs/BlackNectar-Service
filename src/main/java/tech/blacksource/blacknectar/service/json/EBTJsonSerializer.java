@@ -36,6 +36,25 @@ public interface EBTJsonSerializer
     JsonObject serializeField(@Required Field field) throws BlackNectarAPIException;
 
     /**
+     * Attempts to deserialize the JSON String into a {@link Field}.
+     *
+     * @param json The json to parse. Cannot be empty.
+     * @return The corresponding {@link Field}, or null if it cannot be parsed.
+     * @throws BlackNectarAPIException
+     */
+    @Optional
+    Field deserializeField(@NonEmpty String json) throws BlackNectarAPIException;
+
+    /**
+     * Serializes a {@link FieldValue} into a JSON Object.
+     *
+     * @param fieldValue The fieldValue to serialize
+     * @return A {@link JsonObject} representing the field.
+     * @throws BlackNectarAPIException
+     */
+    JsonObject serializeFieldValue(@Required FieldValue fieldValue) throws BlackNectarAPIException;
+
+    /**
      * Attempts to deserialize the JSON String into a {@link FieldValue}.
      *
      * @param json The json to parse. Cannot be empty.
@@ -43,7 +62,7 @@ public interface EBTJsonSerializer
      * @throws BlackNectarAPIException
      */
     @Optional
-    Field deserializeField(@NonEmpty String json) throws BlackNectarAPIException;
+    FieldValue deserializeFieldValue(@NonEmpty String json) throws BlackNectarAPIException;
 
     static EBTJsonSerializer newInstance()
     {

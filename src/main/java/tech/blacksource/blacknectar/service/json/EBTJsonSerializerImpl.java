@@ -16,6 +16,7 @@
  */
 package tech.blacksource.blacknectar.service.json;
 
+import java.util.Objects;
 import javax.inject.Inject;
 
 import com.google.gson.*;
@@ -83,7 +84,9 @@ final class EBTJsonSerializerImpl implements EBTJsonSerializer
     @Override
     public Field deserializeField(String json) throws BlackNectarAPIException
     {
-        checkThat(json).is(nonEmptyString());
+        checkThat(json)
+                .usingMessage("json cannot be missing")
+                .is(nonEmptyString());
 
         JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
 
@@ -96,10 +99,53 @@ final class EBTJsonSerializerImpl implements EBTJsonSerializer
 
         if (result == null)
         {
+            makeNoteThatCouldNotExtractFieldFrom(jsonObject);
+        }
+
+        return result;
+    }
+
+    @Override
+    public JsonObject serializeFieldValue(FieldValue fieldValue) throws BlackNectarAPIException
+    {
+        checkThat(fieldValue).is(notNull());
+
+        JsonElement result = gson.toJsonTree(fieldValue);
+
+        if (!result.isJsonObject())
+        {
+            throw new OperationFailedException("Could not serialize: " + fieldValue);
+        }
+
+        return result.getAsJsonObject();
+    }
+
+    @Override
+    public FieldValue deserializeFieldValue(String json) throws BlackNectarAPIException
+    {
+        checkThat(json)
+                .usingMessage("json cannot be missing")
+                .is(nonEmptyString());
+
+        JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
+
+        checkThat(jsonObject).is(notNull());
+
+        FieldValue result = gson.fromJson(jsonObject, FieldValue.class);
+
+        if (Objects.isNull(result))
+        {
             makeNoteThatCouldNotExtractFieldValueFrom(jsonObject);
         }
 
         return result;
+    }
+
+    private void makeNoteThatCouldNotExtractFieldFrom(JsonObject jsonObject)
+    {
+        String message = "Could not extract Field from JSON: {}";
+        LOG.warn(message, jsonObject);
+        aroma.sendMediumPriorityMessage("Json Parse Failed", message, jsonObject);
     }
 
     private void makeNoteThatCouldNotExtractFieldValueFrom(JsonObject jsonObject)

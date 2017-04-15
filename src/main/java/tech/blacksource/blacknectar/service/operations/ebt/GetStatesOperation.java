@@ -50,7 +50,7 @@ public class GetStatesOperation implements Route
     GetStatesOperation(Aroma aroma, EBTJsonSerializer jsonSerializer, StateWebsiteFactory stateWebsites)
     {
         checkThat(aroma, jsonSerializer, stateWebsites)
-            .are(notNull());
+                .are(notNull());
 
         this.aroma = aroma;
         this.jsonSerializer = jsonSerializer;
@@ -61,8 +61,8 @@ public class GetStatesOperation implements Route
     public JsonArray handle(Request request, Response response) throws Exception
     {
         checkThat(request, response)
-            .throwing(BadArgumentException.class)
-            .are(notNull());
+                .throwing(BadArgumentException.class)
+                .are(notNull());
 
         response.type(MediaTypes.APPLICATION_JSON);
 
@@ -70,18 +70,18 @@ public class GetStatesOperation implements Route
                                          .stream()
                                          .map(jsonSerializer::serializeState)
                                          .collect(JSON.collectArray());
-        
+
         makeNoteOfResults(request, results);
-        
+
         return results;
     }
 
     private void makeNoteOfResults(Request request, JsonArray results)
     {
         String message = "Found {} states for request {} from IP [{}]";
-        
+
         LOG.debug(message, results.size(), request, request.ip());
-        
+
         aroma.sendLowPriorityMessage("Get States Called", message, results.size(), request, request.ip());
     }
 

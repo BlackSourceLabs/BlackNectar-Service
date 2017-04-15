@@ -39,30 +39,29 @@ import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(50)
 @RunWith(AlchemyTestRunner.class)
-public class RunStoreTransformationTest 
+public class RunStoreTransformationTest
 {
     @Mock(answer = RETURNS_MOCKS)
     private Aroma aroma;
-    
+
     @Mock
     private StoreTransformation transformation;
-    
+
     @Mock
     private StoreRepository repository;
-    
+
     private List<Store> stores;
 
     private RunStoreTransformation instance;
-    
+
     @Before
     public void setUp() throws Exception
     {
-        
+
         setupData();
         setupMocks();
         instance = new RunStoreTransformation(aroma, repository, transformation);
@@ -92,32 +91,32 @@ public class RunStoreTransformationTest
     public void testWhenNoUpdatesNeedToHappen() throws Exception
     {
         when(transformation.apply(any(Store.class)))
-            .then(MoreAnswers.returnFirst());
-        
+                .then(MoreAnswers.returnFirst());
+
         instance.call();
-            
+
         verify(repository, never()).updateStore(any());
     }
-    
+
     @Test
     public void testStoresAreUpdated() throws Exception
     {
-        Map<Store,Store> transformations = Maps.create();
-        
-        for (Store store: stores)
+        Map<Store, Store> transformations = Maps.create();
+
+        for (Store store : stores)
         {
             Store transformedStore = one(stores());
-            
+
             when(transformation.apply(store)).thenReturn(transformedStore);
             transformations.put(store, transformedStore);
         }
-        
+
         instance.call();
-            
+
         for (Store store : stores)
         {
             Store transformedStore = transformations.get(store);
-            
+
             verify(repository).updateStore(transformedStore);
         }
     }

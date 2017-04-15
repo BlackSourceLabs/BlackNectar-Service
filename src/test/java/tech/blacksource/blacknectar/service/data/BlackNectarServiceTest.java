@@ -27,20 +27,19 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 /**
- *
  * @author SirWellington
  */
 @RunWith(AlchemyTestRunner.class)
-public class BlackNectarServiceTest 
+public class BlackNectarServiceTest
 {
-    
+
     @Mock
     private JdbcTemplate database;
-    
+
     @Before
     public void setUp() throws Exception
     {
-        
+
         setupData();
         setupMocks();
     }
@@ -48,13 +47,14 @@ public class BlackNectarServiceTest
 
     private void setupData() throws Exception
     {
-        
+
     }
 
     private void setupMocks() throws Exception
     {
-        
+
     }
+
     @Test
     public void testNewMemoryService()
     {

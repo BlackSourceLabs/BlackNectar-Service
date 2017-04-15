@@ -8,22 +8,34 @@ package tech.blacksource.blacknectar.service.exceptions;
  */
 public final class UnsupportedStateException extends BlackNectarAPIException
 {
+    private final String state;
+
     public UnsupportedStateException()
     {
+        this.state = "";
     }
 
-    public UnsupportedStateException(String message)
+    public UnsupportedStateException(String state)
+    {
+        super(state);
+        this.state = state;
+    }
+
+    public UnsupportedStateException(String message, String state)
     {
         super(message);
+        this.state = state;
     }
 
-    public UnsupportedStateException(String message, Throwable cause)
+    public UnsupportedStateException(String message, Throwable cause, String state)
     {
         super(message, cause);
+        this.state = state;
     }
 
-    public UnsupportedStateException(Throwable cause)
+    public UnsupportedStateException(Throwable cause, String state)
     {
         super(cause);
+        this.state = state;
     }
 }

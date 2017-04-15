@@ -42,7 +42,7 @@ public class GetStatesOperation implements Route
 
     private final static Logger LOG = LoggerFactory.getLogger(GetStatesOperation.class);
 
-    private Aroma aroma;
+    private final Aroma aroma;
     private final EBTJsonSerializer jsonSerializer;
     private final StateWebsiteFactory stateWebsites;
 

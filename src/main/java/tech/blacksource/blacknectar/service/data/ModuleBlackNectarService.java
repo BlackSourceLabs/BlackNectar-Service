@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- 
+
 package tech.blacksource.blacknectar.service.data;
 
 
@@ -25,7 +25,6 @@ import tech.blacksource.blacknectar.service.images.ImageRepository;
 import tech.blacksource.blacknectar.service.stores.StoreDataSource;
 
 /**
- *
  * @author SirWellington
  */
 public final class ModuleBlackNectarService extends AbstractModule

@@ -23,7 +23,6 @@ import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 /**
- *
  * @author SirWellington
  */
 @Internal

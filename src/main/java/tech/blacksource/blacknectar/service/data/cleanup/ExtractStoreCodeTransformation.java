@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- 
+
 package tech.blacksource.blacknectar.service.data.cleanup;
 
 
@@ -27,10 +27,9 @@ import sir.wellington.alchemy.collections.lists.Lists;
 import tech.blacksource.blacknectar.service.stores.Store;
 
 /**
- *
  * @author SirWellington
  */
-public final class ExtractStoreCodeTransformation implements StoreTransformation 
+public final class ExtractStoreCodeTransformation implements StoreTransformation
 {
     //^"[\w'\-\./ ]+ [\w\-\#]{0,2}[\d]+[A-Za-z]?"
     private final static Logger LOG = LoggerFactory.getLogger(ExtractStoreCodeTransformation.class);
@@ -43,18 +42,21 @@ public final class ExtractStoreCodeTransformation implements StoreTransformation
         {
             return store;
         }
-        
+
         String storeName = store.getName();
         List<String> tokens = tokenize(storeName);
         String lastToken = Lists.last(tokens);
-       
+
         if (isStoreCode(lastToken))
         {
             List<String> storeNameTokens = Lists.copy(tokens);
             String storeCode = Lists.removeLast(storeNameTokens);
             String cleanedName = String.join(" ", storeNameTokens);
-            
-            return Store.Builder.fromStore(store).withName(cleanedName).withStoreCode(storeCode).build();
+
+            return Store.Builder.fromStore(store)
+                                .withName(cleanedName)
+                                .withStoreCode(storeCode)
+                                .build();
         }
         else
         {
@@ -66,12 +68,12 @@ public final class ExtractStoreCodeTransformation implements StoreTransformation
     {
         StringTokenizer tokenizer = new StringTokenizer(string, " ");
         List<String> tokens = Lists.create();
-        
+
         while (tokenizer.hasMoreTokens())
         {
             tokens.add(tokenizer.nextToken());
         }
-        
+
         return tokens;
     }
 

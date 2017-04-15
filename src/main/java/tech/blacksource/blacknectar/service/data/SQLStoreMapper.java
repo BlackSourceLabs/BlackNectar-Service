@@ -46,27 +46,26 @@ interface SQLStoreMapper extends RowMapper<Store>
      * @param results The SQLTools Row to read.
      * @param rowNum
      * @return A {@link Store} representation of the data, or null if it could not be extracted properly.
-     *
      * @throws SQLException
      */
     @Override
     Store mapRow(ResultSet results, int rowNum) throws SQLException;
-    
+
     SQLStoreMapper INSTANCE = new Impl(new SQLTools.Impl());
-    
+
     class Impl implements SQLStoreMapper
     {
-        
+
         private final SQLTools sqlTools;
-        
+
         @Inject
         Impl(SQLTools sqlTools)
         {
             checkThat(sqlTools).is(notNull());
-            
+
             this.sqlTools = sqlTools;
         }
-        
+
         @Override
         public Store mapRow(ResultSet results, int rowNum) throws SQLException
         {
@@ -79,13 +78,13 @@ interface SQLStoreMapper extends RowMapper<Store>
             {
                 latitude = null;
             }
-            
+
             Double longitude = results.getDouble(SQLColumns.LONGITUDE);
             if (results.wasNull())
             {
                 longitude = null;
             }
-            
+
             UUID storeId = results.getObject(SQLColumns.STORE_ID, UUID.class);
             String address = results.getString(SQLColumns.ADDRESS_LINE_ONE);
             String addressTwo = results.getString(SQLColumns.ADDRESS_LINE_TWO);
@@ -97,66 +96,66 @@ interface SQLStoreMapper extends RowMapper<Store>
 
             //Use the data to start creating a Store object, piece by piece
             Address.Builder addressBuilder = Address.Builder.newBuilder()
-                .withAddressLineOne(address)
-                .withCity(city)
-                .withState(state)
-                .withZipCode(zipCode);
-            
+                                                            .withAddressLineOne(address)
+                                                            .withCity(city)
+                                                            .withState(state)
+                                                            .withZipCode(zipCode);
+
             if (!isNullOrEmpty(county))
             {
                 addressBuilder.withCounty(county);
             }
-            
+
             if (!isNullOrEmpty(addressTwo))
             {
                 addressBuilder.withAddressLineTwo(addressTwo);
             }
-            
+
             if (!isNullOrEmpty(localZip))
             {
                 addressBuilder.withLocalZipCode(localZip);
             }
-            
+
             Store.Builder storeBuilder = Store.Builder.newInstance()
-                .withStoreID(storeId)
-                .withAddress(addressBuilder.build())
-                .withName(name);
-            
+                                                      .withStoreID(storeId)
+                                                      .withAddress(addressBuilder.build())
+                                                      .withName(name);
+
             if (latitude != null && longitude != null)
             {
                 Location location = Location.with(latitude, longitude);
                 storeBuilder.withLocation(location);
             }
-            
+
             if (sqlTools.hasColumn(results, SQLColumns.Images.URL))
             {
                 String url = results.getString(SQLColumns.Images.URL);
-                
+
                 if (!isNullOrEmpty(url))
                 {
                     storeBuilder.withMainImageURL(url);
                 }
             }
-            
+
             if (sqlTools.hasColumn(results, SQLColumns.STORE_CODE))
             {
                 String storeCode = results.getString(SQLColumns.STORE_CODE);
-                
+
                 if (!isNullOrEmpty(storeCode))
                 {
                     storeBuilder = storeBuilder.withStoreCode(storeCode);
                 }
             }
-            
+
             if (sqlTools.hasColumn(results, SQLColumns.IS_FARMERS_MARKET))
             {
                 boolean isFarmersMarket = results.getBoolean(SQLColumns.IS_FARMERS_MARKET);
                 storeBuilder.isFarmersMarket(isFarmersMarket);
             }
-            
+
             return storeBuilder.build();
         }
-        
+
     }
-    
+
 }

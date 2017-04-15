@@ -19,18 +19,17 @@ package tech.blacksource.blacknectar.service.data;
 import tech.sirwellington.alchemy.annotations.access.NonInstantiable;
 
 /**
- *
  * @author SirWellington
  */
 @NonInstantiable
 public final class SQLColumns
 {
-    
+
     SQLColumns() throws IllegalAccessException
     {
         throw new IllegalAccessException("cannot instantiate");
     }
-    
+
     static final String STORE_ID = "store_id";
     static final String STORE_NAME = "store_name";
     static final String STORE_CODE = "store_code";
@@ -44,9 +43,9 @@ public final class SQLColumns
     static final String ZIP_CODE = "zip_code";
     static final String LOCAL_ZIP_CODE = "local_zip_code";
     static final String IS_FARMERS_MARKET = "is_farmers_market";
-    
-    
-    public static class Images 
+
+
+    public static class Images
     {
         public static final String IMAGE_ID = "image_id";
         public static final String STORE_ID = "store_Id";

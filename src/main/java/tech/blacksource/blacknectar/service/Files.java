@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- 
+
 package tech.blacksource.blacknectar.service;
 
 
@@ -26,18 +26,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
  * @author SirWellington
  */
-class Files 
+class Files
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(Files.class);
 
     /**
      * Reads the specified file into a String
+     *
      * @param filename The path of the file to read.
-     * @return 
+     * @return
      */
     static String readFile(String filename)
     {

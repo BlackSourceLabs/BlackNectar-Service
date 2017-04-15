@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- 
+
 package tech.blacksource.blacknectar.service.exceptions;
 
 
@@ -35,7 +35,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
 
 /**
  * Handles Exceptions and reports them to {@link Aroma}.
- * 
+ *
  * @author SirWellington
  */
 public final class BlackNectarExceptionHandler implements ExceptionHandler
@@ -43,7 +43,7 @@ public final class BlackNectarExceptionHandler implements ExceptionHandler
     private final static Logger LOG = LoggerFactory.getLogger(BlackNectarExceptionHandler.class);
     private static final int BAD_ARGUMENT = 400;
     private static final int INTERNAL_ERROR = 500;
-    
+
     private final Aroma aroma;
 
     @Inject
@@ -61,56 +61,56 @@ public final class BlackNectarExceptionHandler implements ExceptionHandler
             LOG.warn("ExceptionMapper received null exception");
             return;
         }
-        
+
         String ip = request.ip();
         ip = Strings.nullToEmpty(ip);
-        
+
         if (ex instanceof BadArgumentException || ex instanceof FailedAssertionException)
         {
             LOG.error("Received BadArgumentException");
-            
+
             aroma.begin().titled("Received Bad Argument")
-                .withBody("From IP: [{}] | {}", ip, ex)
-                .withPriority(Priority.MEDIUM)
-                .send();
-            
+                 .withBody("From IP: [{}] | {}", ip, ex)
+                 .withPriority(Priority.MEDIUM)
+                 .send();
+
             response.status(BAD_ARGUMENT);
         }
         else if (ex instanceof BlackNectarAPIException)
         {
             LOG.error("Internal Operation failed", ex);
-            
+
             aroma.begin().titled("Operation Failed")
-                .withBody("From IP [{}] | {}", ip, ex)
-                .withPriority(Priority.HIGH)
-                .send();
-            
+                 .withBody("From IP [{}] | {}", ip, ex)
+                 .withPriority(Priority.HIGH)
+                 .send();
+
             response.status(((BlackNectarAPIException) ex).getStatusCode());
         }
         else if (ex instanceof YelpException)
         {
             LOG.error("Failed to make Yelp API Call", ex);
-            
+
             aroma.begin()
-                .titled("Yelp API Call Failed")
-                .withBody("Failed to make Yelp API Call from request: {}", request, ex)
-                .withPriority(Priority.HIGH)
-                .send();
-            
+                 .titled("Yelp API Call Failed")
+                 .withBody("Failed to make Yelp API Call from request: {}", request, ex)
+                 .withPriority(Priority.HIGH)
+                 .send();
+
             response.status(INTERNAL_ERROR);
         }
         else
         {
             LOG.error("Unexpected Exception", ex);
-            
+
             aroma.begin().titled("Operation Failed")
-                .withBody("Unexpected Exception occured From IP: [{}] | {}", ip, ex)
-                .withPriority(Priority.HIGH)
-                .send();
-            
+                 .withBody("Unexpected Exception occured From IP: [{}] | {}", ip, ex)
+                 .withPriority(Priority.HIGH)
+                 .send();
+
             response.status(INTERNAL_ERROR);
         }
-        
+
         response.type("text/plain");
         response.body(ex.getMessage());
     }

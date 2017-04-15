@@ -36,12 +36,12 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.v
 
 /**
  * The StoreRepository serves as the Backbone for the REST API.
- * 
+ * <p>
  * It allows for querying EBT stores by name and location.
- * 
+ *
  * @author SirWellington
  */
-public interface StoreRepository 
+public interface StoreRepository
 {
     /**
      * The default radius, in meters, used in queries where a radius is not provided.
@@ -49,63 +49,61 @@ public interface StoreRepository
      * A little more than 8 miles.
      */
     double DEFAULT_RADIUS_METERS = 13_000;
-    
+
     /**
      * Adds a Store to the repository.
-     * 
+     *
      * @param store The store to add.
      * @throws BadArgumentException If the argument is null or invalid.
      */
     void addStore(@Required Store store) throws BlackNectarAPIException;
-    
+
     /**
      * Checks whether the repository contains a Store with the specified Store ID.
-     * 
+     *
      * @param storeId The ID of the store to check. Must be a valid UUID.
      * @return
-     * @throws BlackNectarAPIException 
+     * @throws BlackNectarAPIException
      */
     boolean containsStore(@NonEmpty String storeId) throws BlackNectarAPIException;
 
     /**
      * Get all of the EBT stores in the country.
-     * 
-     * @return  All of the Stores.
+     *
+     * @return All of the Stores.
      */
     default List<Store> getAllStores() throws BlackNectarAPIException
     {
         return getAllStores(0);
     }
-    
+
     /**
      * Get all of the EBT stores, with a specified limit.
-     * 
+     *
      * @param limit A limit on the query, so that no more than {@code limit} stores are returned. Must be {@code >= 0}. A value of 0 means
      *              no limit.
-     *
-     * @return 
+     * @return
      */
     List<Store> getAllStores(int limit) throws BlackNectarAPIException;
-    
+
     /**
      * Searches for stores that match the given criteria.
-     * 
+     *
      * @param request
      * @return
-     * 
-     * @throws OperationFailedException 
+     * @throws OperationFailedException
      */
     List<Store> searchForStores(@Required BlackNectarSearchRequest request) throws BlackNectarAPIException;
-    
+
     /**
      * Unlike {@link #addStore(tech.blacksource.blacknectar.service.stores.Store) }, this operation is for
      * updating an existing {@link Store} with new information.
-     * 
+     *
      * @param store Cannot be empty.
-     * @throws BlackNectarAPIException 
+     * @throws BlackNectarAPIException
      */
     void updateStore(@Required Store store) throws BlackNectarAPIException;
-    
+
     /**
      * Deletes a Store from the repository. This is a convenience method for {@link #deleteStore(java.lang.String) }.
      *
@@ -115,17 +113,17 @@ public interface StoreRepository
     default void deleteStore(@Required Store store) throws BlackNectarAPIException
     {
         checkThat(store)
-            .throwing(BadArgumentException.class)
-            .is(notNull());
+                .throwing(BadArgumentException.class)
+                .is(notNull());
 
         String storeId = store.getStoreId();
 
         checkThat(storeId)
-            .throwing(BadArgumentException.class)
-            .usingMessage("missing storeId")
-            .is(nonEmptyString())
-            .usingMessage("invalid storeId")
-            .is(validUUID());
+                .throwing(BadArgumentException.class)
+                .usingMessage("missing storeId")
+                .is(nonEmptyString())
+                .usingMessage("invalid storeId")
+                .is(validUUID());
 
         this.deleteStore(storeId);
     }
@@ -142,8 +140,8 @@ public interface StoreRepository
      * Creates a new in-memory service that performs all operations in-memory.
      * <p>
      * Note that to start, the memory service included is empty.
-     * 
-     * @return 
+     *
+     * @return
      */
     static StoreRepository newMemoryService()
     {
@@ -153,31 +151,27 @@ public interface StoreRepository
         return new MemoryStoreRepository(stores, formula);
     }
 
-    
+
     /**
-     * Creates a new SQL-backed Service that performs all operations against 
+     * Creates a new SQL-backed Service that performs all operations against
      * a JDBC connection.
-     * 
+     *
      * @param database The {@linkplain JdbcTemplate JDBC connection} , must be open.
-     * 
      * @return
-     * 
-     * @throws SQLException 
+     * @throws SQLException
      */
     static StoreRepository newSQLService(@Required JdbcTemplate database) throws SQLException
     {
         return newSQLService(Aroma.createNoOpInstance(), database);
     }
-    
+
     /**
-     * Creates a new SQL-backed Service that performs all operations against 
+     * Creates a new SQL-backed Service that performs all operations against
      * a JDBC connection.
-     * 
+     *
      * @param aroma
      * @param database The {@linkplain JdbcTemplate JDBC connection} , must be open.
-     * 
      * @return
-     *
      * @throws SQLException
      */
     static StoreRepository newSQLService(@Required Aroma aroma,

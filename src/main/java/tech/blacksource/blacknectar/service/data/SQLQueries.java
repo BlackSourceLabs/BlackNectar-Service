@@ -67,13 +67,13 @@ public final class SQLQueries
     public static final String QUERY_STORES_WITH_LOCATION = loadQuery("query_stores_with_location.sql");
     public static final String QUERY_STORES_WITH_NAME = loadQuery("query_stores_with_name.sql");
     public static final String QUERY_STORES_WITH_ZIPCODE = loadQuery("query_stores_with_zipcode.sql");
-    
+
     public static final String QUERY_STORES_WITH_NAME_AND_LOCATION = loadQuery("query_stores_with_name_and_location.sql");
     public static final String QUERY_STORES_WITH_NAME_AND_ZIPCODE = loadQuery("query_stores_with_name_and_zipcode.sql");
-    
+
     public static final String QUERY_IMAGE = loadQuery("query_image.sql");
     public static final String QUERY_IMAGES_FOR_STORE = loadQuery("query_images_for_store.sql");
-    
+
     //Updates
     public static final String UPDATE_STORE = loadQuery("update_store.sql");
 
@@ -85,7 +85,7 @@ public final class SQLQueries
     private static String loadQuery(@NonEmpty String queryName) throws RuntimeException
     {
         checkThat(queryName)
-            .is(nonEmptyString());
+                .is(nonEmptyString());
 
         String path = PATH_PREFIX + "/" + queryName;
 

@@ -58,7 +58,7 @@ interface SQLTools
         {
             checkThat(results).is(notNull());
             checkThat(expectedColumn).is(nonEmptyString());
-            
+
             ResultSetMetaData metadata = results.getMetaData();
 
             for (int i = 1; i <= metadata.getColumnCount(); ++i)

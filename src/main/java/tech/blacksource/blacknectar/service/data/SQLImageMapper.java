@@ -31,7 +31,6 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
- *
  * @author SirWellington
  */
 @ImplementedBy(SQLImageMapper.Impl.class)
@@ -59,7 +58,7 @@ public interface SQLImageMapper extends RowMapper<Image>
         Impl(SQLTools sqlTools)
         {
             checkThat(sqlTools).is(notNull());
-            
+
             this.sqlTools = sqlTools;
         }
 
@@ -73,17 +72,17 @@ public interface SQLImageMapper extends RowMapper<Image>
 
             String imageId = results.getString(SQLColumns.Images.IMAGE_ID);
             checkThat(imageId)
-                .usingMessage("results missing imageId")
-                .is(nonEmptyString());
+                    .usingMessage("results missing imageId")
+                    .is(nonEmptyString());
 
             UUID storeId = results.getObject(SQLColumns.Images.STORE_ID, UUID.class);
             checkThat(storeId)
-                .usingMessage("results missing storeId")
-                .is(notNull());
+                    .usingMessage("results missing storeId")
+                    .is(notNull());
 
             Image.Builder builder = Image.Builder.newInstance()
-                .withStoreID(storeId)
-                .withImageID(imageId);
+                                                 .withStoreID(storeId)
+                                                 .withImageID(imageId);
 
             String contentType = results.getString(SQLColumns.Images.CONTENT_TYPE);
             if (!isNullOrEmpty(contentType))

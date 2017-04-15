@@ -24,33 +24,33 @@ import tech.blacksource.blacknectar.service.ModuleServer;
 
 /**
  * Fixes issues with stores where some of them are in ALL CAPS.
- * 
+ *
  * @author SirWellington
  */
 public final class FixStoreNames
 {
-    
+
     private final static Logger LOG = LoggerFactory.getLogger(FixStoreNames.class);
-    
+
     public static void main(String[] args) throws Exception
     {
-        Injector injector = Guice.createInjector(new ModuleServer(), 
+        Injector injector = Guice.createInjector(new ModuleServer(),
                                                  new ModuleDatabaseProduction(),
                                                  new ModuleTitleCaseTransformation());
-        
+
         RunStoreTransformation instance = injector.getInstance(RunStoreTransformation.class);
-        
+
         instance.call();
     }
-    
+
     private static class ModuleTitleCaseTransformation extends AbstractModule
     {
-        
+
         @Override
         protected void configure()
         {
             bind(StoreTransformation.class).to(TitleCaseStoreNamesTransformation.class);
         }
     }
-    
+
 }

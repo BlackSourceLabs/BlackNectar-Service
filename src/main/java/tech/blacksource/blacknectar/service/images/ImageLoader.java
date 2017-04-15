@@ -29,21 +29,20 @@ import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPa
 
 
 /**
- * Image Loaders scour the Internet to find images relevant to a particular store. 
+ * Image Loaders scour the Internet to find images relevant to a particular store.
  * Each implementation has its own source and characteristics.
- * 
+ *
  * @author SirWellington
  */
 @StrategyPattern(role = INTERFACE)
-public interface ImageLoader 
+public interface ImageLoader
 {
     /**
      * Tries to find images pertaining to the store.
-     * 
+     *
      * @param store The store to search for.
      * @return A URL pointing to a relevant image, null is one cannot be found.
-     * 
-     * @throws BlackNectarAPIException 
+     * @throws BlackNectarAPIException
      */
     List<URL> getImagesFor(@Required Store store) throws BlackNectarAPIException;
 }

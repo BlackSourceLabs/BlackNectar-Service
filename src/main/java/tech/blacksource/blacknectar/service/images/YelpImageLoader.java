@@ -38,7 +38,6 @@ import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
- *
  * @author SirWellington
  */
 final class YelpImageLoader implements ImageLoader
@@ -54,7 +53,7 @@ final class YelpImageLoader implements ImageLoader
     YelpImageLoader(Aroma aroma, StoreSearchAlgorithm<YelpBusiness> searchAlgorithm, YelpAPI yelp)
     {
         checkThat(aroma, searchAlgorithm, yelp)
-            .are(notNull());
+                .are(notNull());
 
         this.aroma = aroma;
         this.searchAlgorithm = searchAlgorithm;
@@ -65,8 +64,8 @@ final class YelpImageLoader implements ImageLoader
     public List<URL> getImagesFor(Store store)
     {
         checkThat(store)
-            .is(notNull())
-            .is(validStore());
+                .is(notNull())
+                .is(validStore());
 
         String url = tryToGetAPhotoURLFor(store);
 
@@ -105,11 +104,11 @@ final class YelpImageLoader implements ImageLoader
     private void makeNoteThatURLParseFailed(String url, MalformedURLException ex)
     {
         LOG.error("Failed to parse URL: [{}]", url, ex);
-        
+
         aroma.begin().titled("URL Parse Failed")
-            .withBody("Could not parse URL: [{}]", url, ex)
-            .withPriority(Priority.LOW)
-            .send();
+             .withBody("Could not parse URL: [{}]", url, ex)
+             .withPriority(Priority.LOW)
+             .send();
     }
 
 }

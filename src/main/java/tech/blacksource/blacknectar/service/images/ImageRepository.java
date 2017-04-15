@@ -62,13 +62,13 @@ public interface ImageRepository
     default Image getImage(@NonEmpty String storeId, @NonEmpty String imageId) throws BlackNectarAPIException
     {
         checkThat(storeId)
-            .throwing(BadArgumentException.class)
-            .usingMessage("storeId is invalid")
-            .is(validUUID());
-        
+                .throwing(BadArgumentException.class)
+                .usingMessage("storeId is invalid")
+                .is(validUUID());
+
         return this.getImage(UUID.fromString(storeId), imageId);
     }
-    
+
 
     /**
      * Returns all of the images for a store.
@@ -82,43 +82,44 @@ public interface ImageRepository
     default List<Image> getImagesForStore(@NonEmpty String storeId) throws BlackNectarAPIException
     {
         checkThat(storeId)
-            .throwing(BadArgumentException.class)
-            .is(nonEmptyString())
-            .is(validUUID());
+                .throwing(BadArgumentException.class)
+                .is(nonEmptyString())
+                .is(validUUID());
 
         return getImagesForStore(UUID.fromString(storeId));
     }
 
     /**
      * Conveniences function for {@link #getImagesForStore(java.util.UUID) }.
-     * 
+     *
      * @param store
      * @return
-     * @throws BlackNectarAPIException 
+     * @throws BlackNectarAPIException
      */
     default List<Image> getImagesForStore(@Required Store store) throws BlackNectarAPIException
     {
         checkThat(store)
-            .throwing(BadArgumentException.class)
-            .is(notNull());
+                .throwing(BadArgumentException.class)
+                .is(notNull());
 
         return this.getImagesForStore(store.getStoreId());
     }
 
     /**
      * Convenience function for {@link #getImagesForStore(java.lang.String) }.
-     * 
+     *
      * @param storeId
      * @return
-     * @throws BlackNectarAPIException 
+     * @throws BlackNectarAPIException
      */
     List<Image> getImagesForStore(@NonEmpty UUID storeId) throws BlackNectarAPIException;
 
     /**
      * Checks whether the store has any pictures.
+     *
      * @param storeId
      * @return
-     * @throws BlackNectarAPIException 
+     * @throws BlackNectarAPIException
      */
     default boolean hasImages(@Required UUID storeId) throws BlackNectarAPIException
     {
@@ -130,8 +131,8 @@ public interface ImageRepository
     default boolean hasImages(@NonEmpty String storeId) throws BlackNectarAPIException
     {
         checkThat(storeId)
-            .throwing(BadArgumentException.class)
-            .is(validUUID());
+                .throwing(BadArgumentException.class)
+                .is(validUUID());
 
         return hasImages(UUID.fromString(storeId));
     }
@@ -140,7 +141,7 @@ public interface ImageRepository
     {
         UUID storeId = image.getStoreId();
         String imageId = image.getImageId();
-        
+
         deleteImage(storeId, imageId);
     }
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- 
+
 package tech.blacksource.blacknectar.service.images;
 
 
@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
  * @author SirWellington
  */
 public final class ModuleImageLoader extends AbstractModule
@@ -36,5 +35,5 @@ public final class ModuleImageLoader extends AbstractModule
         bind(ImageLoader.class).annotatedWith(Yelp.class).to(YelpImageLoader.class);
         bind(ImageLoader.class).annotatedWith(Google.class).to(GoogleImageLoader.class);
     }
-    
+
 }

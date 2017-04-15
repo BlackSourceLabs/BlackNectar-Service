@@ -38,7 +38,6 @@ import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.http.AlchemyHttp;
 
 /**
- *
  * @author SirWellington
  */
 @Internal
@@ -73,7 +72,7 @@ public final class ModuleServer extends AbstractModule
     {
         return new JdbcTemplate(dataSource, false);
     }
-    
+
     @Provides
     YelpAPI provideYelpAPI(Aroma aroma) throws Exception
     {
@@ -83,16 +82,16 @@ public final class ModuleServer extends AbstractModule
             String secret = Files.readFile("./secrets/yelp-secret.txt").trim();
 
             return YelpAPI.Builder.newInstance()
-                .withClientCredentials(cliendId, secret)
-                .withEagerAuthentication()
-                .build();
+                                  .withClientCredentials(cliendId, secret)
+                                  .withEagerAuthentication()
+                                  .build();
         }
         catch (RuntimeException ex)
         {
             aroma.begin().titled("Yelp Setup Failed")
-                .withBody("Failed to setup the Yelp API Client", ex)
-                .withPriority(Priority.HIGH)
-                .send();
+                 .withBody("Failed to setup the Yelp API Client", ex)
+                 .withPriority(Priority.HIGH)
+                 .send();
 
             return YelpAPI.NO_OP;
         }
@@ -113,9 +112,9 @@ public final class ModuleServer extends AbstractModule
             LOG.error("Failed to initialized Google Places API", ex);
 
             aroma.begin().titled("Initialization Failed")
-                .withBody("Failed to initialized Google Places API", ex)
-                .withPriority(Priority.HIGH)
-                .send();
+                 .withBody("Failed to initialized Google Places API", ex)
+                 .withPriority(Priority.HIGH)
+                 .send();
 
             return GooglePlacesAPI.NO_OP;
         }
@@ -123,13 +122,13 @@ public final class ModuleServer extends AbstractModule
 
     /**
      * Creates a connection to the built-in SQLite database.
-     * 
+     *
      * @return
-     * @throws SQLException 
+     * @throws SQLException
      */
     private Connection createSQLiteConnection() throws SQLException
     {
         return DriverManager.getConnection("jdbc:sqlite::resource:Stores.db");
     }
-   
+
 }

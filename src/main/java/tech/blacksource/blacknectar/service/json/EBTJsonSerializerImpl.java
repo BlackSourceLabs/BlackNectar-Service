@@ -35,14 +35,14 @@ final class EBTJsonSerializerImpl implements EBTJsonSerializer
     public JsonObject serializeState(State state)
     {
         checkThat(state)
-            .usingMessage("State cannot be null")
-            .is(notNull());
-        
+                .usingMessage("State cannot be null")
+                .is(notNull());
+
         final StateJson stateJson = new StateJson(state);
         final JsonObject result = stateJson.asJson();
-        
+
         LOG.debug("Serialized {} to {}", state, result);
-        
+
         return result;
     }
 }

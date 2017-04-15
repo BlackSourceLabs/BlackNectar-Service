@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- 
+
 package tech.blacksource.blacknectar.service.operations;
 
 
@@ -27,7 +27,6 @@ import tech.blacksource.blacknectar.service.operations.stores.SearchStoresOperat
 import tech.blacksource.blacknectar.service.stores.ModuleStores;
 
 /**
- *
  * @author SirWellington
  */
 public final class ModuleOperations extends AbstractModule
@@ -39,7 +38,7 @@ public final class ModuleOperations extends AbstractModule
     {
         install(new ModuleStores());
         install(new ModuleImageLoader());
-        
+
         bind(GetSampleStoreOperation.class);
         bind(SayHelloOperation.class);
         bind(SearchStoresOperation.class);

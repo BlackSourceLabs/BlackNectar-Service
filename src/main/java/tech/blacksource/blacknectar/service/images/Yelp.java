@@ -27,13 +27,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 
 /**
- *
  * @author SirWellington
  */
 @BindingAnnotation
 @Target({FIELD, PARAMETER, METHOD})
 @Retention(RUNTIME)
-public @interface Yelp 
+public @interface Yelp
 {
 
 }

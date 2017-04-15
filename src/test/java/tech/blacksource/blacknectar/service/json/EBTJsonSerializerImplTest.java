@@ -119,7 +119,7 @@ public class EBTJsonSerializerImplTest
         JsonObject json = instance.serializeField(field);
         String jsonString = gson.toJson(json);
 
-        FieldValue result = instance.deserializeFieldValue(jsonString);
+        Field result = instance.deserializeField(jsonString);
         assertThat(result, notNullValue());
         assertThat(result, is(field));
     }
@@ -128,7 +128,7 @@ public class EBTJsonSerializerImplTest
     @Test
     public void testDeserializeFieldWithBadArgs() throws Exception
     {
-        assertThrows(() -> instance.deserializeFieldValue("")).isInstanceOf(IllegalArgumentException.class);
-        assertThrows(() -> instance.deserializeFieldValue(null)).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(() -> instance.deserializeField("")).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(() -> instance.deserializeField(null)).isInstanceOf(IllegalArgumentException.class);
     }
 }

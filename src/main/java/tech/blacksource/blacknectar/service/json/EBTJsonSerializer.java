@@ -43,7 +43,7 @@ public interface EBTJsonSerializer
      * @throws BlackNectarAPIException
      */
     @Optional
-    FieldValue deserializeFieldValue(@NonEmpty String json) throws BlackNectarAPIException;
+    Field deserializeField(@NonEmpty String json) throws BlackNectarAPIException;
 
     static EBTJsonSerializer newInstance()
     {

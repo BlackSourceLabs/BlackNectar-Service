@@ -68,6 +68,7 @@ final class EBTJsonSerializerImpl implements EBTJsonSerializer
     @Override
     public JsonObject serializeField(Field field) throws BlackNectarAPIException
     {
+        checkThat(field).is(notNull());
 
         JsonElement json = gson.toJsonTree(field);
 
@@ -80,7 +81,7 @@ final class EBTJsonSerializerImpl implements EBTJsonSerializer
     }
 
     @Override
-    public FieldValue deserializeFieldValue(String json) throws BlackNectarAPIException
+    public Field deserializeField(String json) throws BlackNectarAPIException
     {
         checkThat(json).is(nonEmptyString());
 
@@ -91,7 +92,7 @@ final class EBTJsonSerializerImpl implements EBTJsonSerializer
             return null;
         }
 
-        FieldValue result = gson.fromJson(jsonObject, FieldValue.class);
+        Field result = gson.fromJson(jsonObject, Field.class);
 
         if (result == null)
         {

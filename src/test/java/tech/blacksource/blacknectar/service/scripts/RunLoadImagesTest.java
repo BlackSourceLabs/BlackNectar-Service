@@ -46,7 +46,6 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.ALPHABETIC;
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(10)
@@ -64,7 +63,7 @@ public class RunLoadImagesTest
 
     @Mock
     private AlchemyHttp http;
-    
+
     @Mock(answer = RETURNS_MOCKS)
     private Aroma aroma;
 
@@ -89,18 +88,18 @@ public class RunLoadImagesTest
     {
         stores = listOf(stores());
         images = stores.stream()
-            .collect(toMap(s -> s, s -> one(images())));
-        
+                       .collect(toMap(s -> s, s -> one(images())));
+
         urls = images.values().stream()
-            .map(Image::getUrl)
-            .collect(toList());
+                     .map(Image::getUrl)
+                     .collect(toList());
 
         arguments = RunLoadImages.Arguments.Builder.newInstance()
-            .withSleepTime(0, TimeUnit.MINUTES)
-            .withSource(source)
-            .withStores(stores)
-            .withImageLoader(imageLoader)
-            .build();
+                                                   .withSleepTime(0, TimeUnit.MINUTES)
+                                                   .withSource(source)
+                                                   .withStores(stores)
+                                                   .withImageLoader(imageLoader)
+                                                   .build();
     }
 
     private void setupMocks() throws Exception
@@ -108,7 +107,7 @@ public class RunLoadImagesTest
         images.forEach((store, image) -> when(imageLoader.getImagesFor(store))
                                             .thenReturn(Lists.createFrom(image.getUrl())));
     }
-    
+
     @DontRepeat
     @Test
     public void testConstructor() throws Exception
@@ -122,16 +121,16 @@ public class RunLoadImagesTest
     public void testAccept()
     {
         instance.accept(arguments);
-        
+
         String expectedSQL = SQLQueries.INSERT_STORE_IMAGE;
-        
+
         for (Store store : stores)
         {
             verify(imageLoader).getImagesFor(store);
-            
+
             UUID storeId = UUID.fromString(store.getStoreId());
             Image image = images.get(store);
-            
+
 //            verify(database).update(eq(expectedSQL), Matchers.<Object>anyVararg());
         }
     }

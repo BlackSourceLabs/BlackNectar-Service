@@ -32,16 +32,15 @@ import static tech.blacksource.blacknectar.service.BlackNectarGenerators.address
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(50)
 @RunWith(AlchemyTestRunner.class)
-public class AddressTest 
+public class AddressTest
 {
 
     private Address instance;
-    
+
     @Before
     public void setUp() throws Exception
     {
@@ -57,7 +56,7 @@ public class AddressTest
 
     private void setupMocks() throws Exception
     {
-        
+
     }
 
     @Test
@@ -65,7 +64,7 @@ public class AddressTest
     {
         AlchemyAssertion<Address> assertion = Address.validAddress();
         assertThat(assertion, notNullValue());
-        
+
         assertion.check(instance);
     }
 
@@ -74,22 +73,22 @@ public class AddressTest
     {
         JsonObject json = instance.asJSON();
         assertThat(json, notNullValue());
-        
+
         String addressOne = json.get(Keys.ADDRESS_LINE_ONE).getAsString();
         assertThat(addressOne, is(instance.getAddressLineOne()));
-        
+
         String addressTwo = json.get(Keys.ADDRESS_LINE_TWO).getAsString();
         assertThat(addressTwo, is(instance.getAddressLineTwo()));
-        
+
         String city = json.get(Keys.CITY).getAsString();
         assertThat(city, is(instance.getCity()));
-        
+
         String county = json.get(Keys.COUNTY).getAsString();
         assertThat(county, is(instance.getCounty()));
-        
+
         String zipCode = json.get(Keys.ZIP).getAsString();
         assertThat(zipCode, is(instance.getZipCode()));
-        
+
         String localZip = json.get(Keys.LOCAL_ZIP).getAsString();
         assertThat(localZip, is(instance.getLocalZipCode()));
     }

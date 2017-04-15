@@ -32,21 +32,20 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateDouble.Type.RANGE;
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(100)
 @RunWith(AlchemyTestRunner.class)
-public class LocationTest 
+public class LocationTest
 {
     @GenerateDouble(value = RANGE, min = -90.0, max = 90.0)
     private Double latitude;
-    
+
     @GenerateDouble(value = RANGE, min = -180.0, max = 180.0)
     private Double longitude;
-    
+
     private Location location;
-    
+
     @Before
     public void setUp() throws Exception
     {
@@ -63,28 +62,28 @@ public class LocationTest
     {
         AlchemyAssertion<Location> assertion = Location.validLocation();
         assertThat(assertion, notNullValue());
-        
+
         assertion.check(location);
     }
-    
+
     @Test
     public void testInvalidLocation()
     {
         double badLatitude = one(doubles(91, Double.MAX_VALUE));
         double badLongitude = one(doubles(-Double.MAX_VALUE, -91.0));
-        
+
         assertThrows(() -> new Location(badLatitude, badLongitude)).isInstanceOf(IllegalArgumentException.class);
     }
-    
+
     @Test
     public void testAsJSON()
     {
         JsonObject json = location.asJSON();
         assertThat(json, notNullValue());
-        
+
         double lat = json.get(Location.Keys.LATITUDE).getAsDouble();
         double lon = json.get(Location.Keys.LONGITUDE).getAsDouble();
-        
+
         assertThat(lat, is(location.getLatitude()));
         assertThat(lon, is(location.getLongitude()));
     }

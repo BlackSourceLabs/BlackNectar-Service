@@ -39,36 +39,35 @@ import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.
 
 
 /**
- *
  * @author SirWellington
  */
 @Repeat(10)
 @RunWith(AlchemyTestRunner.class)
-public class FileRepositoryTest 
+public class FileRepositoryTest
 {
-    
+
     @Mock(answer = RETURNS_MOCKS)
     private Aroma aroma;
-    
+
     @Mock
     private IDGenerator idGenerator;
-    
+
     private FileStoreDataSource instance;
-    
+
     private Store store;
-    
+
     @GenerateString(UUID)
     private String storeIdString;
-    
+
     private UUID storeId;
 
     @Before
     public void setUp() throws Exception
     {
-        
+
         setupData();
         setupMocks();
-        
+
         instance = new FileStoreDataSource(aroma, idGenerator);
     }
 
@@ -78,7 +77,7 @@ public class FileRepositoryTest
         store = one(stores());
         storeId = java.util.UUID.fromString(storeIdString);
     }
-    
+
     private void setupMocks() throws Exception
     {
         when(idGenerator.generateKey()).thenReturn(storeId);
@@ -94,7 +93,7 @@ public class FileRepositoryTest
         assertThat(results, not(empty()));
         assertThat(results.size(), greaterThanOrEqualTo(100));
         assertThat(results.size(), lessThanOrEqualTo(FileStoreDataSource.MAXIMUM_STORES));
-        
+
         results.forEach(s -> assertThat(s.getStoreId(), is(storeIdString)));
         verify(idGenerator, atLeastOnce()).generateKey();
     }
@@ -111,9 +110,9 @@ public class FileRepositoryTest
     public void testSplitFileIntoLines()
     {
         List<String> lines = listOf(alphabeticString());
-        
+
         String file = String.join("\n", lines);
-        
+
         List<String> result = instance.splitFileIntoLines(file);
         assertThat(result, is(lines));
     }
@@ -123,10 +122,10 @@ public class FileRepositoryTest
     {
         double latitude = one(doubles(-10, 10));
         double longitude = one(doubles(-10, 10));
-        
+
         String latitudeString = String.valueOf(latitude);
         String longitudeString = String.valueOf(longitude);
-        
+
         Location result = instance.extractLocationFrom(latitudeString, longitudeString);
         assertThat(result.getLatitude(), is(latitude));
         assertThat(result.getLongitude(), is(longitude));

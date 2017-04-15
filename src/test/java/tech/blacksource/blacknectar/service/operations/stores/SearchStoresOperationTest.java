@@ -289,8 +289,8 @@ public class SearchStoresOperationTest
     private List<Store> withoutImages(List<Store> stores)
     {
         return stores.stream()
-            .map(s -> Store.Builder.fromStore(s).withoutMainImageURL().build())
-            .collect(toList());
+                     .map(s -> Store.Builder.fromStore(s).withoutMainImageURL().build())
+                     .collect(toList());
     }
 
 }

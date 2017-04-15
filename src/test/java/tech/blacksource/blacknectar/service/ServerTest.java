@@ -30,7 +30,6 @@ import static org.mockito.Mockito.*;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
- *
  * @author SirWellington
  */
 @RunWith(AlchemyTestRunner.class)
@@ -52,7 +51,7 @@ public class ServerTest
     {
         setupData();
         setupMocks();
-        
+
         instance = new Server(aroma, exceptionHandler, routes);
 
     }
@@ -66,7 +65,7 @@ public class ServerTest
     }
 
     @Test
-    public void  testConstructor()
+    public void testConstructor()
     {
         assertThrows(() -> new Server(null, exceptionHandler, routes)).isInstanceOf(IllegalArgumentException.class);
         assertThrows(() -> new Server(aroma, null, routes)).isInstanceOf(IllegalArgumentException.class);

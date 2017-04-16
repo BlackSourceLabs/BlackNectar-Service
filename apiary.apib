@@ -221,7 +221,7 @@ View an EBT Card's Transaction History. Credentials must be passed into the meth
 + BALANCE - The State supports the "/balance/" api and allows users to get their EBT Balance.
 + TRANSACTION - The State supports the "/transactions/" api and allows users to view their Transaction history.
       
-s
+
 ### Field (object)
 
 + name: `user-id` (string, required) - The unique name of the field. Each field will have a different name.
@@ -230,11 +230,13 @@ s
 + is_required: `true` (boolean, required) - Whether this field is required or optional.
 + requirements (StringRequirements, required) - Details any requirements on the value that this field accepts.
 
+
 ### StringRequirements (object)
 
 + min_length: `4` (number, required) - The value must have at least this many characters
 + max_length: `35` (number, required) - The value cannot have more than this many characters
 + character_requirements (CharacterRequirements, required) - Describes requirements on the characters
+
 
 ### CharacterRequirements (object)
 
@@ -246,13 +248,15 @@ s
 
 ### FieldValue (object)
 
-+ field: (Field, required) - The field. This should be pulled directly from the State's Sign-Up or Sign-In requirements
++ field: (Field, required) - Note that only the 'name' and 'type' fields need to be set in this object. This should be pulled directly from the State's Sign-Up or Sign-In requirements
 + value: `cordhernandez` (string, required) - The value of the field. The value should always be a String.
+
 
 ### Balance (object)
 
 + cash_balance: `93.04` (number, required) - The amount of cash money left on the EBT Card
 + food_balance: `31.30` (number, required) - The amount of food money left on the EBT Card
+
 
 ### Transaction (object)
 
@@ -266,6 +270,7 @@ s
     + CHARGE
     + DEPOSIT
 + type: `FOOD` (string, required) - Additional information about the type of the transaction.
+
 
 ### OperationResult (object)
 + success: `true` (boolean, required) - Whether the operation succeeded or not

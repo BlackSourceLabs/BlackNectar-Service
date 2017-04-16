@@ -221,7 +221,7 @@ View an EBT Card's Transaction History. Credentials must be passed into the meth
 + BALANCE - The State supports the "/balance/" api and allows users to get their EBT Balance.
 + TRANSACTION - The State supports the "/transactions/" api and allows users to view their Transaction history.
       
-
+s
 ### Field (object)
 
 + name: `user-id` (string, required) - The unique name of the field. Each field will have a different name.
@@ -246,7 +246,7 @@ View an EBT Card's Transaction History. Credentials must be passed into the meth
 
 ### FieldValue (object)
 
-+ name: `user-id` (string, required) - The name of the field. This should be pulled from the Field's `name` parameter.
++ field: (Field, required) - The field. This should be pulled directly from the State's Sign-Up or Sign-In requirements
 + value: `cordhernandez` (string, required) - The value of the field. The value should always be a String.
 
 ### Balance (object)

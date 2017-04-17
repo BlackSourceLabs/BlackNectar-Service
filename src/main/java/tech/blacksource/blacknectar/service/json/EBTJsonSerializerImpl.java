@@ -91,12 +91,14 @@ final class EBTJsonSerializerImpl implements EBTJsonSerializer
                 .usingMessage("json cannot be missing")
                 .is(nonEmptyString());
 
-        JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
+        JsonElement parsedJson = tryToParseJson(json);
 
-        if (jsonObject == null || jsonObject.isJsonNull())
+        if (parsedJson == null || parsedJson.isJsonNull() || !parsedJson.isJsonObject())
         {
             return null;
         }
+
+        JsonObject jsonObject = parsedJson.getAsJsonObject();
 
         Field result = gson.fromJson(jsonObject, Field.class);
 
@@ -130,9 +132,14 @@ final class EBTJsonSerializerImpl implements EBTJsonSerializer
                 .usingMessage("json cannot be missing")
                 .is(nonEmptyString());
 
-        JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
+        JsonElement parsedJson = tryToParseJson(json);
 
-        checkThat(jsonObject).is(notNull());
+        checkThat(parsedJson)
+                .throwing(BadArgumentException.class)
+                .usingMessage("Could not parse json as Object: " + json)
+                .is(instanceOf(JsonObject.class));
+
+        JsonObject jsonObject = parsedJson.getAsJsonObject();
 
         FieldValue result = gson.fromJson(jsonObject, FieldValue.class);
 
@@ -155,15 +162,7 @@ final class EBTJsonSerializerImpl implements EBTJsonSerializer
             return result;
         }
 
-        JsonElement jsonElement;
-        try
-        {
-            jsonElement = gson.fromJson(json, JsonElement.class);
-        }
-        catch (JsonSyntaxException ex)
-        {
-            throw new BadArgumentException("Invalid JSON", ex);
-        }
+        JsonElement jsonElement = tryToParseJson(json);
 
         if (!jsonElement.isJsonArray())
         {
@@ -192,6 +191,26 @@ final class EBTJsonSerializerImpl implements EBTJsonSerializer
                 .forEach(result::add);
 
         return result;
+    }
+
+    private JsonElement tryToParseJson(String json)
+    {
+        try
+        {
+            return gson.fromJson(json, JsonElement.class);
+        }
+        catch (JsonParseException ex)
+        {
+            makeNoteOfInvalidJson(json);
+            throw new BadArgumentException("Invalid JSON: " + json, ex);
+        }
+    }
+
+    private void makeNoteOfInvalidJson(String json)
+    {
+        String message = "Received invalid JSON: {}";
+        LOG.error(message, json);
+        aroma.sendHighPriorityMessage("Json Parse Failed", message, json);
     }
 
     private void makeNoteThatJsonIsNotArray(String json)

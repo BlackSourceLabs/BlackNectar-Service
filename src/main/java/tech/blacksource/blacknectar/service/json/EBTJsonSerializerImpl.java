@@ -141,14 +141,21 @@ final class EBTJsonSerializerImpl implements EBTJsonSerializer
 
         JsonObject jsonObject = parsedJson.getAsJsonObject();
 
-        FieldValue result = gson.fromJson(jsonObject, FieldValue.class);
+        return tryToLoadFieldValueFrom(jsonObject);
+    }
 
-        if (Objects.isNull(result))
+    private FieldValue tryToLoadFieldValueFrom(JsonObject jsonObject)
+    {
+
+        try
+        {
+            return gson.fromJson(jsonObject, FieldValue.class);
+        }
+        catch (RuntimeException ex)
         {
             makeNoteThatCouldNotExtractFieldValueFrom(jsonObject);
+            throw new OperationFailedException(ex);
         }
-
-        return result;
     }
 
     @Override

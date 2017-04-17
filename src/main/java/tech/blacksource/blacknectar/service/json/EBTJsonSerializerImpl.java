@@ -26,8 +26,7 @@ import org.slf4j.LoggerFactory;
 import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.ebt.balance.*;
-import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
-import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
+import tech.blacksource.blacknectar.service.exceptions.*;
 import tech.sirwellington.alchemy.arguments.Checks;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.*;
@@ -156,7 +155,15 @@ final class EBTJsonSerializerImpl implements EBTJsonSerializer
             return result;
         }
 
-        JsonElement jsonElement = gson.fromJson(json, JsonElement.class);
+        JsonElement jsonElement;
+        try
+        {
+            jsonElement = gson.fromJson(json, JsonElement.class);
+        }
+        catch (JsonSyntaxException ex)
+        {
+            throw new BadArgumentException("Invalid JSON", ex);
+        }
 
         if (!jsonElement.isJsonArray())
         {

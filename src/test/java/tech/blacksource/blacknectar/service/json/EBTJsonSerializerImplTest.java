@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.ebt.balance.*;
+import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.sirwellington.alchemy.generator.StringGenerators;
 import tech.sirwellington.alchemy.test.junit.runners.*;
 
@@ -218,6 +219,15 @@ public class EBTJsonSerializerImplTest
         List<FieldValue> result = instance.deserializeFieldValues(badJson);
         assertThat(result, notNullValue());
         assertThat(result, is(empty()));
+    }
+
+    @Test
+    public void testDeserializeFieldValuesWithBadJson() throws Exception
+    {
+        String unterminatedJson = "{" + one(StringGenerators.strings());
+
+        assertThrows(() -> instance.deserializeFieldValues(unterminatedJson))
+                .isInstanceOf(BadArgumentException.class);
     }
 
     @DontRepeat

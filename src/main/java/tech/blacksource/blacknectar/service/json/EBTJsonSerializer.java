@@ -64,21 +64,48 @@ public interface EBTJsonSerializer
     @Optional
     FieldValue deserializeFieldValue(@NonEmpty String json) throws BlackNectarAPIException;
 
+    //==========================================================
+    //| Static Initializers |
+    //==========================================================
+
+    /**
+     * @return A default {@link EBTJsonSerializer}.
+     */
     static EBTJsonSerializer newInstance()
     {
         return newInstance(Aroma.createNoOpInstance(), JSON.GSON);
     }
 
+    /**
+     * Allows creating a default instance of {@link EBTJsonSerializer} using a customized {@link Gson}.
+     *
+     * @param gson The {@link Gson} object to use for serialization. Cannot be null.
+     * @return A customized {@link EBTJsonSerializer}.
+     */
     static EBTJsonSerializer newInstance(@Required Gson gson)
     {
         return newInstance(Aroma.createNoOpInstance(), gson);
     }
 
+    /**
+     * Allows creating a default instance of {@link EBTJsonSerializer} using a customized {@link Aroma}.
+     *
+     * @param aroma The {@link Aroma} to use. Cannot be null.
+     * @return A customized {@link EBTJsonSerializer}.
+     */
     static EBTJsonSerializer newInstance(@Required Aroma aroma)
     {
         return newInstance(aroma, JSON.GSON);
     }
 
+    /**
+     * Allows creating a customized instance of {@link EBTJsonSerializer} using a custom
+     * {@link Aroma} and {@link Gson} instance.
+     *
+     * @param aroma The custom Aroma instance to use.
+     * @param gson  The custom Gson instance ot use.
+     * @return A customized instance of {@link EBTJsonSerializer}.
+     */
     static EBTJsonSerializer newInstance(@Required Aroma aroma, @Required Gson gson)
     {
         return new EBTJsonSerializerImpl(aroma, gson);

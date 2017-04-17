@@ -42,7 +42,7 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 /**
  * @author SirWellington
  */
-@Repeat(10)
+@Repeat
 @RunWith(AlchemyTestRunner.class)
 public class EBTJsonSerializerImplTest
 {
@@ -187,7 +187,11 @@ public class EBTJsonSerializerImplTest
                                                .map(FieldValueJson::toNative)
                                                .collect(Collectors.toList());
 
-        String json = gson.toJson(fieldValues);
+        String json = fieldValues.stream()
+                                 .map(FieldValueJson::asJson)
+                                 .collect(JSON.collectArray())
+                                 .toString();
+
 
         List<FieldValue> result = instance.deserializeFieldValues(json);
         assertThat(result, is(expected));

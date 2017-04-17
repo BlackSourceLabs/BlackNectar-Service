@@ -28,6 +28,7 @@ import spark.*;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.ebt.balance.*;
 import tech.blacksource.blacknectar.service.Responses;
+import tech.blacksource.blacknectar.service.data.MediaTypes;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.exceptions.UnsupportedStateException;
 import tech.blacksource.blacknectar.service.json.EBTJsonSerializer;
@@ -91,6 +92,7 @@ public class SignInOperation implements Route
         }
 
         OperationResultJson result = tryToSignIntoState(state, fieldValues);
+        response.type(MediaTypes.APPLICATION_JSON);
 
         return result.asJson();
     }
@@ -117,7 +119,7 @@ public class SignInOperation implements Route
 
     private void makeNoteThatRequestReceived(Request request, State state)
     {
-        String message = "Received request to sign into state: {} from [{]]";
+        String message = "Received request to sign into state: {} from [{}]";
         LOG.debug(message, state, request.ip());
         aroma.sendLowPriorityMessage("[Sign In] Called", message, state, request.ip());
     }

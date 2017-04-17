@@ -16,16 +16,19 @@
  */
 package tech.blacksource.blacknectar.service.json;
 
+import java.util.List;
 import java.util.Objects;
 import javax.inject.Inject;
 
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.ebt.balance.*;
 import tech.blacksource.blacknectar.service.exceptions.BlackNectarAPIException;
 import tech.blacksource.blacknectar.service.exceptions.OperationFailedException;
+import tech.sirwellington.alchemy.arguments.Checks;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.instanceOf;
@@ -50,6 +53,7 @@ final class EBTJsonSerializerImpl implements EBTJsonSerializer
         this.aroma = aroma;
         this.gson = gson;
     }
+
 
     @Override
     public JsonObject serializeState(State state)
@@ -141,6 +145,62 @@ final class EBTJsonSerializerImpl implements EBTJsonSerializer
         return result;
     }
 
+    @Override
+    public List<FieldValue> deserializeFieldValues(String json) throws BlackNectarAPIException
+    {
+        List<FieldValue> result = Lists.create();
+
+        if (Checks.isNullOrEmpty(json))
+        {
+            makeNoteThatReceivedEmptyString();
+            return result;
+        }
+
+        JsonElement jsonElement = gson.fromJson(json, JsonElement.class);
+
+        if (!jsonElement.isJsonArray())
+        {
+            makeNoteThatJsonIsNotArray(json);
+            return result;
+        }
+
+        JsonArray array = jsonElement.getAsJsonArray();
+
+        if (array == null || array.size() == 0)
+        {
+            makeNoteThatArrayOfFieldValueIsEmpty(json);
+            return result;
+        }
+
+        List<JsonElement> elements = Lists.create();
+        array.iterator().forEachRemaining(elements::add);
+
+        elements.stream()
+                .filter(JsonElement::isJsonObject)
+                .map(JsonElement::getAsJsonObject)
+                .filter(Objects::nonNull)
+                .map(FieldValueJson::fromJson)
+                .filter(Objects::nonNull)
+                .map(FieldValueJson::toNative)
+                .forEach(result::add);
+
+        return result;
+    }
+
+    private void makeNoteThatJsonIsNotArray(String json)
+    {
+        String message = "Expected JSON Array, but is intead: {}";
+        LOG.warn(message, json);
+        aroma.sendMediumPriorityMessage("Json Parse Failed", message, json);
+    }
+
+    private void makeNoteThatArrayOfFieldValueIsEmpty(String json)
+    {
+        String message = "Array is unexpectedly empty: {}";
+        LOG.warn(message, json);
+        aroma.sendMediumPriorityMessage("Json Parse Failed", message, json);
+    }
+
     private void makeNoteThatCouldNotExtractFieldFrom(JsonObject jsonObject)
     {
         String message = "Could not extract Field from JSON: {}";
@@ -153,5 +213,12 @@ final class EBTJsonSerializerImpl implements EBTJsonSerializer
         String message = "Could not extract FieldValue from JSON: {}";
         LOG.warn(message, jsonObject);
         aroma.sendMediumPriorityMessage("Json Parse Failed", message, jsonObject);
+    }
+
+    private void makeNoteThatReceivedEmptyString()
+    {
+        String message = "Received unexpected empty string. Recovering.";
+        LOG.warn(message);
+        aroma.sendMediumPriorityMessage("Json Parse Failed", message);
     }
 }

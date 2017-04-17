@@ -16,22 +16,25 @@
 
 package tech.blacksource.blacknectar.service.json;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import sir.wellington.alchemy.collections.lists.Lists;
 import tech.aroma.client.Aroma;
 import tech.blacksource.blacknectar.ebt.balance.*;
-import tech.blacksource.blacknectar.ebt.balance.states.California;
+import tech.sirwellington.alchemy.generator.StringGenerators;
 import tech.sirwellington.alchemy.test.junit.runners.*;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
+import static tech.blacksource.blacknectar.service.BlackNectarGenerators.fieldValues;
+import static tech.blacksource.blacknectar.service.BlackNectarGenerators.jsonObjects;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
-import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
+import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 
@@ -69,9 +72,8 @@ public class EBTJsonSerializerImplTest
 
     private void setupData() throws Exception
     {
-        this.field = Lists.oneOf(California.Fields.INSTANCE.getAll());
-
-        this.fieldValue = new FieldValue(this.field, one(alphabeticString()));
+        this.fieldValue = one(fieldValues());
+        this.field = fieldValue.getField();
     }
 
     private void setupMocks() throws Exception
@@ -171,5 +173,63 @@ public class EBTJsonSerializerImplTest
     {
         assertThrows(() -> instance.deserializeFieldValue("")).isInstanceOf(IllegalArgumentException.class);
         assertThrows(() -> instance.deserializeFieldValue(null)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void testDeserializeFieldValues() throws Exception
+    {
+        List<FieldValueJson> fieldValues = listOf(fieldValues()).stream()
+                                                                .map(this::fieldValueToJsonCounterPart)
+                                                                .collect(Collectors.toList());
+
+        List<FieldValue> expected = fieldValues.stream()
+                                               .map(FieldValueJson::toNative)
+                                               .collect(Collectors.toList());
+
+        String json = gson.toJson(fieldValues);
+
+        List<FieldValue> result = instance.deserializeFieldValues(json);
+        assertThat(result, is(expected));
+    }
+
+    private FieldValueJson fieldValueToJsonCounterPart(FieldValue fieldValue)
+    {
+        return new FieldValueJson(fieldValue.getField().getName(),
+                                  fieldValue.getValue(),
+                                  fieldValue.getField().getType());
+    }
+
+    @Test
+    public void testDeserializeFieldValuesWithJsonObject() throws Exception
+    {
+        JsonObject object = one(jsonObjects());
+        String json = object.toString();
+
+        List<FieldValue> result = instance.deserializeFieldValues(json);
+        assertThat(result, notNullValue());
+        assertThat(result, is(empty()));
+    }
+
+    @Test
+    public void testDeserializeFieldValuesWithJsonNotArray() throws Exception
+    {
+        String badJson = one(StringGenerators.hexadecimalString(10));
+
+        List<FieldValue> result = instance.deserializeFieldValues(badJson);
+        assertThat(result, notNullValue());
+        assertThat(result, is(empty()));
+    }
+
+    @DontRepeat
+    @Test
+    public void testDeserializeFieldValuesWithBadArgs() throws Exception
+    {
+        List<FieldValue> result = instance.deserializeFieldValues(null);
+        assertThat(result, notNullValue());
+        assertThat(result, is(empty()));
+
+        result = instance.deserializeFieldValues("");
+        assertThat(result, notNullValue());
+        assertThat(result, is(empty()));
     }
 }

@@ -24,8 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Service;
 import tech.blacksource.blacknectar.service.operations.*;
-import tech.blacksource.blacknectar.service.operations.ebt.GetStateInfoOperation;
-import tech.blacksource.blacknectar.service.operations.ebt.GetStatesOperation;
+import tech.blacksource.blacknectar.service.operations.ebt.*;
 import tech.blacksource.blacknectar.service.operations.stores.SearchStoresOperation;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
@@ -50,19 +49,22 @@ interface Routes
         private final GetStatesOperation getStatesOperation;
         private final GetStateInfoOperation getStateInfoOperation;
         private final SearchStoresOperation searchStoresOperation;
+        private final SignInOperation signInOperation;
 
         @Inject
         Impl(SayHelloOperation sayHelloOperation,
              GetSampleStoreOperation getSampleStoreOperation,
              GetStatesOperation getStatesOperation,
              GetStateInfoOperation getStateInfoOperation,
-             SearchStoresOperation searchStoresOperation)
+             SearchStoresOperation searchStoresOperation,
+             SignInOperation signInOperation)
         {
             checkThat(sayHelloOperation,
                       getSampleStoreOperation,
                       getStatesOperation,
                       getStateInfoOperation,
-                      searchStoresOperation)
+                      searchStoresOperation,
+                      signInOperation)
                     .are(notNull());
 
             this.sayHelloOperation = sayHelloOperation;
@@ -70,6 +72,7 @@ interface Routes
             this.getStatesOperation = getStatesOperation;
             this.getStateInfoOperation = getStateInfoOperation;
             this.searchStoresOperation = searchStoresOperation;
+            this.signInOperation = signInOperation;
         }
 
         @Override
@@ -86,7 +89,13 @@ interface Routes
             {
                 service.get("", this.getStatesOperation);
 
-                service.get("/" + Parameters.EBT.STATE, this.getStateInfoOperation);
+                service.path("/" + Parameters.EBT.STATE, () ->
+                {
+                    service.get("", this.getStateInfoOperation);
+
+                    service.get("/sign-in", this.signInOperation);
+                });
+
             });
 
         }

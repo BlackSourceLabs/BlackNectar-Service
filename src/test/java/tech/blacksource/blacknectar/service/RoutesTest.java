@@ -7,8 +7,7 @@ import org.mockito.Mock;
 import spark.Service;
 import tech.blacksource.blacknectar.service.operations.GetSampleStoreOperation;
 import tech.blacksource.blacknectar.service.operations.SayHelloOperation;
-import tech.blacksource.blacknectar.service.operations.ebt.GetStateInfoOperation;
-import tech.blacksource.blacknectar.service.operations.ebt.GetStatesOperation;
+import tech.blacksource.blacknectar.service.operations.ebt.*;
 import tech.blacksource.blacknectar.service.operations.stores.SearchStoresOperation;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
@@ -34,6 +33,9 @@ public class RoutesTest
     @Mock
     private SearchStoresOperation searchStoresOperation;
 
+    @Mock
+    private SignInOperation signInOperation;
+
     private Service service;
 
     private Routes instance;
@@ -47,18 +49,20 @@ public class RoutesTest
                                    getSampleStoreOperation,
                                    getStatesOperation,
                                    getStateInfoOperation,
-                                   searchStoresOperation);
+                                   searchStoresOperation,
+                                   signInOperation);
     }
 
     @DontRepeat
     @Test
     public void testConstructor() throws Exception
     {
-        assertThrows(() -> new Routes.Impl(null, getSampleStoreOperation, getStatesOperation, getStateInfoOperation, searchStoresOperation));
-        assertThrows(() -> new Routes.Impl(sayHelloOperation, null, getStatesOperation, getStateInfoOperation, searchStoresOperation));
-        assertThrows(() -> new Routes.Impl(sayHelloOperation, getSampleStoreOperation, null, getStateInfoOperation, searchStoresOperation));
-        assertThrows(() -> new Routes.Impl(sayHelloOperation, getSampleStoreOperation, getStatesOperation, null, searchStoresOperation));
-        assertThrows(() -> new Routes.Impl(sayHelloOperation, getSampleStoreOperation, getStatesOperation, getStateInfoOperation, null));
+        assertThrows(() -> new Routes.Impl(null, getSampleStoreOperation, getStatesOperation, getStateInfoOperation, searchStoresOperation, signInOperation));
+        assertThrows(() -> new Routes.Impl(sayHelloOperation, null, getStatesOperation, getStateInfoOperation, searchStoresOperation, signInOperation));
+        assertThrows(() -> new Routes.Impl(sayHelloOperation, getSampleStoreOperation, null, getStateInfoOperation, searchStoresOperation, signInOperation));
+        assertThrows(() -> new Routes.Impl(sayHelloOperation, getSampleStoreOperation, getStatesOperation, null, searchStoresOperation, signInOperation));
+        assertThrows(() -> new Routes.Impl(sayHelloOperation, getSampleStoreOperation, getStatesOperation, getStateInfoOperation, null, signInOperation));
+        assertThrows(() -> new Routes.Impl(sayHelloOperation, getSampleStoreOperation, getStatesOperation, getStateInfoOperation, searchStoresOperation, null));
     }
 
     @Test

@@ -22,10 +22,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.sirwellington.alchemy.test.junit.runners.*;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
+import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
  * @author SirWellington
@@ -34,6 +33,7 @@ import static org.junit.Assert.assertThat;
 @Repeat
 public class OperationResultJsonTest
 {
+
     @GenerateString
     private String message;
 
@@ -68,4 +68,26 @@ public class OperationResultJsonTest
         assertThat(statusCode, is(this.statusCode));
     }
 
+
+    @Test
+    public void testFromJson() throws Exception
+    {
+        JsonObject json = new JsonObject();
+
+        json.addProperty(OperationResultJson.Keys.MESSAGE, message);
+        json.addProperty(OperationResultJson.Keys.SUCCESS, result);
+        json.addProperty(OperationResultJson.Keys.STATUS_CODE, statusCode);
+
+        OperationResultJson result = OperationResultJson.fromJson(json);
+
+        assertThat(result, is(instance));
+    }
+
+    @DontRepeat
+    @Test
+    public void testFromJsonWithBadArgs() throws Exception
+    {
+        assertThrows(() -> OperationResultJson.fromJson(null));
+        assertThrows(() -> OperationResultJson.fromJson(new JsonObject()));
+    }
 }

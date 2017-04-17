@@ -23,7 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
+import static tech.blacksource.blacknectar.service.BlackNectarAssertions.hasField;
 import static tech.sirwellington.alchemy.arguments.Arguments.*;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
@@ -38,6 +40,20 @@ public final class OperationResultJson implements AsJson
     private final int statusCode;
     private final JsonObject json;
 
+    public static OperationResultJson fromJson(@Required JsonObject object)
+    {
+        checkThat(object)
+                .is(notNull())
+                .is(hasField(Keys.MESSAGE))
+                .is(hasField(Keys.STATUS_CODE))
+                .is(hasField(Keys.SUCCESS));
+
+        String message = object.get(Keys.MESSAGE).getAsString();
+        boolean success = object.get(Keys.SUCCESS).getAsBoolean();
+        int statusCode = object.get(Keys.STATUS_CODE).getAsInt();
+
+        return new OperationResultJson(message, success, statusCode);
+    }
 
     public OperationResultJson(@Required String message, boolean success, int statusCode)
     {

@@ -248,8 +248,9 @@ View an EBT Card's Transaction History. Credentials must be passed into the meth
 
 ### FieldValue (object)
 
-+ field: (Field, required) - Note that only the 'name' and 'type' fields need to be set in this object. This should be pulled directly from the State's Sign-Up or Sign-In requirements
++ name: `user-id` (string, required) - The name of the field. This should be copied from the corresponding "Field" object.
 + value: `cordhernandez` (string, required) - The value of the field. The value should always be a String.
++ type: `USERNAME` (string, required) - Information about what type of data this field is intended to capture. This should be copied from the corresponding "Field" object.
 
 
 ### Balance (object)

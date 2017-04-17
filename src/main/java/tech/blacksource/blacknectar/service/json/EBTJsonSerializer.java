@@ -1,5 +1,7 @@
 package tech.blacksource.blacknectar.service.json;
 
+import java.util.List;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.ImplementedBy;
@@ -63,6 +65,15 @@ public interface EBTJsonSerializer
      */
     @Optional
     FieldValue deserializeFieldValue(@NonEmpty String json) throws BlackNectarAPIException;
+
+    /**
+     * Attempts to deserialize the JSON String into a {@code List<FieldValue>}.
+     *
+     * @param json The json to parse. This must represent a JSON Array type. Cannot be empty.
+     * @return A {@code List<FieldValue>} or {@code null} if it cannot be parsed.
+     * @throws BlackNectarAPIException
+     */
+    List<FieldValue> deserializeFieldValues(@NonEmpty String json) throws BlackNectarAPIException;
 
     //==========================================================
     //| Static Initializers |

@@ -16,6 +16,8 @@
  */
 package tech.blacksource.blacknectar.service.json;
 
+import java.util.Objects;
+
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +63,39 @@ public final class OperationResultJson implements AsJson
     public JsonObject asJson()
     {
         return json;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+        OperationResultJson that = (OperationResultJson) o;
+        return success == that.success &&
+                statusCode == that.statusCode &&
+                Objects.equals(message, that.message);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(message, success, statusCode);
+    }
+
+    @Override
+    public String toString()
+    {
+        return "OperationResultJson{" +
+                "message='" + message + '\'' +
+                ", success=" + success +
+                ", statusCode=" + statusCode +
+                '}';
     }
 
     static class Keys

@@ -40,12 +40,15 @@ public class OperationResultJsonTest
     @GenerateBoolean
     private Boolean result;
 
+    @GenerateInteger
+    private Integer statusCode;
+
     private OperationResultJson instance;
 
     @Before
     public void setUp() throws Exception
     {
-        instance = new OperationResultJson(message, result);
+        instance = new OperationResultJson(message, result, statusCode);
     }
 
     @Test
@@ -56,11 +59,13 @@ public class OperationResultJsonTest
 
         String messageResult = result.get(OperationResultJson.Keys.MESSAGE).getAsString();
         boolean successResult = result.get(OperationResultJson.Keys.SUCCESS).getAsBoolean();
+        int statusCode = result.get(OperationResultJson.Keys.STATUS_CODE).getAsInt();
 
         assertThat(messageResult, not(isEmptyOrNullString()));
 
         assertThat(messageResult, is(this.message));
         assertThat(successResult, is(this.result));
+        assertThat(statusCode, is(this.statusCode));
     }
 
 }

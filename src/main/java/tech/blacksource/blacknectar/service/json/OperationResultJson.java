@@ -27,21 +27,23 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
 /**
  * @author SirWellington
  */
-final class OperationResultJson implements AsJson
+public final class OperationResultJson implements AsJson
 {
     private final static Logger LOG = LoggerFactory.getLogger(OperationResultJson.class);
 
     private final String message;
     private final boolean success;
+    private final int statusCode;
     private final JsonObject json;
 
 
-    OperationResultJson(@Required String message, boolean success)
+    public OperationResultJson(@Required String message, boolean success, int statusCode)
     {
         checkThat(message).is(nonEmptyString());
 
         this.message = message;
         this.success = success;
+        this.statusCode = statusCode;
         this.json = toJson();
     }
 
@@ -50,6 +52,7 @@ final class OperationResultJson implements AsJson
         JsonObject json = new JsonObject();
         json.addProperty(Keys.MESSAGE, message);
         json.addProperty(Keys.SUCCESS, success);
+        json.addProperty(Keys.STATUS_CODE, statusCode);
 
         return json;
     }
@@ -64,5 +67,6 @@ final class OperationResultJson implements AsJson
     {
         static final String MESSAGE = "message";
         static final String SUCCESS = "success";
+        static final String STATUS_CODE = "status_code";
     }
 }

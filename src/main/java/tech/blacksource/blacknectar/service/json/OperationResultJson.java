@@ -75,6 +75,21 @@ public final class OperationResultJson implements AsJson
         return json;
     }
 
+    public String getMessage()
+    {
+        return message;
+    }
+
+    public boolean isSuccess()
+    {
+        return success;
+    }
+
+    public int getStatusCode()
+    {
+        return statusCode;
+    }
+
     @Override
     public JsonObject asJson()
     {

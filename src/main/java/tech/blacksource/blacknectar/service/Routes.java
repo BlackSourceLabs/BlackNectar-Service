@@ -93,7 +93,7 @@ interface Routes
                 {
                     service.get("", this.getStateInfoOperation);
 
-                    service.get("/sign-in", this.signInOperation);
+                    service.post("/sign-in", this.signInOperation);
                 });
 
             });

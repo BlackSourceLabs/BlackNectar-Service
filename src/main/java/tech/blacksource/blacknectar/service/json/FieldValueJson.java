@@ -178,6 +178,6 @@ final class FieldValueJson implements AsJson
     {
         static final String NAME = "name";
         static final String VALUE = "value";
-        static final String TYPE = "fieldType";
+        static final String TYPE = "field_type";
     }
 }

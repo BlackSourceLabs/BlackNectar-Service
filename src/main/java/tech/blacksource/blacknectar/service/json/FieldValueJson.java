@@ -16,7 +16,10 @@
  */
 package tech.blacksource.blacknectar.service.json;
 
+import java.util.Objects;
+
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.blacksource.blacknectar.ebt.balance.Field;
@@ -58,14 +61,14 @@ final class FieldValueJson implements AsJson
         checkThat(json)
                 .is(notNull())
                 .is(hasField(Keys.NAME))
-                .is(hasField(Keys.VALUE))
-                .is(hasField(Keys.TYPE));
+                .is(hasField(Keys.VALUE));
 
         String name = json.get(Keys.NAME).getAsString();
         String value = json.get(Keys.VALUE).getAsString();
-        String fieldTypeString = json.get(Keys.TYPE).getAsString();
 
-        Field.FieldType fieldType = extractFieldTypeFrom(fieldTypeString);
+        JsonPrimitive fieldTypeElement = json.getAsJsonPrimitive(Keys.TYPE);
+
+        Field.FieldType fieldType = extractFieldTypeFrom(fieldTypeElement);
 
         return new FieldValueJson(name, value, fieldType);
     }
@@ -99,6 +102,21 @@ final class FieldValueJson implements AsJson
         return new FieldValue(field, value);
     }
 
+    public String getName()
+    {
+        return name;
+    }
+
+    public String getValue()
+    {
+        return value;
+    }
+
+    public Field.FieldType getFieldType()
+    {
+        return fieldType;
+    }
+
     @Override
     public JsonObject asJson()
     {
@@ -106,8 +124,15 @@ final class FieldValueJson implements AsJson
     }
 
 
-    private static Field.FieldType extractFieldTypeFrom(String fieldTypeString)
+    private static Field.FieldType extractFieldTypeFrom(JsonPrimitive fieldTypeElement)
     {
+        if (fieldTypeElement == null || fieldTypeElement.isJsonNull())
+        {
+            return Field.FieldType.OTHER;
+        }
+
+        String fieldTypeString = fieldTypeElement.getAsString();
+
         if (Checks.isNullOrEmpty(fieldTypeString))
         {
             return Field.FieldType.OTHER;
@@ -123,11 +148,36 @@ final class FieldValueJson implements AsJson
         }
     }
 
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        FieldValueJson that = (FieldValueJson) o;
+
+        return Objects.equals(name, that.name) &&
+                Objects.equals(value, that.value) &&
+                fieldType == that.fieldType;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(name, value, fieldType);
+    }
 
     static class Keys
     {
         static final String NAME = "name";
         static final String VALUE = "value";
-        static final String TYPE = "type";
+        static final String TYPE = "fieldType";
     }
 }

@@ -16,6 +16,7 @@
  */
 package tech.blacksource.blacknectar.service.json;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.hamcrest.Matchers;
 import org.junit.*;
@@ -25,6 +26,7 @@ import tech.blacksource.blacknectar.ebt.balance.FieldValue;
 import tech.sirwellington.alchemy.test.junit.runners.*;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
@@ -35,6 +37,8 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 @Repeat
 public class FieldValueJsonTest
 {
+    private final Gson gson = JSON.GSON;
+
     @GenerateString
     private String name;
 
@@ -84,6 +88,29 @@ public class FieldValueJsonTest
         assertThat(result.getValue(), is(value));
         assertThat(result.getField().getName(), is(name));
         assertThat(result.getField().getType(), is(fieldType));
+    }
+
+    @Test
+    public void testFromJson() throws Exception
+    {
+        JsonObject object = instance.asJson();
+        FieldValueJson result = FieldValueJson.fromJson(object);
+
+        assertThat(result, is(instance));
+    }
+
+    @Test
+    public void testFromJsonWhenTypeMissing() throws Exception
+    {
+        JsonObject object = instance.asJson();
+        object.remove(FieldValueJson.Keys.TYPE);
+
+        FieldValueJson result = FieldValueJson.fromJson(object);
+        assertThat(result, notNullValue());
+        assertThat(result.getName(), is(name));
+        assertThat(result.getFieldType(), is(Field.FieldType.OTHER));
+        assertThat(result.getValue(), is(value));
+
     }
 
     private void setupData()

@@ -28,7 +28,7 @@ import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.arguments.*;
 import tech.sirwellington.alchemy.arguments.Checks;
 
-import static tech.blacksource.blacknectar.service.BlackNectarAssertions.hasField;
+import static tech.blacksource.blacknectar.service.BlackNectarAssertions.objectWithField;
 import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
@@ -60,8 +60,8 @@ final class FieldValueJson implements AsJson
     {
         checkThat(json)
                 .is(notNull())
-                .is(hasField(Keys.NAME))
-                .is(hasField(Keys.VALUE));
+                .is(objectWithField(Keys.NAME))
+                .is(objectWithField(Keys.VALUE));
 
         String name = json.get(Keys.NAME).getAsString();
         String value = json.get(Keys.VALUE).getAsString();

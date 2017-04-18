@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
-import static tech.blacksource.blacknectar.service.BlackNectarAssertions.hasField;
+import static tech.blacksource.blacknectar.service.BlackNectarAssertions.objectWithField;
 import static tech.sirwellington.alchemy.arguments.Arguments.*;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
@@ -44,9 +44,9 @@ public final class OperationResult implements AsJson
     {
         checkThat(object)
                 .is(notNull())
-                .is(hasField(Keys.MESSAGE))
-                .is(hasField(Keys.STATUS_CODE))
-                .is(hasField(Keys.SUCCESS));
+                .is(objectWithField(Keys.MESSAGE))
+                .is(objectWithField(Keys.STATUS_CODE))
+                .is(objectWithField(Keys.SUCCESS));
 
         String message = object.get(Keys.MESSAGE).getAsString();
         boolean success = object.get(Keys.SUCCESS).getAsBoolean();

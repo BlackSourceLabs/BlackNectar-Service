@@ -104,7 +104,7 @@ public final class BlackNectarAssertions
      * @param field The field to check.
      * @return
      */
-    public static AlchemyAssertion<JsonObject> hasField(@Required String field)
+    public static AlchemyAssertion<JsonObject> objectWithField(@Required String field)
     {
         checkThat(field).is(StringAssertions.nonEmptyString());
 

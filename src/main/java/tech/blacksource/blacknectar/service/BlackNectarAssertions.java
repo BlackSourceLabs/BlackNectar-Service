@@ -110,6 +110,10 @@ public final class BlackNectarAssertions
 
         return json ->
         {
+            checkThat(json)
+                    .usingMessage("JsonObject is null")
+                    .is(notNull());
+
             if (!json.has(field))
             {
                 throw new FailedAssertionException("Expecting JSON to have field: " + field);

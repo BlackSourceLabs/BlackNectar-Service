@@ -18,6 +18,7 @@ package tech.blacksource.blacknectar.service;
 
 import java.util.Arrays;
 
+import com.google.gson.JsonObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,8 +31,10 @@ import tech.sirwellington.alchemy.arguments.FailedAssertionException;
 import tech.sirwellington.alchemy.test.junit.runners.*;
 
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 
 /**
@@ -41,6 +44,7 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.*;
 @RunWith(AlchemyTestRunner.class)
 public class BlackNectarAssertionsTest
 {
+
     @Mock
     private StateWebsiteFactory websiteFactory;
 
@@ -131,5 +135,53 @@ public class BlackNectarAssertionsTest
     {
         assertThrows(() -> BlackNectarAssertions.supportedState(null))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void testObjectWithField() throws Exception
+    {
+        String field = normalString;
+        String value = longString;
+
+        AlchemyAssertion<JsonObject> assertion = BlackNectarAssertions.objectWithField(field);
+        assertNotNull(assertion);
+
+        JsonObject object = one(BlackNectarGenerators.jsonObjects());
+        object.addProperty(field, value);
+
+        assertion.check(object);
+    }
+
+    @Test
+    public void testObjectWithFieldWhenDoesNotHaveObject() throws Exception
+    {
+        String field = normalString;
+
+        AlchemyAssertion<JsonObject> assertion = BlackNectarAssertions.objectWithField(field);
+        assertNotNull(assertion);
+
+        JsonObject object = one(BlackNectarGenerators.jsonObjects());
+
+        assertThrows(() -> assertion.check(object)).isInstanceOf(FailedAssertionException.class);
+    }
+
+    @DontRepeat
+    @Test
+    public void testObjectWithFieldWithBadObject() throws Exception
+    {
+        String field = normalString;
+
+        AlchemyAssertion<JsonObject> assertion = BlackNectarAssertions.objectWithField(field);
+        assertNotNull(assertion);
+
+        assertThrows(() -> assertion.check(null)).isInstanceOf(FailedAssertionException.class);
+    }
+
+    @DontRepeat
+    @Test
+    public void testObjectWithFieldWithBadArgs() throws Exception
+    {
+        assertThrows(() -> BlackNectarAssertions.objectWithField("")).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(() -> BlackNectarAssertions.objectWithField(null)).isInstanceOf(IllegalArgumentException.class);
     }
 }

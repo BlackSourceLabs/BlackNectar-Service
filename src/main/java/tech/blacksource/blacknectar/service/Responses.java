@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import spark.Response;
 import tech.blacksource.blacknectar.service.json.OperationResult;
 import tech.sirwellington.alchemy.annotations.access.NonInstantiable;
+import tech.sirwellington.alchemy.annotations.arguments.Optional;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
 /**
@@ -41,7 +42,7 @@ public final class Responses
     /**
      * Use when the client passes a bad argument.
      */
-    public static JsonObject badArgument(String message, @Required Response response)
+    public static JsonObject badArgument(@Optional String message, @Required Response response)
     {
         message = Strings.nullToEmpty(message);
         int statusCode = StatusCodes.BAD_ARGUMENT;

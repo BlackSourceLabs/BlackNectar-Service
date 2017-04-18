@@ -68,7 +68,7 @@ final class FieldValueJson implements AsJson
 
         JsonPrimitive fieldTypeElement = json.getAsJsonPrimitive(Keys.TYPE);
 
-        Field.FieldType fieldType = extractFieldTypeFrom(fieldTypeElement);
+        Field.FieldType fieldType = determineFieldTypeFrom(fieldTypeElement);
 
         return new FieldValueJson(name, value, fieldType);
     }
@@ -124,7 +124,7 @@ final class FieldValueJson implements AsJson
     }
 
 
-    private static Field.FieldType extractFieldTypeFrom(JsonPrimitive fieldTypeElement)
+    private static Field.FieldType determineFieldTypeFrom(JsonPrimitive fieldTypeElement)
     {
         if (fieldTypeElement == null || fieldTypeElement.isJsonNull())
         {

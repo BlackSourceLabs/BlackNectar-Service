@@ -27,7 +27,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
 /**
  * @author SirWellington
  */
-final class StateJson
+final class StateJson implements AsJson
 {
     private final State state;
     private final JsonObject json;
@@ -44,14 +44,14 @@ final class StateJson
     {
         JsonObject object = new JsonObject();
 
-        object.addProperty("id", state.getAbbreviation()
-                                      .name());
-        object.addProperty("name", state.getTitleCased());
+        object.addProperty(Keys.STATE_ID, state.getAbbreviation().name());
+        object.addProperty(Keys.STATE_NAME, state.getTitleCased());
 
         return object;
     }
 
-    JsonObject asJson()
+    @Override
+    public JsonObject asJson()
     {
         return json;
     }
@@ -88,7 +88,12 @@ final class StateJson
     {
         return "StateJson{" +
                 "state=" + state +
-                ", json=" + json +
                 '}';
+    }
+
+    static class Keys
+    {
+        static final String STATE_ID = "id";
+        static final String STATE_NAME = "name";
     }
 }

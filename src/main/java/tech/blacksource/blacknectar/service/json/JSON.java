@@ -19,8 +19,7 @@ package tech.blacksource.blacknectar.service.json;
 import java.util.function.*;
 import java.util.stream.Collector;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
+import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.sirwellington.alchemy.annotations.access.NonInstantiable;
@@ -33,6 +32,10 @@ public final class JSON
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(JSON.class);
+
+    public static final Gson GSON = new GsonBuilder()
+            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            .create();
 
     public static Collector<JsonElement, JsonArray, JsonArray> collectArray()
     {

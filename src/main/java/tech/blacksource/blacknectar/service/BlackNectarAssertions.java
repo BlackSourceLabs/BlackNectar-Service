@@ -18,13 +18,24 @@
 package tech.blacksource.blacknectar.service;
 
 
+import java.util.Set;
+
 import com.google.common.base.Strings;
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sir.wellington.alchemy.collections.sets.Sets;
+import tech.blacksource.blacknectar.ebt.balance.State;
+import tech.blacksource.blacknectar.ebt.balance.StateWebsiteFactory;
 import tech.sirwellington.alchemy.annotations.access.NonInstantiable;
+import tech.sirwellington.alchemy.annotations.arguments.Required;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
+import tech.sirwellington.alchemy.arguments.FailedAssertionException;
+import tech.sirwellington.alchemy.arguments.assertions.StringAssertions;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.*;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+import static tech.sirwellington.alchemy.arguments.assertions.CollectionAssertions.collectionContaining;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.stringWithLengthLessThanOrEqualTo;
 
 /**
@@ -64,6 +75,49 @@ public final class BlackNectarAssertions
             checkThat(arg)
                     .usingMessage("Argument is too long at " + arg.length() + " characters")
                     .is(stringWithLengthLessThanOrEqualTo(MAX_QUERY_PARAMETER_ARGUMENT_LENGTH));
+        };
+    }
+
+    /**
+     * Checks whether a {@link State} is supported by the {@linkplain StateWebsiteFactory websiteFactory} provided.
+     *
+     * @param websiteFactory Cannot be null
+     * @return
+     */
+    public static AlchemyAssertion<State> supportedState(@Required StateWebsiteFactory websiteFactory)
+    {
+        checkThat(websiteFactory).is(notNull());
+
+        return state ->
+        {
+            Set<State> supportedStates = Sets.nullToEmpty(websiteFactory.getSupportedStates());
+
+            checkThat(supportedStates)
+                    .usingMessage("State is unsupported: " + state)
+                    .is(collectionContaining(state));
+        };
+    }
+
+    /**
+     * Checks whether a {@link JsonObject} {@linkplain JsonObject#has(String) has} the specified field
+     *
+     * @param field The field to check.
+     * @return
+     */
+    public static AlchemyAssertion<JsonObject> objectWithField(@Required String field)
+    {
+        checkThat(field).is(StringAssertions.nonEmptyString());
+
+        return json ->
+        {
+            checkThat(json)
+                    .usingMessage("JsonObject is null")
+                    .is(notNull());
+
+            if (!json.has(field))
+            {
+                throw new FailedAssertionException("Expecting JSON to have field: " + field);
+            }
         };
     }
 }

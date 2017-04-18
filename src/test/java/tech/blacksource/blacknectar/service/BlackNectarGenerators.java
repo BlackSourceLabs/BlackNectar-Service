@@ -24,6 +24,8 @@ import java.util.UUID;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.blacksource.blacknectar.ebt.balance.Field;
+import tech.blacksource.blacknectar.ebt.balance.FieldValue;
 import tech.blacksource.blacknectar.service.images.Image;
 import tech.blacksource.blacknectar.service.stores.*;
 import tech.sirwellington.alchemy.generator.AlchemyGenerator;
@@ -32,6 +34,7 @@ import tech.sirwellington.alchemy.generator.StringGenerators;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.BooleanGenerators.booleans;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
+import static tech.sirwellington.alchemy.generator.EnumGenerators.enumValueOf;
 import static tech.sirwellington.alchemy.generator.NetworkGenerators.httpUrls;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.*;
 import static tech.sirwellington.alchemy.generator.StringGenerators.*;
@@ -117,6 +120,29 @@ public class BlackNectarGenerators
             fields.forEach(field -> object.addProperty(field, one(alphanumericString())));
 
             return object;
+        };
+    }
+
+    public static AlchemyGenerator<Field> fields()
+    {
+        return () ->
+        {
+            Field.FieldType type = enumValueOf(Field.FieldType.class).get();
+            String name = one(alphabeticString());
+            String description = one(alphabeticString());
+
+            return new Field(name, type, description);
+        };
+    }
+
+    public static AlchemyGenerator<FieldValue> fieldValues()
+    {
+        return () ->
+        {
+            Field field = one(fields());
+            String value = one(alphabeticString());
+
+            return new FieldValue(field, value);
         };
     }
 }

@@ -33,7 +33,7 @@ import tech.blacksource.blacknectar.service.Responses;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.exceptions.UnsupportedStateException;
 import tech.blacksource.blacknectar.service.json.EBTJsonSerializer;
-import tech.blacksource.blacknectar.service.json.OperationResultJson;
+import tech.blacksource.blacknectar.service.json.OperationResult;
 import tech.blacksource.blacknectar.service.operations.Parameters;
 import tech.sirwellington.alchemy.test.junit.runners.*;
 
@@ -131,7 +131,7 @@ public class SignInOperationTest
     {
         JsonObject response = instance.handle(request, this.response);
 
-        OperationResultJson result = OperationResultJson.fromJson(response);
+        OperationResult result = OperationResult.fromJson(response);
         assertThat(result, notNullValue());
         assertThat(result.isSuccess(), is(true));
         assertThat(result.getStatusCode(), is(Responses.StatusCodes.OK));
@@ -150,7 +150,7 @@ public class SignInOperationTest
                 .thenReturn(false);
 
         JsonObject jsonResponse = instance.handle(request, response);
-        OperationResultJson response = OperationResultJson.fromJson(jsonResponse);
+        OperationResult response = OperationResult.fromJson(jsonResponse);
 
         assertThat(response, notNullValue());
         assertThat(response.isSuccess(), is(false));
@@ -163,7 +163,7 @@ public class SignInOperationTest
                 .thenReturn(Lists.emptyList());
 
         JsonObject jsonReponse = instance.handle(request, this.response);
-        OperationResultJson response = OperationResultJson.fromJson(jsonReponse);
+        OperationResult response = OperationResult.fromJson(jsonReponse);
         assertThat(response, notNullValue());
         assertThat(response.isSuccess(), is(false));
         assertThat(response.getStatusCode(), is(Responses.StatusCodes.BAD_ARGUMENT));

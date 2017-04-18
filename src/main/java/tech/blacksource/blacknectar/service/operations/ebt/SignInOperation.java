@@ -32,7 +32,7 @@ import tech.blacksource.blacknectar.service.data.MediaTypes;
 import tech.blacksource.blacknectar.service.exceptions.BadArgumentException;
 import tech.blacksource.blacknectar.service.exceptions.UnsupportedStateException;
 import tech.blacksource.blacknectar.service.json.EBTJsonSerializer;
-import tech.blacksource.blacknectar.service.json.OperationResultJson;
+import tech.blacksource.blacknectar.service.json.OperationResult;
 import tech.blacksource.blacknectar.service.operations.Parameters;
 
 import static tech.blacksource.blacknectar.service.BlackNectarAssertions.supportedState;
@@ -91,13 +91,13 @@ public class SignInOperation implements Route
             return Responses.badArgument("Field values missing from request", response);
         }
 
-        OperationResultJson result = tryToSignIntoState(state, fieldValues);
+        OperationResult result = tryToSignIntoState(state, fieldValues);
         response.type(MediaTypes.APPLICATION_JSON);
 
         return result.asJson();
     }
 
-    private OperationResultJson tryToSignIntoState(State state, List<FieldValue> fieldValues)
+    private OperationResult tryToSignIntoState(State state, List<FieldValue> fieldValues)
     {
 
         StateWebsite stateWebsite = websiteFactory.getConnectionToState(state);
@@ -109,11 +109,11 @@ public class SignInOperation implements Route
 
         if (isSignedIn)
         {
-            return new OperationResultJson("Successfully signed in", isSignedIn, Responses.StatusCodes.OK);
+            return new OperationResult("Successfully signed in", isSignedIn, Responses.StatusCodes.OK);
         }
         else
         {
-            return new OperationResultJson("Failed to sign in", isSignedIn, Responses.StatusCodes.OK);
+            return new OperationResult("Failed to sign in", isSignedIn, Responses.StatusCodes.OK);
         }
     }
 

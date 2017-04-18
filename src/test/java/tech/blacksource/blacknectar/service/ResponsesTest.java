@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import spark.Response;
-import tech.blacksource.blacknectar.service.json.OperationResultJson;
+import tech.blacksource.blacknectar.service.json.OperationResult;
 import tech.sirwellington.alchemy.test.junit.runners.*;
 
 import static org.mockito.Mockito.verify;
@@ -38,7 +38,7 @@ public class ResponsesTest
     @GenerateString
     private String message;
 
-    private OperationResultJson expected;
+    private OperationResult expected;
 
     @Before
     public void setUp() throws Exception
@@ -54,7 +54,7 @@ public class ResponsesTest
 
     private void setupData()
     {
-        expected = new OperationResultJson(message, false, Responses.StatusCodes.BAD_ARGUMENT);
+        expected = new OperationResult(message, false, Responses.StatusCodes.BAD_ARGUMENT);
     }
 
     private void setupMocks()

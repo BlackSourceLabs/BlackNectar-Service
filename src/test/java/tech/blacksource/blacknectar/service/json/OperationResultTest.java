@@ -31,7 +31,7 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
  */
 @RunWith(AlchemyTestRunner.class)
 @Repeat
-public class OperationResultJsonTest
+public class OperationResultTest
 {
 
     @GenerateString
@@ -43,12 +43,12 @@ public class OperationResultJsonTest
     @GenerateInteger
     private Integer statusCode;
 
-    private OperationResultJson instance;
+    private OperationResult instance;
 
     @Before
     public void setUp() throws Exception
     {
-        instance = new OperationResultJson(message, result, statusCode);
+        instance = new OperationResult(message, result, statusCode);
     }
 
     @Test
@@ -57,9 +57,9 @@ public class OperationResultJsonTest
         JsonObject result = instance.asJson();
         assertThat(result, Matchers.notNullValue());
 
-        String messageResult = result.get(OperationResultJson.Keys.MESSAGE).getAsString();
-        boolean successResult = result.get(OperationResultJson.Keys.SUCCESS).getAsBoolean();
-        int statusCode = result.get(OperationResultJson.Keys.STATUS_CODE).getAsInt();
+        String messageResult = result.get(OperationResult.Keys.MESSAGE).getAsString();
+        boolean successResult = result.get(OperationResult.Keys.SUCCESS).getAsBoolean();
+        int statusCode = result.get(OperationResult.Keys.STATUS_CODE).getAsInt();
 
         assertThat(messageResult, not(isEmptyOrNullString()));
 
@@ -74,11 +74,11 @@ public class OperationResultJsonTest
     {
         JsonObject json = new JsonObject();
 
-        json.addProperty(OperationResultJson.Keys.MESSAGE, message);
-        json.addProperty(OperationResultJson.Keys.SUCCESS, result);
-        json.addProperty(OperationResultJson.Keys.STATUS_CODE, statusCode);
+        json.addProperty(OperationResult.Keys.MESSAGE, message);
+        json.addProperty(OperationResult.Keys.SUCCESS, result);
+        json.addProperty(OperationResult.Keys.STATUS_CODE, statusCode);
 
-        OperationResultJson result = OperationResultJson.fromJson(json);
+        OperationResult result = OperationResult.fromJson(json);
 
         assertThat(result, is(instance));
     }
@@ -87,7 +87,7 @@ public class OperationResultJsonTest
     @Test
     public void testFromJsonWithBadArgs() throws Exception
     {
-        assertThrows(() -> OperationResultJson.fromJson(null));
-        assertThrows(() -> OperationResultJson.fromJson(new JsonObject()));
+        assertThrows(() -> OperationResult.fromJson(null));
+        assertThrows(() -> OperationResult.fromJson(new JsonObject()));
     }
 }

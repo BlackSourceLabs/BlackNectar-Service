@@ -21,7 +21,7 @@ import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Response;
-import tech.blacksource.blacknectar.service.json.OperationResultJson;
+import tech.blacksource.blacknectar.service.json.OperationResult;
 import tech.sirwellington.alchemy.annotations.access.NonInstantiable;
 import tech.sirwellington.alchemy.annotations.arguments.Required;
 
@@ -48,7 +48,7 @@ public final class Responses
 
         response.status(statusCode);
 
-        return new OperationResultJson(message, false, statusCode).asJson();
+        return new OperationResult(message, false, statusCode).asJson();
     }
 
 

@@ -31,16 +31,16 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
 /**
  * @author SirWellington
  */
-public final class OperationResultJson implements AsJson
+public final class OperationResult implements AsJson
 {
-    private final static Logger LOG = LoggerFactory.getLogger(OperationResultJson.class);
+    private final static Logger LOG = LoggerFactory.getLogger(OperationResult.class);
 
     private final String message;
     private final boolean success;
     private final int statusCode;
     private final JsonObject json;
 
-    public static OperationResultJson fromJson(@Required JsonObject object)
+    public static OperationResult fromJson(@Required JsonObject object)
     {
         checkThat(object)
                 .is(notNull())
@@ -52,10 +52,10 @@ public final class OperationResultJson implements AsJson
         boolean success = object.get(Keys.SUCCESS).getAsBoolean();
         int statusCode = object.get(Keys.STATUS_CODE).getAsInt();
 
-        return new OperationResultJson(message, success, statusCode);
+        return new OperationResult(message, success, statusCode);
     }
 
-    public OperationResultJson(@Required String message, boolean success, int statusCode)
+    public OperationResult(@Required String message, boolean success, int statusCode)
     {
         checkThat(message).is(nonEmptyString());
 
@@ -107,7 +107,7 @@ public final class OperationResultJson implements AsJson
         {
             return false;
         }
-        OperationResultJson that = (OperationResultJson) o;
+        OperationResult that = (OperationResult) o;
         return success == that.success &&
                 statusCode == that.statusCode &&
                 Objects.equals(message, that.message);
@@ -122,7 +122,7 @@ public final class OperationResultJson implements AsJson
     @Override
     public String toString()
     {
-        return "OperationResultJson{" +
+        return "OperationResult{" +
                 "message='" + message + '\'' +
                 ", success=" + success +
                 ", statusCode=" + statusCode +

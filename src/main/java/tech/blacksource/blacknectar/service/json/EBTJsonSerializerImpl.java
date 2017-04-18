@@ -18,6 +18,7 @@ package tech.blacksource.blacknectar.service.json;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 import com.google.gson.*;
@@ -161,12 +162,11 @@ final class EBTJsonSerializerImpl implements EBTJsonSerializer
     @Override
     public List<FieldValue> deserializeFieldValues(String json) throws BlackNectarAPIException
     {
-        List<FieldValue> result = Lists.create();
 
         if (Checks.isNullOrEmpty(json))
         {
             makeNoteThatReceivedEmptyString();
-            return result;
+            return Lists.emptyList();
         }
 
         JsonElement jsonElement = tryToParseJson(json);
@@ -174,7 +174,7 @@ final class EBTJsonSerializerImpl implements EBTJsonSerializer
         if (!jsonElement.isJsonArray())
         {
             makeNoteThatJsonIsNotArray(json);
-            return result;
+            return Lists.emptyList();
         }
 
         JsonArray array = jsonElement.getAsJsonArray();
@@ -182,22 +182,27 @@ final class EBTJsonSerializerImpl implements EBTJsonSerializer
         if (array == null || array.size() == 0)
         {
             makeNoteThatArrayOfFieldValueIsEmpty(json);
-            return result;
+            return Lists.emptyList();
         }
 
+        List<FieldValue> result = readFieldValuesFromJsonArray(array);
+
+        return result;
+    }
+
+    private List<FieldValue> readFieldValuesFromJsonArray(JsonArray array)
+    {
         List<JsonElement> elements = Lists.create();
         array.iterator().forEachRemaining(elements::add);
 
-        elements.stream()
-                .filter(JsonElement::isJsonObject)
-                .map(JsonElement::getAsJsonObject)
-                .filter(Objects::nonNull)
-                .map(FieldValueJson::fromJson)
-                .filter(Objects::nonNull)
-                .map(FieldValueJson::toNative)
-                .forEach(result::add);
-
-        return result;
+        return elements.stream()
+                       .filter(JsonElement::isJsonObject)
+                       .map(JsonElement::getAsJsonObject)
+                       .filter(Objects::nonNull)
+                       .map(FieldValueJson::fromJson)
+                       .filter(Objects::nonNull)
+                       .map(FieldValueJson::toNative)
+                       .collect(Collectors.toList());
     }
 
     private JsonElement tryToParseJson(String json)
